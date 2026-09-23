@@ -3,6 +3,7 @@ import { Rubik_Wet_Paint, Fraunces, Inter, JetBrains_Mono } from "next/font/goog
 import "./globals.css";
 import SmoothScrollProvider from "@/components/system/SmoothScrollProvider";
 import Cursor from "@/components/system/Cursor";
+import DiscoveryBadge from "@/components/system/DiscoveryBadge";
 import Navigation from "@/components/nav/Navigation";
 
 const rubikWetPaint = Rubik_Wet_Paint({
@@ -55,6 +56,7 @@ export default function RootLayout({
       <body>
         <SmoothScrollProvider>
           <Cursor />
+          <DiscoveryBadge />
           <Navigation />
           {children}
         </SmoothScrollProvider>

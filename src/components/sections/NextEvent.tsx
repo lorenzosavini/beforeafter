@@ -12,7 +12,7 @@ export default function NextEvent() {
     >
       <ChapterMarker index="02" label="Prossimo capitolo" className="mb-10" />
 
-      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      <div className="grid items-start gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
         <div className="flex flex-col justify-between">
           <SplitLines
             lines={[nextEvent.title, "in arrivo."]}
@@ -43,7 +43,7 @@ export default function NextEvent() {
           </p>
         </div>
 
-        <RevealImage direction="up" className="aspect-[3/4] w-full lg:aspect-auto lg:h-full">
+        <RevealImage direction="up" className="aspect-[3/4] w-full lg:aspect-[4/5]">
           <EventPoster event={nextEvent} className="h-full w-full" cursorLabel="Presto" />
         </RevealImage>
       </div>

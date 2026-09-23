@@ -3,8 +3,9 @@
 import ChapterMarker from "@/components/chapter/ChapterMarker";
 import SplitLines from "@/components/motion/SplitLines";
 import RevealImage from "@/components/motion/RevealImage";
-import GeneratedArtwork from "@/components/media/GeneratedArtwork";
+import GeneratedArtworkGL from "@/components/webgl/GeneratedArtworkGL";
 import { setCursor } from "@/lib/cursor";
+import { markDiscovered } from "@/lib/discovery";
 
 interface Memory {
   seed: number;
@@ -44,10 +45,14 @@ export default function MemoryGallery() {
           >
             <div
               className="relative h-full w-full"
-              onMouseEnter={() => setCursor({ variant: "image" })}
+              onMouseEnter={() => {
+                setCursor({ variant: "image" });
+                markDiscovered(`memory:${i}`);
+              }}
               onMouseLeave={() => setCursor(null)}
+              onTouchStart={() => markDiscovered(`memory:${i}`)}
             >
-              <GeneratedArtwork
+              <GeneratedArtworkGL
                 seed={memory.seed}
                 label=""
                 className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]"

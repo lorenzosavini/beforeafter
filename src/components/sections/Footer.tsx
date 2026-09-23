@@ -1,10 +1,16 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import BeforeAfterLogo from "@/components/logo/BeforeAfterLogo";
 import MagneticElement from "@/components/motion/MagneticElement";
 import { smoothScrollTo } from "@/lib/scroll";
+import { useDiscoveryCount } from "@/lib/hooks/useDiscovery";
+import { DISCOVERY_UNLOCK_THRESHOLD } from "@/lib/discovery";
 
 export default function Footer() {
+  const discovered = useDiscoveryCount();
+  const unlocked = discovered >= DISCOVERY_UNLOCK_THRESHOLD;
+
   return (
     <footer
       id="footer"
@@ -19,6 +25,19 @@ export default function Footer() {
         <p className="font-serif-italic max-w-lg text-2xl leading-snug text-paper/80 sm:text-3xl">
           Il prossimo capitolo è già in scrittura.
         </p>
+
+        <AnimatePresence>
+          {unlocked && (
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="font-mono-label max-w-sm text-flame"
+            >
+              Hai guardato ogni frammento. beforeafter nota chi guarda davvero.
+            </motion.p>
+          )}
+        </AnimatePresence>
 
         <MagneticElement>
           <button

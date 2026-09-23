@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
 import { CURSOR_EVENT, type CursorPayload } from "@/lib/cursor";
 import { useIsFinePointer, useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -26,6 +32,18 @@ export default function Cursor() {
   const springX = useSpring(x, { damping: 30, stiffness: 400, mass: 0.4 });
   const springY = useSpring(y, { damping: 30, stiffness: 400, mass: 0.4 });
 
+  // velocity-driven stretch: fast movement elongates the dot along its
+  // direction of travel; it relaxes back to a circle the moment it stops.
+  const stretch = useMotionValue(0);
+  const angle = useMotionValue(0);
+  const springStretch = useSpring(stretch, {
+    damping: 18,
+    stiffness: 320,
+    mass: 0.5,
+  });
+  const lastPos = useRef<{ x: number; y: number; t: number } | null>(null);
+  const relaxTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (!isFine || reducedMotion) return;
 
@@ -33,6 +51,24 @@ export default function Cursor() {
       x.set(e.clientX);
       y.set(e.clientY);
       setVisible(true);
+
+      const now = performance.now();
+      const last = lastPos.current;
+      if (last) {
+        const dt = Math.max(now - last.t, 1);
+        const dx = e.clientX - last.x;
+        const dy = e.clientY - last.y;
+        const dist = Math.hypot(dx, dy);
+        const velocity = dist / dt;
+        stretch.set(Math.min(velocity * 10, 0.85));
+        if (dist > 0.5) {
+          angle.set((Math.atan2(dy, dx) * 180) / Math.PI);
+        }
+      }
+      lastPos.current = { x: e.clientX, y: e.clientY, t: now };
+
+      if (relaxTimer.current) clearTimeout(relaxTimer.current);
+      relaxTimer.current = setTimeout(() => stretch.set(0), 80);
     };
     const onLeave = () => setVisible(false);
     const onCursorEvent = (e: Event) => {
@@ -48,14 +84,21 @@ export default function Cursor() {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
       window.removeEventListener(CURSOR_EVENT, onCursorEvent);
+      if (relaxTimer.current) clearTimeout(relaxTimer.current);
     };
-  }, [isFine, reducedMotion, x, y]);
-
-  if (!isFine || reducedMotion) return null;
+  }, [isFine, reducedMotion, x, y, stretch, angle]);
 
   const variant = payload?.variant ?? "default";
   const label = payload?.label ?? LABELS[variant];
   const isActive = variant !== "default";
+
+  const scaleX = useTransform(springStretch, (v) => 1 + (isActive ? 0 : v));
+  const scaleY = useTransform(springStretch, (v) =>
+    Math.max(1 - (isActive ? 0 : v * 0.5), 0.4)
+  );
+  const counterRotate = useTransform(angle, (a) => -a);
+
+  if (!isFine || reducedMotion) return null;
 
   return (
     <motion.div
@@ -71,6 +114,7 @@ export default function Cursor() {
     >
       <motion.div
         className="flex items-center justify-center rounded-full bg-paper"
+        style={{ rotate: angle, scaleX, scaleY }}
         animate={{
           width: isActive ? 84 : 8,
           height: isActive ? 84 : 8,
@@ -86,6 +130,7 @@ export default function Cursor() {
               exit={{ opacity: 0, scale: 0.6 }}
               transition={{ duration: 0.2 }}
               className="font-mono-label text-ink"
+              style={{ rotate: counterRotate }}
             >
               {label}
             </motion.span>

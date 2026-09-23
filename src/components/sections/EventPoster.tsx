@@ -2,8 +2,9 @@
 
 import { useRef, type MouseEvent } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import GeneratedArtwork from "@/components/media/GeneratedArtwork";
+import GeneratedArtworkGL from "@/components/webgl/GeneratedArtworkGL";
 import { setCursor } from "@/lib/cursor";
+import { markDiscovered } from "@/lib/discovery";
 import { useIsFinePointer, useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import type { EventRecord } from "@/lib/data/events";
 
@@ -51,15 +52,17 @@ export default function EventPoster({
       style={{ perspective: 1400 }}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      onMouseEnter={() =>
-        setCursor({ variant: "event", label: cursorLabel ?? event.edition })
-      }
+      onMouseEnter={() => {
+        setCursor({ variant: "event", label: cursorLabel ?? event.edition });
+        markDiscovered(`next:${event.slug}`);
+      }}
+      onTouchStart={() => markDiscovered(`next:${event.slug}`)}
     >
       <motion.div
         style={{ rotateX: springX, rotateY: springY }}
         className="h-full w-full will-change-transform"
       >
-        <GeneratedArtwork
+        <GeneratedArtworkGL
           seed={event.seed}
           label={event.edition}
           className="h-full w-full"

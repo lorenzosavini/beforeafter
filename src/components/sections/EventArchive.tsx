@@ -2,8 +2,9 @@
 
 import ChapterMarker from "@/components/chapter/ChapterMarker";
 import SplitLines from "@/components/motion/SplitLines";
-import GeneratedArtwork from "@/components/media/GeneratedArtwork";
+import GeneratedArtworkGL from "@/components/webgl/GeneratedArtworkGL";
 import { setCursor } from "@/lib/cursor";
+import { markDiscovered } from "@/lib/discovery";
 import { archiveEvents } from "@/lib/data/events";
 
 export default function EventArchive() {
@@ -30,13 +31,15 @@ export default function EventArchive() {
             key={event.slug}
             href="#footer"
             className="group flex w-[72vw] shrink-0 snap-start flex-col gap-4 sm:w-[34vw] lg:w-[22vw]"
-            onMouseEnter={() =>
-              setCursor({ variant: "view", label: "Presto" })
-            }
+            onMouseEnter={() => {
+              setCursor({ variant: "view", label: "Presto" });
+              markDiscovered(`archive:${event.slug}`);
+            }}
             onMouseLeave={() => setCursor(null)}
+            onTouchStart={() => markDiscovered(`archive:${event.slug}`)}
           >
             <div className="aspect-[3/4] overflow-hidden">
-              <GeneratedArtwork
+              <GeneratedArtworkGL
                 seed={event.seed}
                 label={event.edition}
                 className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]"
