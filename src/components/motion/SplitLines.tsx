@@ -34,7 +34,7 @@ export default function SplitLines({
       {lines.map((line, i) => (
         <span key={i} className={clsx("reveal-line", lineClassName)}>
           <motion.span
-            className="inline-block will-change-transform"
+            className="block w-full will-change-transform"
             initial={{ y: "110%" }}
             animate={inView ? { y: "0%" } : { y: "110%" }}
             transition={{

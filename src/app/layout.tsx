@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import { Rubik_Wet_Paint, Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/system/SmoothScrollProvider";
 import Cursor from "@/components/system/Cursor";
 import Navigation from "@/components/nav/Navigation";
 
-const anton = Anton({
-  variable: "--font-anton",
+const rubikWetPaint = Rubik_Wet_Paint({
+  variable: "--font-rubik-wet-paint",
   subsets: ["latin"],
   weight: "400",
   display: "swap",
@@ -50,7 +50,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${rubikWetPaint.variable} ${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         <SmoothScrollProvider>

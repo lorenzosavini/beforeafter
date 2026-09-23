@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import BeforeAfterLogoReveal from "@/components/logo/BeforeAfterLogoReveal";
+import SplitLines from "@/components/motion/SplitLines";
 import { smoothScrollTo } from "@/lib/scroll";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function Hero() {
   const [settled, setSettled] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSettled(true), 1150);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <section
@@ -19,40 +24,30 @@ export default function Hero() {
         className="font-mono-label flex items-center justify-between text-ink-soft"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1.6 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
       >
         <span>Roma · Milano · Napoli</span>
         <span>Est. 2024</span>
       </motion.div>
 
       <div className="flex-1 flex flex-col justify-center">
-        <BeforeAfterLogoReveal
-          className="w-[92vw] text-ink sm:w-[70vw] lg:w-[58vw]"
-          onSettled={() => setSettled(true)}
+        <SplitLines
+          lines={["L'esperienza inizia prima.", "Continua dopo."]}
+          className="font-display text-[13vw] leading-[0.92] text-flame sm:text-[9vw] lg:text-[7vw]"
+          stagger={0.12}
+          delay={0.1}
         />
 
-        <div className="mt-8 max-w-xl sm:mt-10">
-          <span className="reveal-line block">
-            <motion.span
-              className="font-serif-italic block text-2xl leading-tight text-ink-soft sm:text-3xl"
-              initial={{ y: "100%" }}
-              animate={settled ? { y: "0%" } : { y: "100%" }}
-              transition={{ duration: 0.8, ease: EASE }}
-            >
-              Un collettivo di eventi ed esperienze notturne.
-            </motion.span>
-          </span>
-          <span className="reveal-line mt-1 block">
-            <motion.span
-              className="font-serif-italic block text-2xl leading-tight text-ink-soft sm:text-3xl"
-              initial={{ y: "100%" }}
-              animate={settled ? { y: "0%" } : { y: "100%" }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.08 }}
-            >
-              L&apos;esperienza inizia prima. Continua dopo.
-            </motion.span>
-          </span>
-        </div>
+        <span className="reveal-line mt-8 block sm:mt-10">
+          <motion.span
+            className="font-serif-italic block max-w-xl text-2xl leading-tight text-ink-soft sm:text-3xl"
+            initial={{ y: "100%" }}
+            animate={settled ? { y: "0%" } : { y: "100%" }}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
+          >
+            Un collettivo di eventi ed esperienze notturne.
+          </motion.span>
+        </span>
       </div>
 
       <motion.button
