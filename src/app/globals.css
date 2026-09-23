@@ -2,8 +2,9 @@
 
 /* ============================================================
    beforeafter — design tokens
-   Palette: PAPER (day / before) <-> NIGHT (after / event)
-   Single accent used sparingly: FLAME
+   Palette: black / cream / chrome, warmed only by photography —
+   matches the client's real event materials (tickets, merch, signage).
+   Accent (--flame token, now a warm champagne gold) used sparingly.
    ============================================================ */
 
 :root {
@@ -15,13 +16,16 @@
   --night-soft: #1c1a17;
   --night-line: #33302a;
   --paper-line: #cfc9b8;
-  --flame: #ff3d1f;
-  --flame-dim: #c72e14;
+  --flame: #c9a876;
+  --flame-dim: #9c7f4d;
+  --chrome-light: #eef0f2;
+  --chrome-mid: #9aa0a6;
+  --chrome-dark: #35383d;
 
-  --font-display: var(--font-rubik-wet-paint);
+  --font-display: var(--font-jost);
   --font-serif: var(--font-fraunces);
   --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains);
+  --font-mono: var(--font-jost);
 
   /* motion */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -45,6 +49,9 @@
   --color-paper-line: var(--paper-line);
   --color-flame: var(--flame);
   --color-flame-dim: var(--flame-dim);
+  --color-chrome-light: var(--chrome-light);
+  --color-chrome-mid: var(--chrome-mid);
+  --color-chrome-dark: var(--chrome-dark);
 
   --font-display: var(--font-display);
   --font-serif: var(--font-serif);
@@ -57,13 +64,13 @@
 }
 
 html {
-  background: var(--paper);
+  background: var(--night);
   scroll-behavior: auto;
 }
 
 body {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--night);
+  color: var(--paper);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
@@ -71,7 +78,7 @@ body {
 
 ::selection {
   background: var(--flame);
-  color: var(--paper);
+  color: var(--night);
 }
 
 a {
@@ -84,9 +91,9 @@ button {
 
 .font-display {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 300;
   text-transform: uppercase;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
 }
 
 .font-serif-italic {
@@ -97,8 +104,9 @@ button {
 
 .font-mono-label {
   font-family: var(--font-mono);
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   font-size: 0.72rem;
 }
 
@@ -138,6 +146,6 @@ button {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--ink-soft);
+  background: var(--paper);
   opacity: 0.3;
 }

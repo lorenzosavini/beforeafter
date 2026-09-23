@@ -8,13 +8,13 @@ interface GeneratedArtworkProps {
 }
 
 const GRADIENTS = [
-  "radial-gradient(120% 120% at 15% 10%, #ff3d1f 0%, transparent 55%), radial-gradient(120% 120% at 85% 90%, #0d0c0b 0%, transparent 60%)",
-  "radial-gradient(110% 140% at 80% 15%, #ff6a45 0%, transparent 50%), linear-gradient(200deg, #0d0c0b 0%, #33302a 100%)",
-  "conic-gradient(from 200deg at 50% 50%, #0d0c0b, #33302a, #ff3d1f, #0d0c0b)",
-  "radial-gradient(140% 100% at 20% 100%, #c72e14 0%, transparent 55%), radial-gradient(100% 100% at 90% 0%, #1c1a17 0%, transparent 60%)",
-  "linear-gradient(160deg, #1c1a17 0%, #0d0c0b 45%, #ff3d1f 130%)",
+  "radial-gradient(120% 120% at 15% 10%, #c9a876 0%, transparent 55%), radial-gradient(120% 120% at 85% 90%, #0d0c0b 0%, transparent 60%)",
+  "radial-gradient(110% 140% at 80% 15%, #d9bd8f 0%, transparent 50%), linear-gradient(200deg, #0d0c0b 0%, #33302a 100%)",
+  "conic-gradient(from 200deg at 50% 50%, #0d0c0b, #33302a, #c9a876, #0d0c0b)",
+  "radial-gradient(140% 100% at 20% 100%, #9c7f4d 0%, transparent 55%), radial-gradient(100% 100% at 90% 0%, #1c1a17 0%, transparent 60%)",
+  "linear-gradient(160deg, #1c1a17 0%, #0d0c0b 45%, #9c7f4d 130%)",
   "radial-gradient(100% 100% at 50% 0%, #33302a 0%, #0d0c0b 60%)",
-  "radial-gradient(130% 90% at 90% 100%, #ff3d1f 0%, transparent 50%), linear-gradient(210deg, #0d0c0b, #1c1a17)",
+  "radial-gradient(130% 90% at 90% 100%, #c9a876 0%, transparent 50%), linear-gradient(210deg, #0d0c0b, #1c1a17)",
 ];
 
 /**

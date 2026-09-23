@@ -53,7 +53,7 @@ export default function Footer() {
         </MagneticElement>
       </div>
 
-      <BeforeAfterLogo className="w-[92vw] h-auto text-flame sm:w-[48vw]" />
+      <BeforeAfterLogo className="w-[92vw] h-auto sm:w-[48vw]" />
 
       <div className="font-mono-label mt-10 flex flex-col gap-2 border-t border-paper/15 pt-6 text-paper/50 sm:mt-14 sm:flex-row sm:items-center sm:justify-between">
         <span>hello@beforeafter.it</span>

@@ -17,8 +17,8 @@ interface GeneratedArtworkGLProps {
   toneClassName?: string;
 }
 
-const FLAME = ["#ff3d1f", "#c72e14"];
-const DARK = ["#33302a", "#1c1a17"];
+const GOLD = ["#c9a876", "#9c7f4d"];
+const CHROME = ["#4a4d52", "#1c1a17"];
 
 function seededRandom(seed: number) {
   let s = (seed + 1) * 9301 + 49297;
@@ -45,8 +45,8 @@ function ArtworkPlane({ seed, interactive }: PlaneProps) {
   const uniforms = useMemo(() => {
     const rand = seededRandom(seed);
     return {
-      colorA: new THREE.Color(FLAME[seed % FLAME.length]),
-      colorB: new THREE.Color(DARK[seed % DARK.length]),
+      colorA: new THREE.Color(GOLD[seed % GOLD.length]),
+      colorB: new THREE.Color(CHROME[seed % CHROME.length]),
       centerA: new THREE.Vector2(0.15 + rand() * 0.45, 0.15 + rand() * 0.7),
       centerB: new THREE.Vector2(0.4 + rand() * 0.5, 0.2 + rand() * 0.6),
       radiusA: 0.45 + rand() * 0.35,

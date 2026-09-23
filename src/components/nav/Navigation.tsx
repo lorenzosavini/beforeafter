@@ -54,7 +54,7 @@ export default function Navigation() {
             onMouseEnter={() => setCursor({ variant: "next", label: "Home" })}
             onMouseLeave={() => setCursor(null)}
           >
-            <BeforeAfterLogo className="h-6 w-auto sm:h-7" />
+            <BeforeAfterLogo variant="solid" className="h-6 w-auto sm:h-7" />
           </Link>
 
           <nav className="hidden items-center gap-8 font-mono-label md:flex">

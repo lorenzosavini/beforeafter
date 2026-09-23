@@ -1,15 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Rubik_Wet_Paint, Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import { Jost, Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/system/SmoothScrollProvider";
 import Cursor from "@/components/system/Cursor";
 import DiscoveryBadge from "@/components/system/DiscoveryBadge";
 import Navigation from "@/components/nav/Navigation";
 
-const rubikWetPaint = Rubik_Wet_Paint({
-  variable: "--font-rubik-wet-paint",
+const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["300", "400", "500"],
   display: "swap",
 });
 
@@ -28,13 +28,6 @@ const inter = Inter({
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "beforeafter",
   description:
@@ -42,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0c0b",
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({
@@ -51,7 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${rubikWetPaint.variable} ${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${jost.variable} ${fraunces.variable} ${inter.variable}`}
     >
       <body>
         <SmoothScrollProvider>

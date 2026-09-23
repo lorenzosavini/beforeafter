@@ -32,13 +32,13 @@ export default function DiscoveryBadge() {
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className={unlocked ? "text-flame" : "text-ink-soft mix-blend-difference"}
+            className={unlocked ? "text-flame" : "text-paper/60"}
           >
             {unlocked
               ? "hai visto tutto"
               : `scoperti ${count}/${DISCOVERY_TOTAL}`}
           </motion.span>
-          <span className="block h-px w-16 overflow-hidden bg-ink-soft/20 mix-blend-difference">
+          <span className="block h-px w-16 overflow-hidden bg-paper/20">
             <motion.span
               className="block h-full bg-flame"
               initial={{ scaleX: 0 }}
