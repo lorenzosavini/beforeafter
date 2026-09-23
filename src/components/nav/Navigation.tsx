@@ -51,11 +51,10 @@ export default function Navigation() {
           <Link
             href="/"
             onClick={handleNavClick("#top")}
-            className="text-lg sm:text-xl"
             onMouseEnter={() => setCursor({ variant: "next", label: "Home" })}
             onMouseLeave={() => setCursor(null)}
           >
-            <BeforeAfterLogo panelClassName="bg-white text-ink" />
+            <BeforeAfterLogo className="h-6 w-auto sm:h-7" />
           </Link>
 
           <nav className="hidden items-center gap-8 font-mono-label md:flex">

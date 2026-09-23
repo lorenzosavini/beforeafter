@@ -27,7 +27,7 @@ export default function Hero() {
 
       <div className="flex-1 flex flex-col justify-center">
         <BeforeAfterLogoReveal
-          className="text-[13.5vw] sm:text-[10vw] lg:text-[8.5vw]"
+          className="w-[92vw] text-ink sm:w-[70vw] lg:w-[58vw]"
           onSettled={() => setSettled(true)}
         />
 

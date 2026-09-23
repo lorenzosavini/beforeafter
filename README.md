@@ -9,7 +9,7 @@ npm run dev
 
 ## Structure
 
-- `src/components/logo` — the `BeforeAfterLogo` wordmark system. It's a **placeholder** built from real typography (not a raster fake), designed as the single point of integration: every consumer renders `<BeforeAfterLogo />` rather than raw text, so dropping in the official vector logo later is a one-file change.
+- `src/components/logo` — the official mark. `BeforeAfterMark` inlines the real vector logo (`public/brand/beforeafter-logo.svg`, hand-lettered "BE4FTER" wordmark) with `fill="currentColor"` so it themes via CSS and stays available for path-level animation. `BeforeAfterLogo` (static) and `BeforeAfterLogoReveal` (hero entrance wipe) both render it — every consumer goes through these two rather than touching the SVG directly.
 - `src/components/motion` — reusable motion primitives (`SplitLines`, `AnimatedWords`, `RevealImage`, `MagneticElement`) that implement the site's entrance/reveal vocabulary. All triggers are scroll- or pointer-driven and settle to a stable state — no ambient infinite-loop animation.
 - `src/components/system` — cross-cutting runtime: `SmoothScrollProvider` (Lenis, disabled under `prefers-reduced-motion` and on coarse/touch pointers) and `Cursor` (contextual desktop-only cursor, disabled on touch/reduced motion).
 - `src/components/sections` — the homepage chapters (`Hero`, `NextEvent`, `MemoryGallery`, `EventArchive`, `Manifesto`, `Footer`), each owning its own background tone as the page moves from day (paper) to night and back.
@@ -18,5 +18,4 @@ npm run dev
 
 ## Notes
 
-- No official vector logo was available at build time — `BeforeAfterLogo` is a clearly-scoped placeholder, not a redesign of a real mark.
 - All content in `src/lib/data` is placeholder/structural, not real event information.
