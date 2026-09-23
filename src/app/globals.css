@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/* ============================================================
+   beforeafter — design tokens
+   Palette: PAPER (day / before) <-> NIGHT (after / event)
+   Single accent used sparingly: FLAME
+   ============================================================ */
+
+:root {
+  --paper: #f2efe8;
+  --paper-dim: #e7e2d6;
+  --ink: #0d0c0b;
+  --ink-soft: #46433d;
+  --night: #0a0a0a;
+  --night-soft: #1c1a17;
+  --night-line: #33302a;
+  --paper-line: #cfc9b8;
+  --flame: #ff3d1f;
+  --flame-dim: #c72e14;
+
+  --font-display: var(--font-anton);
+  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+
+  /* motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out-circ: cubic-bezier(0.08, 0.82, 0.17, 1);
+  --dur-fast: 0.32s;
+  --dur-base: 0.65s;
+  --dur-slow: 1.05s;
+  --dur-cinematic: 1.7s;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-night: var(--night);
+  --color-night-soft: var(--night-soft);
+  --color-night-line: var(--night-line);
+  --color-paper-line: var(--paper-line);
+  --color-flame: var(--flame);
+  --color-flame-dim: var(--flame-dim);
+
+  --font-display: var(--font-display);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--flame);
+  color: var(--paper);
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.font-serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-optical-sizing: auto;
+}
+
+.font-mono-label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+}
+
+/* line-mask reveal primitive: parent has overflow hidden */
+.reveal-line {
+  overflow: hidden;
+  display: block;
+}
+
+/* custom cursor: hide native cursor only when our cursor is active */
+.cursor-none-when-active {
+  cursor: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hairline rule used across editorial layouts */
+.hairline {
+  border-color: currentColor;
+  opacity: 0.18;
+}
+
+/* Scrollbar: keep minimal, brand-neutral */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-soft);
+  opacity: 0.3;
+}
