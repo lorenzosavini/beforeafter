@@ -235,26 +235,31 @@ export async function setCoverImageFromUrl(
   return events[idx];
 }
 
-/** Records a gallery photo already uploaded directly to storage by the
- * client (bypasses the serverless function's request-body size cap). */
-export async function addGalleryPhotoFromUrl(
+/** Records gallery photos already uploaded directly to storage by the
+ * client (bypasses the serverless function's request-body size cap).
+ * Takes the whole batch from one bulk upload in a single read-modify-write:
+ * the store is one shared JSON document with no locking, so doing N
+ * separate writes in quick succession (one per photo) risks each one
+ * reading a snapshot that doesn't yet include the previous write and
+ * silently clobbering it on save. */
+export async function addGalleryPhotosFromUrls(
   eventId: string,
-  photo: { url: string; filename: string }
+  photos: { url: string; filename: string }[]
 ): Promise<EventRecord> {
   const events = await readAll();
   const idx = events.findIndex((e) => e.id === eventId);
   if (idx === -1) throw new Error("Event not found");
 
-  const uploaded: GalleryPhoto = {
+  const uploaded: GalleryPhoto[] = photos.map((photo) => ({
     id: id(),
     url: photo.url,
     filename: photo.filename,
     uploadedAt: new Date().toISOString(),
-  };
+  }));
 
   events[idx] = {
     ...events[idx],
-    gallery: [...events[idx].gallery, uploaded],
+    gallery: [...events[idx].gallery, ...uploaded],
     updatedAt: new Date().toISOString(),
   };
   await writeAll(events);

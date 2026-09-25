@@ -33,25 +33,21 @@ export default function GalleryManager({
     if (usingBlobStorage) {
       // One direct-to-Blob upload per file, from the browser, so a large
       // batch never has to fit inside a single serverless function's
-      // request-body cap — and a failure partway through keeps whatever
-      // already succeeded instead of losing the whole batch.
+      // request-body cap. The uploads themselves don't touch the events
+      // store, so they're safe to do one at a time with no race — only
+      // the final registration step below writes to it, and it does so
+      // ONCE for the whole batch (see addGalleryPhotosFromUrls: doing N
+      // separate read-modify-writes in quick succession would let a
+      // later one silently clobber an earlier one before it's settled).
       setProgress({ done: 0, total: files.length });
-      let currentGallery = photos;
+      const uploaded: { url: string; filename: string }[] = [];
       for (const file of files) {
         try {
           const blob = await upload(`gallery/${eventId}/${file.name}`, file, {
             access: "public",
             handleUploadUrl: "/api/admin/blob-upload",
           });
-          const res = await fetch(`/api/admin/events/${eventId}/gallery`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: blob.url, filename: file.name }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error ?? "Errore nel caricamento");
-          currentGallery = data.event.gallery;
-          onChange(currentGallery);
+          uploaded.push({ url: blob.url, filename: file.name });
         } catch (err) {
           setError(
             `${file.name}: ${err instanceof Error ? err.message : "errore nel caricamento"}`
@@ -59,6 +55,21 @@ export default function GalleryManager({
         }
         setProgress((p) => (p ? { ...p, done: p.done + 1 } : p));
       }
+
+      if (uploaded.length > 0) {
+        const res = await fetch(`/api/admin/events/${eventId}/gallery`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ photos: uploaded }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error ?? "Errore nel salvataggio");
+        } else {
+          onChange(data.event.gallery);
+        }
+      }
+
       setProgress(null);
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
