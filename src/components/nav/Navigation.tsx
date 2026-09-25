@@ -9,7 +9,7 @@ import { setCursor } from "@/lib/cursor";
 import { smoothScrollTo } from "@/lib/scroll";
 
 const LINKS = [
-  { label: "Eventi", href: "#archive" },
+  { label: "Eventi", href: "/eventi" },
   { label: "Memorie", href: "#memories" },
   { label: "Chi siamo", href: "#manifesto" },
   { label: "Contatti", href: "#footer" },
@@ -39,9 +39,12 @@ export default function Navigation() {
 
   const handleNavClick =
     (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault();
       setMenuOpen(false);
-      smoothScrollTo(href, 0);
+      if (href.startsWith("#")) {
+        e.preventDefault();
+        smoothScrollTo(href, 0);
+      }
+      // Real page links (e.g. /eventi) navigate normally.
     };
 
   return (

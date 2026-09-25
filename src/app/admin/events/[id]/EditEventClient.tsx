@@ -40,6 +40,15 @@ export default function EditEventClient({
 
   return (
     <div className="flex flex-col gap-14">
+      <a
+        href={`/eventi/${event.slug}`}
+        target="_blank"
+        rel="noreferrer"
+        className="font-mono-label w-fit text-flame hover:underline"
+      >
+        Vedi scheda pubblica dell&apos;evento →
+      </a>
+
       <EventForm
         submitLabel="Salva modifiche"
         initial={event}
@@ -63,16 +72,6 @@ export default function EditEventClient({
           usingBlobStorage={usingBlobStorage}
           onChange={(gallery) => setEvent((e) => ({ ...e, gallery }))}
         />
-        {event.gallery.length > 0 && (
-          <a
-            href={`/memorie/${event.slug}`}
-            target="_blank"
-            rel="noreferrer"
-            className="font-mono-label w-fit text-flame hover:underline"
-          >
-            Vedi pagina pubblica della gallery →
-          </a>
-        )}
       </div>
 
       <button

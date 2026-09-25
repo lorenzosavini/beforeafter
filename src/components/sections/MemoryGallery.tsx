@@ -20,7 +20,7 @@ export default async function MemoryGallery() {
       event.gallery.map((photo) => ({
         photoUrl: photo.url,
         caption: `${event.title} — ${event.city}`,
-        href: `/memorie/${event.slug}`,
+        href: `/eventi/${event.slug}`,
       }))
     )
     .slice(0, 6);
