@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 import EditEventClient from "@/app/admin/events/[id]/EditEventClient";
 import { getEventById } from "@/lib/store/events";
+import { usingBlobStorage } from "@/lib/store/backend";
 
 export default async function EditEventPage({
   params,
@@ -14,7 +15,7 @@ export default async function EditEventPage({
 
   return (
     <AdminShell title={event.title}>
-      <EditEventClient event={event} />
+      <EditEventClient event={event} usingBlobStorage={usingBlobStorage} />
     </AdminShell>
   );
 }

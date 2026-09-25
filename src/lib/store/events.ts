@@ -212,6 +212,55 @@ export async function setCoverImage(
   return events[idx];
 }
 
+/** Records a cover image already uploaded directly to storage by the client
+ * (bypasses the serverless function's request-body size cap). */
+export async function setCoverImageFromUrl(
+  eventId: string,
+  url: string
+): Promise<EventRecord> {
+  const events = await readAll();
+  const idx = events.findIndex((e) => e.id === eventId);
+  if (idx === -1) throw new Error("Event not found");
+
+  if (events[idx].coverImageUrl) {
+    await deleteFile(events[idx].coverImageUrl!).catch(() => {});
+  }
+
+  events[idx] = {
+    ...events[idx],
+    coverImageUrl: url,
+    updatedAt: new Date().toISOString(),
+  };
+  await writeAll(events);
+  return events[idx];
+}
+
+/** Records a gallery photo already uploaded directly to storage by the
+ * client (bypasses the serverless function's request-body size cap). */
+export async function addGalleryPhotoFromUrl(
+  eventId: string,
+  photo: { url: string; filename: string }
+): Promise<EventRecord> {
+  const events = await readAll();
+  const idx = events.findIndex((e) => e.id === eventId);
+  if (idx === -1) throw new Error("Event not found");
+
+  const uploaded: GalleryPhoto = {
+    id: id(),
+    url: photo.url,
+    filename: photo.filename,
+    uploadedAt: new Date().toISOString(),
+  };
+
+  events[idx] = {
+    ...events[idx],
+    gallery: [...events[idx].gallery, uploaded],
+    updatedAt: new Date().toISOString(),
+  };
+  await writeAll(events);
+  return events[idx];
+}
+
 export async function addGalleryPhotos(
   eventId: string,
   files: { buffer: Buffer; filename: string; contentType: string }[]

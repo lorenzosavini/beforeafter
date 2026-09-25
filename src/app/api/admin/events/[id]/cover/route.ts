@@ -1,13 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { setCoverImage } from "@/lib/store/events";
+import { setCoverImage, setCoverImageFromUrl } from "@/lib/store/events";
 
-const MAX_SIZE = 8 * 1024 * 1024; // 8MB
+const MAX_SIZE = 8 * 1024 * 1024; // 8MB — only applies to the local-dev relay path below
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // Client already uploaded directly to Blob storage (production path) —
+  // just record the resulting URL.
+  if (req.headers.get("content-type")?.includes("application/json")) {
+    const { url } = (await req.json()) as { url?: string };
+    if (!url) {
+      return NextResponse.json({ error: "URL mancante" }, { status: 400 });
+    }
+    try {
+      const event = await setCoverImageFromUrl(id, url);
+      return NextResponse.json({ event });
+    } catch {
+      return NextResponse.json({ error: "Evento non trovato" }, { status: 404 });
+    }
+  }
+
   const form = await req.formData();
   const file = form.get("file");
 

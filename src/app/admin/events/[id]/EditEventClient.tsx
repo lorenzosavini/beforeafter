@@ -9,8 +9,10 @@ import type { EventRecord } from "@/lib/store/events";
 
 export default function EditEventClient({
   event: initialEvent,
+  usingBlobStorage,
 }: {
   event: EventRecord;
+  usingBlobStorage: boolean;
 }) {
   const router = useRouter();
   const [event, setEvent] = useState(initialEvent);
@@ -47,6 +49,7 @@ export default function EditEventClient({
       <CoverUploader
         eventId={event.id}
         coverImageUrl={event.coverImageUrl}
+        usingBlobStorage={usingBlobStorage}
         onUploaded={(url) => setEvent((e) => ({ ...e, coverImageUrl: url }))}
       />
 
@@ -57,6 +60,7 @@ export default function EditEventClient({
         <GalleryManager
           eventId={event.id}
           photos={event.gallery}
+          usingBlobStorage={usingBlobStorage}
           onChange={(gallery) => setEvent((e) => ({ ...e, gallery }))}
         />
         {event.gallery.length > 0 && (

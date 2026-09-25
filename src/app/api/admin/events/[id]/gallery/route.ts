@@ -1,14 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addGalleryPhotos } from "@/lib/store/events";
+import { addGalleryPhotos, addGalleryPhotoFromUrl } from "@/lib/store/events";
 
-const MAX_SIZE = 12 * 1024 * 1024; // 12MB per photo
-const MAX_FILES = 40; // per request
+const MAX_SIZE = 12 * 1024 * 1024; // 12MB per photo — only applies to the local-dev relay path below
+const MAX_FILES = 40; // per request — only applies to the local-dev relay path below
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // Client already uploaded directly to Blob storage (production path),
+  // one file at a time — just record the resulting URL.
+  if (req.headers.get("content-type")?.includes("application/json")) {
+    const { url, filename } = (await req.json()) as {
+      url?: string;
+      filename?: string;
+    };
+    if (!url || !filename) {
+      return NextResponse.json({ error: "Dati mancanti" }, { status: 400 });
+    }
+    try {
+      const event = await addGalleryPhotoFromUrl(id, { url, filename });
+      return NextResponse.json({ event });
+    } catch {
+      return NextResponse.json({ error: "Evento non trovato" }, { status: 404 });
+    }
+  }
+
   const form = await req.formData();
   const entries = form.getAll("files").filter((f): f is File => f instanceof File);
 
