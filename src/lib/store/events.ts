@@ -1,6 +1,6 @@
 import { readJSON, writeJSON, uploadFile, deleteFile } from "@/lib/store/backend";
 
-const EVENTS_KEY = "data/events.json";
+const EVENTS_KEY = "data/events";
 
 export interface GalleryPhoto {
   id: string;

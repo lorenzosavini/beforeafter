@@ -4,12 +4,21 @@ import { list } from "@vercel/blob";
 export const dynamic = "force-dynamic";
 
 /** TEMPORARY diagnostic route — inspects raw blob metadata for the events
- * document to debug a write-persistence issue. Remove after use. */
+ * document (new versioned scheme + legacy fixed path) to debug a
+ * write-persistence issue. Remove after use. */
 export async function GET() {
-  const { blobs } = await list({ prefix: "data/events.json" });
+  const [versioned, legacy] = await Promise.all([
+    list({ prefix: "data/events/" }),
+    list({ prefix: "data/events.json" }),
+  ]);
   return NextResponse.json({
-    count: blobs.length,
-    blobs: blobs.map((b) => ({
+    versioned: versioned.blobs.map((b) => ({
+      pathname: b.pathname,
+      url: b.url,
+      size: b.size,
+      uploadedAt: b.uploadedAt,
+    })),
+    legacy: legacy.blobs.map((b) => ({
       pathname: b.pathname,
       url: b.url,
       size: b.size,

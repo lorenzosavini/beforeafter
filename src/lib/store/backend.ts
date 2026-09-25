@@ -9,19 +9,42 @@ async function ensureLocalDir(filePath: string) {
   await mkdir(path.dirname(filePath), { recursive: true });
 }
 
-/** Reads a JSON document by its logical key. Returns null if it doesn't exist yet. */
+function parseVersionTimestamp(pathname: string): number {
+  const filename = pathname.split("/").pop() ?? "";
+  return Number(filename.split("-")[0]) || 0;
+}
+
+/**
+ * Reads a JSON document by its logical key. Returns null if it doesn't
+ * exist yet.
+ *
+ * Each write creates a brand-new, never-before-fetched blob rather than
+ * overwriting one fixed URL — see writeJSON for why. list() metadata
+ * (verified via direct testing: size/uploadedAt update instantly on every
+ * write) finds the newest version reliably; a fixed overwritten URL's
+ * *content*, by contrast, was observed staying stale for 20+ seconds after
+ * a write, apparently cached at a layer that ignores cache-control and
+ * cache-busting query strings.
+ */
 export async function readJSON<T>(key: string): Promise<T | null> {
   if (hasBlob) {
-    const { blobs } = await list({ prefix: key, limit: 1 });
-    const blob = blobs.find((b) => b.pathname === key);
-    if (!blob) return null;
-    // Blob content is served through a CDN with a long default cache
-    // lifetime, and an `allowOverwrite` write does not purge it — so a
-    // plain fetch right after a write can silently return stale data
-    // (verified: still stale 20+ seconds later). A unique query string
-    // forces a cache-key miss and a fresh fetch from origin every time.
-    const freshUrl = `${blob.url}${blob.url.includes("?") ? "&" : "?"}cb=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const res = await fetch(freshUrl, { cache: "no-store" });
+    const { blobs } = await list({ prefix: `${key}/` });
+    if (blobs.length === 0) {
+      // One-time migration path: this key used to be written as a single
+      // fixed-pathname blob (`${key}.json`, overwritten in place) before
+      // the versioned scheme above. Fall back to it so existing data
+      // isn't orphaned; the next write moves it into the new scheme.
+      const legacy = await list({ prefix: `${key}.json` });
+      const legacyBlob = legacy.blobs.find((b) => b.pathname === `${key}.json`);
+      if (!legacyBlob) return null;
+      const res = await fetch(legacyBlob.url, { cache: "no-store" });
+      if (!res.ok) return null;
+      return (await res.json()) as T;
+    }
+    const latest = blobs.reduce((a, b) =>
+      parseVersionTimestamp(b.pathname) > parseVersionTimestamp(a.pathname) ? b : a
+    );
+    const res = await fetch(latest.url, { cache: "no-store" });
     if (!res.ok) return null;
     return (await res.json()) as T;
   }
@@ -35,18 +58,32 @@ export async function readJSON<T>(key: string): Promise<T | null> {
   }
 }
 
-/** Overwrites a JSON document at a fixed logical key. */
+/**
+ * Writes a JSON document under a fixed logical key, as a new versioned
+ * blob rather than an overwrite (see readJSON for why). Older versions are
+ * cleaned up afterward, best-effort, without blocking the write — and
+ * never deletes anything as new or newer than what was just written, so a
+ * genuinely concurrent write's blob is never at risk of being deleted.
+ */
 export async function writeJSON(key: string, data: unknown): Promise<void> {
   const body = JSON.stringify(data, null, 2);
 
   if (hasBlob) {
-    await put(key, body, {
+    const now = Date.now();
+    const pathname = `${key}/${now}-${Math.random().toString(36).slice(2)}.json`;
+    await put(pathname, body, {
       access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
       contentType: "application/json",
-      cacheControlMaxAge: 60, // minimum allowed — this document changes on every write
     });
+
+    list({ prefix: `${key}/` })
+      .then(({ blobs }) => {
+        const staleUrls = blobs
+          .filter((b) => b.pathname !== pathname && parseVersionTimestamp(b.pathname) < now)
+          .map((b) => b.url);
+        if (staleUrls.length > 0) return del(staleUrls);
+      })
+      .catch(() => {});
     return;
   }
 
