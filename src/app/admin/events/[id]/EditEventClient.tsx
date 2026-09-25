@@ -6,7 +6,6 @@ import EventForm, { type EventFormValues } from "@/components/admin/EventForm";
 import CoverUploader from "@/components/admin/CoverUploader";
 import GalleryManager from "@/components/admin/GalleryManager";
 import type { EventRecord } from "@/lib/store/events";
-import { isPastEvent } from "@/lib/isPastEvent";
 
 export default function EditEventClient({
   event: initialEvent,
@@ -16,7 +15,6 @@ export default function EditEventClient({
   const router = useRouter();
   const [event, setEvent] = useState(initialEvent);
   const [deleting, setDeleting] = useState(false);
-  const isPast = isPastEvent(event.isoDate);
 
   const handleSubmit = async (values: EventFormValues) => {
     const res = await fetch(`/api/admin/events/${event.id}`, {
@@ -52,33 +50,26 @@ export default function EditEventClient({
         onUploaded={(url) => setEvent((e) => ({ ...e, coverImageUrl: url }))}
       />
 
-      {isPast && (
-        <div className="flex flex-col gap-3">
-          <span className="font-mono-label text-paper/60">
-            Gallery foto ({event.gallery.length})
-          </span>
-          <GalleryManager
-            eventId={event.id}
-            photos={event.gallery}
-            onChange={(gallery) => setEvent((e) => ({ ...e, gallery }))}
-          />
-          {event.gallery.length > 0 && (
-            <a
-              href={`/memorie/${event.slug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="font-mono-label w-fit text-flame hover:underline"
-            >
-              Vedi pagina pubblica della gallery →
-            </a>
-          )}
-        </div>
-      )}
-      {!isPast && (
-        <p className="font-serif-italic max-w-md text-paper/50">
-          La gestione della gallery foto si sblocca dopo la data dell&apos;evento.
-        </p>
-      )}
+      <div className="flex flex-col gap-3">
+        <span className="font-mono-label text-paper/60">
+          Gallery foto ({event.gallery.length})
+        </span>
+        <GalleryManager
+          eventId={event.id}
+          photos={event.gallery}
+          onChange={(gallery) => setEvent((e) => ({ ...e, gallery }))}
+        />
+        {event.gallery.length > 0 && (
+          <a
+            href={`/memorie/${event.slug}`}
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono-label w-fit text-flame hover:underline"
+          >
+            Vedi pagina pubblica della gallery →
+          </a>
+        )}
+      </div>
 
       <button
         type="button"
