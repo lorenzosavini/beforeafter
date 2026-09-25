@@ -6,7 +6,7 @@ import GeneratedArtworkGL from "@/components/webgl/GeneratedArtworkGL";
 import { setCursor } from "@/lib/cursor";
 import { markDiscovered } from "@/lib/discovery";
 import { useIsFinePointer, useReducedMotion } from "@/lib/hooks/useReducedMotion";
-import type { EventRecord } from "@/lib/data/events";
+import type { EventRecord } from "@/lib/store/events";
 
 interface EventPosterProps {
   event: EventRecord;
@@ -60,13 +60,29 @@ export default function EventPoster({
     >
       <motion.div
         style={{ rotateX: springX, rotateY: springY }}
-        className="h-full w-full will-change-transform"
+        className="relative h-full w-full overflow-hidden will-change-transform"
       >
-        <GeneratedArtworkGL
-          seed={event.seed}
-          label={event.edition}
-          className="h-full w-full"
-        />
+        {event.coverImageUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={event.coverImageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-night/85 to-transparent p-4 sm:p-6">
+              <span className="font-display block text-[10vw] leading-[0.8] text-paper/90 sm:text-[4vw]">
+                {event.edition}
+              </span>
+            </div>
+          </>
+        ) : (
+          <GeneratedArtworkGL
+            seed={event.seed}
+            label={event.edition}
+            className="h-full w-full"
+          />
+        )}
       </motion.div>
     </div>
   );

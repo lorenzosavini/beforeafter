@@ -1,28 +1,30 @@
-"use client";
-
 import ChapterMarker from "@/components/chapter/ChapterMarker";
 import SplitLines from "@/components/motion/SplitLines";
-import RevealImage from "@/components/motion/RevealImage";
-import GeneratedArtworkGL from "@/components/webgl/GeneratedArtworkGL";
-import { setCursor } from "@/lib/cursor";
-import { markDiscovered } from "@/lib/discovery";
+import MemoryGalleryTile from "@/components/sections/MemoryGalleryTile";
+import { getPastEvents } from "@/lib/store/events";
 
-interface Memory {
-  seed: number;
-  caption: string;
-  span: string;
-}
-
-const MEMORIES: Memory[] = [
-  { seed: 3, caption: "Capitolo VI — Roma", span: "sm:col-span-4 sm:row-span-2" },
-  { seed: 8, caption: "Backstage", span: "sm:col-span-2" },
-  { seed: 1, caption: "Capitolo V — Milano", span: "sm:col-span-2" },
-  { seed: 5, caption: "Dopo mezzanotte", span: "sm:col-span-3" },
-  { seed: 9, caption: "Capitolo IV — Roma", span: "sm:col-span-3" },
-  { seed: 2, caption: "L'ultima ora", span: "sm:col-span-6" },
+const SPANS = [
+  "sm:col-span-4 sm:row-span-2",
+  "sm:col-span-2",
+  "sm:col-span-2",
+  "sm:col-span-3",
+  "sm:col-span-3",
+  "sm:col-span-6",
 ];
 
-export default function MemoryGallery() {
+export default async function MemoryGallery() {
+  const pastEvents = await getPastEvents();
+
+  const tiles = pastEvents
+    .flatMap((event) =>
+      event.gallery.map((photo) => ({
+        photoUrl: photo.url,
+        caption: `${event.title} — ${event.city}`,
+        href: `/memorie/${event.slug}`,
+      }))
+    )
+    .slice(0, 6);
+
   return (
     <section
       id="memories"
@@ -35,37 +37,22 @@ export default function MemoryGallery() {
         className="font-display mb-14 text-[13vw] leading-[0.85] sm:text-[6.5vw] lg:mb-20"
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-6 sm:auto-rows-[14vw]">
-        {MEMORIES.map((memory, i) => (
-          <RevealImage
-            key={i}
-            direction={i % 2 === 0 ? "up" : "down"}
-            delay={i * 0.05}
-            className={`group relative aspect-[4/5] sm:aspect-auto ${memory.span}`}
-          >
-            <div
-              className="relative h-full w-full"
-              onMouseEnter={() => {
-                setCursor({ variant: "image" });
-                markDiscovered(`memory:${i}`);
-              }}
-              onMouseLeave={() => setCursor(null)}
-              onTouchStart={() => markDiscovered(`memory:${i}`)}
-            >
-              <GeneratedArtworkGL
-                seed={memory.seed}
-                label=""
-                className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-night/80 to-transparent p-4">
-                <span className="font-mono-label text-paper/80">
-                  {memory.caption}
-                </span>
-              </div>
-            </div>
-          </RevealImage>
-        ))}
-      </div>
+      {tiles.length === 0 ? (
+        <p className="font-serif-italic max-w-md text-xl text-paper/60">
+          Le prime memorie arrivano dopo il primo capitolo.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-6 sm:auto-rows-[14vw]">
+          {tiles.map((tile, i) => (
+            <MemoryGalleryTile
+              key={tile.photoUrl}
+              {...tile}
+              span={SPANS[i % SPANS.length]}
+              index={i}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
