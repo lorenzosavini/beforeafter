@@ -15,7 +15,13 @@ export async function readJSON<T>(key: string): Promise<T | null> {
     const { blobs } = await list({ prefix: key, limit: 1 });
     const blob = blobs.find((b) => b.pathname === key);
     if (!blob) return null;
-    const res = await fetch(blob.url, { cache: "no-store" });
+    // Blob content is served through a CDN with a long default cache
+    // lifetime, and an `allowOverwrite` write does not purge it — so a
+    // plain fetch right after a write can silently return stale data
+    // (verified: still stale 20+ seconds later). A unique query string
+    // forces a cache-key miss and a fresh fetch from origin every time.
+    const freshUrl = `${blob.url}${blob.url.includes("?") ? "&" : "?"}cb=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const res = await fetch(freshUrl, { cache: "no-store" });
     if (!res.ok) return null;
     return (await res.json()) as T;
   }
@@ -39,6 +45,7 @@ export async function writeJSON(key: string, data: unknown): Promise<void> {
       addRandomSuffix: false,
       allowOverwrite: true,
       contentType: "application/json",
+      cacheControlMaxAge: 60, // minimum allowed — this document changes on every write
     });
     return;
   }
