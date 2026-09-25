@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Dev-only: serves files written by the local filesystem fallback in
  * lib/store/backend.ts (used when BLOB_READ_WRITE_TOKEN is unset). In

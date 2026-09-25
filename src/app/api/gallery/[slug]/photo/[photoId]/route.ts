@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getEventBySlug } from "@/lib/store/events";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /** Proxies a single gallery photo with a Content-Disposition header, so the
  * browser downloads it (with its original filename) instead of navigating

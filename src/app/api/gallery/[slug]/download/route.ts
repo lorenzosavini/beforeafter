@@ -4,6 +4,7 @@ import archiver from "archiver";
 import { getEventBySlug } from "@/lib/store/events";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /** Streams every gallery photo for an event as a single zip download. */
 export async function GET(

@@ -6,6 +6,10 @@ import {
   type EventInput,
 } from "@/lib/store/events";
 
+// See events/route.ts — GET handlers are eligible for Next.js's static
+// route cache unless opted out explicitly.
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
