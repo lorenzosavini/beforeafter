@@ -47,12 +47,76 @@ export default async function NextEvent() {
                 <div className="opacity-60">Coordinate</div>
                 <div className="mt-1 text-paper">{nextEvent.coordinates}</div>
               </div>
+              {nextEvent.price && (
+                <div>
+                  <div className="opacity-60">Prezzo</div>
+                  <div className="mt-1 text-paper">{nextEvent.price}</div>
+                </div>
+              )}
+              {nextEvent.ageRestriction && (
+                <div>
+                  <div className="opacity-60">Età minima</div>
+                  <div className="mt-1 text-paper">{nextEvent.ageRestriction}</div>
+                </div>
+              )}
+              {nextEvent.dressCode && (
+                <div>
+                  <div className="opacity-60">Dress code</div>
+                  <div className="mt-1 text-paper">{nextEvent.dressCode}</div>
+                </div>
+              )}
             </div>
 
             {nextEvent.summary && (
               <p className="font-serif-italic mt-10 max-w-md text-xl text-paper/70 lg:mt-14">
                 {nextEvent.summary}
               </p>
+            )}
+
+            {nextEvent.lineup.length > 0 && (
+              <div className="font-mono-label mt-10 lg:mt-14">
+                <div className="mb-3 text-paper/60">Lineup</div>
+                <ul className="flex flex-col gap-1.5">
+                  {nextEvent.lineup.map((entry) => (
+                    <li key={entry.id} className="flex items-baseline gap-3">
+                      <span className="text-paper">{entry.name}</span>
+                      {entry.role && (
+                        <span className="text-paper/50">{entry.role}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {nextEvent.timeline.length > 0 && (
+              <div className="font-mono-label mt-10 lg:mt-14">
+                <div className="mb-3 text-paper/60">Timeline</div>
+                <ul className="flex flex-col gap-1.5">
+                  {nextEvent.timeline.map((entry) => (
+                    <li key={entry.id} className="flex items-baseline gap-4">
+                      <span className="text-flame">{entry.time}</span>
+                      <span className="text-paper/80">{entry.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {nextEvent.ctaButtons.length > 0 && (
+              <div className="mt-10 flex flex-wrap gap-4 lg:mt-14">
+                {nextEvent.ctaButtons.map((btn) => (
+                  <a
+                    key={btn.id}
+                    href={btn.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono-label border border-flame/60 px-6 py-3 text-flame transition-colors hover:bg-flame hover:text-night"
+                  >
+                    {btn.label}
+                  </a>
+                ))}
+              </div>
             )}
           </div>
 

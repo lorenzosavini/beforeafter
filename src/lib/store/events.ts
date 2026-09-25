@@ -9,6 +9,27 @@ export interface GalleryPhoto {
   uploadedAt: string;
 }
 
+/** A DJ, band, or other performer/guest billed at the event. */
+export interface LineupEntry {
+  id: string;
+  name: string;
+  role: string;
+}
+
+/** One entry in the event's running order, e.g. "22:00" / "Apertura porte". */
+export interface TimelineEntry {
+  id: string;
+  time: string;
+  label: string;
+}
+
+/** A custom call-to-action button (tickets, WhatsApp, booking, etc). */
+export interface CtaButton {
+  id: string;
+  label: string;
+  url: string;
+}
+
 export interface EventRecord {
   id: string;
   slug: string;
@@ -19,6 +40,12 @@ export interface EventRecord {
   venue: string;
   coordinates: string;
   summary: string;
+  price: string;
+  dressCode: string;
+  ageRestriction: string;
+  lineup: LineupEntry[];
+  timeline: TimelineEntry[];
+  ctaButtons: CtaButton[];
   coverImageUrl: string | null;
   seed: number;
   gallery: GalleryPhoto[];
@@ -28,10 +55,27 @@ export interface EventRecord {
 
 export type EventInput = Omit<
   EventRecord,
-  "id" | "gallery" | "createdAt" | "updatedAt" | "coverImageUrl" | "seed"
+  | "id"
+  | "gallery"
+  | "createdAt"
+  | "updatedAt"
+  | "coverImageUrl"
+  | "seed"
+  | "price"
+  | "dressCode"
+  | "ageRestriction"
+  | "lineup"
+  | "timeline"
+  | "ctaButtons"
 > & {
   coverImageUrl?: string | null;
   seed?: number;
+  price?: string;
+  dressCode?: string;
+  ageRestriction?: string;
+  lineup?: LineupEntry[];
+  timeline?: TimelineEntry[];
+  ctaButtons?: CtaButton[];
 };
 
 function slugify(title: string): string {
@@ -122,6 +166,12 @@ export async function createEvent(input: EventInput): Promise<EventRecord> {
     venue: input.venue,
     coordinates: input.coordinates,
     summary: input.summary,
+    price: input.price ?? "",
+    dressCode: input.dressCode ?? "",
+    ageRestriction: input.ageRestriction ?? "",
+    lineup: input.lineup ?? [],
+    timeline: input.timeline ?? [],
+    ctaButtons: input.ctaButtons ?? [],
     coverImageUrl: input.coverImageUrl ?? null,
     seed: input.seed ?? Math.floor(Math.random() * 1000),
     gallery: [],
