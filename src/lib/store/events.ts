@@ -91,9 +91,24 @@ function id(): string {
   return crypto.randomUUID();
 }
 
+/** Backfills fields added after some records were already written, so
+ * older events (missing them entirely, not just empty) don't crash
+ * consumers that assume they're always present. */
+function normalize(event: EventRecord): EventRecord {
+  return {
+    ...event,
+    price: event.price ?? "",
+    dressCode: event.dressCode ?? "",
+    ageRestriction: event.ageRestriction ?? "",
+    lineup: event.lineup ?? [],
+    timeline: event.timeline ?? [],
+    ctaButtons: event.ctaButtons ?? [],
+  };
+}
+
 async function readAll(): Promise<EventRecord[]> {
   const events = await readJSON<EventRecord[]>(EVENTS_KEY);
-  return events ?? [];
+  return (events ?? []).map(normalize);
 }
 
 async function writeAll(events: EventRecord[]): Promise<void> {
