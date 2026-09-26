@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import BeforeAfterLogo from "@/components/logo/BeforeAfterLogo";
@@ -16,6 +17,7 @@ const LINKS = [
 ];
 
 export default function Navigation() {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [time, setTime] = useState<string | null>(null);
 
@@ -37,14 +39,26 @@ export default function Navigation() {
     document.documentElement.style.overflow = menuOpen ? "hidden" : "";
   }, [menuOpen]);
 
+  // The admin panel has its own header — the public site's fixed nav would
+  // otherwise sit on top of it.
+  if (pathname?.startsWith("/admin")) return null;
+
+  const isHome = pathname === "/";
+  // On any page other than the homepage, a section anchor (#memories, etc)
+  // has nothing to scroll to — it needs the leading "/" so it's a real
+  // navigation back to the homepage, landing on that section.
+  const resolveHref = (href: string) =>
+    href.startsWith("#") && !isHome ? `/${href}` : href;
+
   const handleNavClick =
     (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
       setMenuOpen(false);
-      if (href.startsWith("#")) {
+      if (href.startsWith("#") && isHome) {
         e.preventDefault();
         smoothScrollTo(href, 0);
       }
-      // Real page links (e.g. /eventi) navigate normally.
+      // Otherwise: a real link (cross-page anchor, or a route like /eventi)
+      // — let it navigate normally.
     };
 
   return (
@@ -53,7 +67,13 @@ export default function Navigation() {
         <div className="flex items-center justify-between px-5 py-5 text-white sm:px-8 sm:py-6">
           <Link
             href="/"
-            onClick={handleNavClick("#top")}
+            onClick={(e) => {
+              setMenuOpen(false);
+              if (isHome) {
+                e.preventDefault();
+                smoothScrollTo("#top", 0);
+              }
+            }}
             onMouseEnter={() => setCursor({ variant: "next", label: "Home" })}
             onMouseLeave={() => setCursor(null)}
           >
@@ -64,7 +84,7 @@ export default function Navigation() {
             {LINKS.map((link) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={resolveHref(link.href)}
                 onClick={handleNavClick(link.href)}
                 onMouseEnter={() => setCursor({ variant: "view" })}
                 onMouseLeave={() => setCursor(null)}
@@ -93,7 +113,7 @@ export default function Navigation() {
       <AnimatePresence>
         {menuOpen && (
           <MobileMenu
-            links={LINKS}
+            links={LINKS.map((link) => ({ ...link, href: resolveHref(link.href) }))}
             onNavigate={handleNavClick}
             onClose={() => setMenuOpen(false)}
           />

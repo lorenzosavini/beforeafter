@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDiscoveryCount } from "@/lib/hooks/useDiscovery";
 import {
@@ -14,8 +15,11 @@ import {
  * with a single pulse — no ongoing animation.
  */
 export default function DiscoveryBadge() {
+  const pathname = usePathname();
   const count = useDiscoveryCount();
   const unlocked = count >= DISCOVERY_UNLOCK_THRESHOLD;
+
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <AnimatePresence>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   motion,
   useMotionValue,
@@ -22,6 +23,7 @@ const LABELS: Record<CursorPayload["variant"], string> = {
 };
 
 export default function Cursor() {
+  const pathname = usePathname();
   const isFine = useIsFinePointer();
   const reducedMotion = useReducedMotion();
   const [payload, setPayload] = useState<CursorPayload | null>(null);
@@ -98,7 +100,7 @@ export default function Cursor() {
   );
   const counterRotate = useTransform(angle, (a) => -a);
 
-  if (!isFine || reducedMotion) return null;
+  if (!isFine || reducedMotion || pathname?.startsWith("/admin")) return null;
 
   return (
     <motion.div
