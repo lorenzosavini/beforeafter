@@ -8,8 +8,8 @@ if ( empty( $GLOBALS['ip_has_form'] ) && ! is_404() && ! ( (int) ip_opt( 'thanks
 	<section class="endform">
 		<div class="wrap endform-in">
 			<div class="endform-text">
-				<h2>Parla con un orientatore</h2>
-				<p>Ti spieghiamo come funziona lo studio online, quanto costa davvero il percorso che ti interessa e quali agevolazioni puoi ottenere. La consulenza è gratuita e non ti impegna.</p>
+				<h2><?php echo esc_html( ip_opt( 'end_title' ) ); ?></h2>
+				<p><?php echo esc_html( ip_opt( 'end_text' ) ); ?></p>
 				<?php ip_contact_block(); ?>
 			</div>
 			<?php ip_form(); ?>
@@ -60,12 +60,12 @@ endif;
 					<?php endif; ?>
 				</ul>
 			</div>
-			<?php if ( ip_opt( 'facebook' ) || ip_opt( 'instagram' ) || has_nav_menu( 'legal' ) ) : ?>
+			<?php $socials = array_filter( array( 'Facebook' => ip_opt( 'facebook' ), 'Instagram' => ip_opt( 'instagram' ), 'LinkedIn' => ip_opt( 'linkedin' ), 'YouTube' => ip_opt( 'youtube' ), 'TikTok' => ip_opt( 'tiktok' ) ) ); ?>
+			<?php if ( $socials || has_nav_menu( 'legal' ) ) : ?>
 			<div>
-				<p class="ftr-h">Seguici</p>
+				<p class="ftr-h"><?php echo $socials ? 'Seguici' : 'Link utili'; ?></p>
 				<ul class="ftr-list">
-					<?php if ( ip_opt( 'facebook' ) ) : ?><li><a href="<?php echo esc_url( ip_opt( 'facebook' ) ); ?>" target="_blank" rel="noopener">Facebook</a></li><?php endif; ?>
-					<?php if ( ip_opt( 'instagram' ) ) : ?><li><a href="<?php echo esc_url( ip_opt( 'instagram' ) ); ?>" target="_blank" rel="noopener">Instagram</a></li><?php endif; ?>
+					<?php foreach ( $socials as $label => $url ) : ?><li><a href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $label ); ?></a></li><?php endforeach; ?>
 				</ul>
 				<?php if ( has_nav_menu( 'legal' ) ) : ?>
 					<?php wp_nav_menu( array( 'theme_location' => 'legal', 'container' => false, 'menu_class' => 'ftr-list ftr-legal', 'depth' => 1 ) ); ?>

@@ -1,0 +1,17 @@
+.ip-rep { max-width: 900px; }
+.ip-rep-row { display: flex; gap: 12px; align-items: flex-start; padding: 12px; margin: 0 0 8px; background: #fff; border: 1px solid #dcdcde; border-left: 3px solid #225e48; border-radius: 4px; }
+.ip-rep-fields { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 12px; }
+.ip-rep-f { display: grid; gap: 3px; font-size: 12px; color: #50575e; }
+.ip-rep-f span { font-weight: 600; }
+.ip-rep-textarea { grid-column: 1 / -1; }
+.ip-rep-f input, .ip-rep-f textarea { width: 100%; }
+.ip-media { display: flex; gap: 6px; }
+.ip-rep-tools { display: flex; flex-direction: column; gap: 2px; }
+.ip-rep-tools .button-link { text-decoration: none; padding: 2px 6px; }
+.ip-rep-del { color: #b32d2e; }
+.ip-admin input[type=color] { width: 60px; height: 32px; padding: 0 2px; vertical-align: middle; }
+#ip-course .inside .ip-rep-row, #ip-docs .ip-rep-row { padding: 8px; }
+.ip-curr-list { margin: 0; }
+.ip-curr-list li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0f1; }
+.ip-check .ip-rep-row { padding: 6px 10px; align-items: center; }
+.ip-check .ip-rep-tools { flex-direction: row; }

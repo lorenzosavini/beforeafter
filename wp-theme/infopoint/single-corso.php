@@ -6,7 +6,6 @@ while ( have_posts() ) :
 	the_post();
 	$id    = get_the_ID();
 	$tip   = ip_course_tipologia();
-	$areas = get_the_terms( $id, 'area' );
 	$stato = ip_meta( 'stato' ) ? ip_meta( 'stato' ) : 'aperte';
 	$is_degree = $tip && 0 === strpos( $tip->slug, 'laurea' );
 	$facts = array_filter( array(
@@ -27,8 +26,20 @@ while ( have_posts() ) :
 					<span class="status status-<?php echo esc_attr( $stato ); ?>"><?php echo esc_html( ip_status_label( $stato ) ); ?></span>
 				</p>
 				<h1><?php the_title(); ?></h1>
-				<?php if ( $areas && ! is_wp_error( $areas ) ) : ?>
-					<p class="phead-sub"><?php echo esc_html( $areas[0]->name ); ?></p>
+				<?php if ( ip_meta( 'evidenza' ) ) : ?>
+					<p class="phead-note"><?php echo esc_html( ip_meta( 'evidenza' ) ); ?></p>
+				<?php endif; ?>
+				<?php
+				$sub = array();
+				foreach ( array( 'dipartimento', 'area' ) as $tx ) {
+					$tt = get_the_terms( $id, $tx );
+					if ( $tt && ! is_wp_error( $tt ) ) {
+						$sub[] = '<a href="' . esc_url( get_term_link( $tt[0] ) ) . '">' . esc_html( $tt[0]->name ) . '</a>';
+					}
+				}
+				?>
+				<?php if ( $sub ) : ?>
+					<p class="phead-sub"><?php echo implode( ' · ', $sub ); // phpcs:ignore ?></p>
 				<?php endif; ?>
 				<dl class="facts-dl">
 					<?php foreach ( $facts as $k => $v ) : ?>
@@ -47,11 +58,45 @@ while ( have_posts() ) :
 				<?php if ( trim( get_the_content() ) ) : ?>
 					<?php the_content(); ?>
 				<?php else : ?>
-					<p>Stiamo completando la scheda di questo corso. Lasciaci i tuoi dati: ti inviamo il piano di studi aggiornato, i costi e le agevolazioni a cui hai diritto.</p>
+					<p><?php echo esc_html( ip_opt( 'course_empty' ) ); ?></p>
 				<?php endif; ?>
 
-				<h2>Come iscriversi</h2>
-				<?php ip_steps(); ?>
+				<?php $curricula = ip_course_curricula( $id ); ?>
+				<?php if ( $curricula ) : ?>
+					<h2 id="piani-di-studio">Piani di studio</h2>
+					<div class="curricula">
+						<?php foreach ( $curricula as $i => $c ) : ?>
+							<details<?php echo 1 === count( $curricula ) ? ' open' : ''; ?>>
+								<summary><?php echo esc_html( $c->post_title ); ?></summary>
+								<div class="curriculum-body">
+									<?php echo apply_filters( 'the_content', $c->post_content ); // phpcs:ignore ?>
+								</div>
+							</details>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+
+				<?php $docs = ip_meta_rows( 'docs', $id ); ?>
+				<?php if ( $docs ) : ?>
+					<h2>Documenti</h2>
+					<ul class="docs">
+						<?php foreach ( $docs as $d ) : ?>
+							<?php if ( empty( $d['url'] ) ) { continue; } ?>
+							<li><a href="<?php echo esc_url( $d['url'] ); ?>" target="_blank" rel="noopener" data-track="document"><?php echo ip_icon( 'doc', 18 ); // phpcs:ignore ?><span><?php echo esc_html( $d['label'] ? $d['label'] : basename( $d['url'] ) ); ?></span><?php if ( preg_match( '/\.pdf($|\?)/i', $d['url'] ) ) : ?><small>PDF</small><?php endif; ?></a></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+
+				<?php $faq = ip_meta_rows( 'faq', $id ); ?>
+				<?php if ( $faq ) : ?>
+					<h2>Domande frequenti</h2>
+					<?php ip_faq_list( $faq ); ?>
+				<?php endif; ?>
+
+				<?php if ( ip_rows( 'steps' ) ) : ?>
+					<h2>Come iscriversi con noi</h2>
+					<?php ip_steps(); ?>
+				<?php endif; ?>
 			</div>
 
 			<aside class="aside">
@@ -65,7 +110,7 @@ while ( have_posts() ) :
 								<p><span>Costo</span><strong><?php echo esc_html( $cost ); ?></strong></p>
 							<?php else : ?>
 								<p><span>Retta</span><strong>da <?php echo esc_html( ip_price_from() ); ?>/mese</strong></p>
-								<p class="muted">con le agevolazioni, in 12 rate senza interessi. Retta standard € 2.760/anno.</p>
+								<p class="muted">con le agevolazioni, rateizzabile senza interessi.<?php echo ip_opt( 'retta_std' ) ? ' Retta standard ' . esc_html( ip_opt( 'retta_std' ) ) . '.' : ''; ?></p>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>

@@ -18,10 +18,10 @@ add_action( 'after_setup_theme', function () {
 	// Niente palette e dimensioni arbitrarie nell'editor: chi scrive usa le
 	// stesse poche scelte del tema, e il sito resta coerente.
 	add_theme_support( 'editor-color-palette', array(
-		array( 'name' => 'Blu', 'slug' => 'brand', 'color' => '#0b3b74' ),
-		array( 'name' => 'Arancio', 'slug' => 'accent', 'color' => '#c2410c' ),
-		array( 'name' => 'Inchiostro', 'slug' => 'ink', 'color' => '#14202e' ),
-		array( 'name' => 'Grigio chiaro', 'slug' => 'soft', 'color' => '#f2f4f7' ),
+		array( 'name' => 'Verde UniMarconi', 'slug' => 'brand', 'color' => '#225e48' ),
+		array( 'name' => 'Rosso UniMarconi', 'slug' => 'accent', 'color' => '#a0300e' ),
+		array( 'name' => 'Antracite', 'slug' => 'ink', 'color' => '#373737' ),
+		array( 'name' => 'Grigio chiaro', 'slug' => 'soft', 'color' => '#f0f0f0' ),
 		array( 'name' => 'Bianco', 'slug' => 'white', 'color' => '#ffffff' ),
 	) );
 	add_theme_support( 'disable-custom-colors' );
@@ -112,8 +112,47 @@ add_action( 'wp_head', function () {
 		$css = str_replace( array( ' {', '{ ', ' }', '; ', ': ', ', ', ' >' ), array( '{', '{', '}', ';', ':', ',', '>' ), $css );
 		set_transient( 'ip_css_' . IP_VERSION, $css, WEEK_IN_SECONDS );
 	}
+	$css = str_replace( 'url("assets/', 'url("' . IP_URI . '/assets/', $css );
 	echo '<style id="ip-css">' . $css . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput
 }, 7 );
+
+/**
+ * Colori e font scelti in Infopoint → Impostazioni → Aspetto.
+ */
+function ip_custom_vars() {
+	$map  = array(
+		'color_brand'       => '--brand',
+		'color_brand_dark'  => '--brand-dark',
+		'color_brand_deep'  => '--brand-deep',
+		'color_accent'      => '--accent',
+		'color_accent_dark' => '--accent-dark',
+		'color_soft'        => '--soft',
+		'color_dark'        => '--dark',
+	);
+	$vars = '';
+	foreach ( $map as $opt => $var ) {
+		$c = sanitize_hex_color( ip_opt( $opt ) );
+		if ( $c ) {
+			$vars .= $var . ':' . $c . ';';
+		}
+	}
+	$brand = sanitize_hex_color( ip_opt( 'color_brand' ) );
+	if ( $brand ) {
+		// Tinta chiara derivata dal colore principale (8% su bianco).
+		list( $r, $g, $b ) = sscanf( $brand, '#%02x%02x%02x' );
+		$vars .= sprintf( '--brand-tint:#%02x%02x%02x;--ok:%s;--ok-tint:#%02x%02x%02x;', 255 - ( 255 - $r ) * .1, 255 - ( 255 - $g ) * .1, 255 - ( 255 - $b ) * .1, $brand, 255 - ( 255 - $r ) * .1, 255 - ( 255 - $g ) * .1, 255 - ( 255 - $b ) * .1 );
+	}
+	if ( ! ip_opt( 'font_brand' ) ) {
+		$vars .= '--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;';
+	}
+	return $vars ? ':root{' . $vars . '}' : '';
+}
+add_action( 'wp_head', function () {
+	$v = ip_custom_vars();
+	if ( $v ) {
+		echo '<style id="ip-vars">' . $v . '</style>' . "\n"; // phpcs:ignore
+	}
+}, 8 );
 
 // Commenti: un info point non ne ha bisogno.
 add_action( 'init', function () {

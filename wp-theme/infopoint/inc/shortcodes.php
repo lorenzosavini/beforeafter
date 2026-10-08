@@ -9,6 +9,7 @@
  * [ip_contatti]
  * [ip_passi]
  * [ip_cta titolo=""]
+ * [ip_faq]
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -114,6 +115,7 @@ function ip_agevolazioni( $limit = -1 ) {
 		$retta = ip_meta( 'retta', $p->ID );
 		$rata  = ip_meta( 'rata', $p->ID );
 		$cond  = array_filter( array_map( 'trim', explode( "\n", ip_meta( 'cond', $p->ID ) ) ) );
+		$det   = ip_meta( 'det', $p->ID );
 		?>
 		<article class="agev-item">
 			<header>
@@ -123,16 +125,19 @@ function ip_agevolazioni( $limit = -1 ) {
 			<p class="agev-price">
 				<?php if ( $rata ) : ?>
 					<strong>€ <?php echo esc_html( $rata ); ?></strong><span>/mese</span>
-					<?php if ( $retta ) : ?><small>€ <?php echo esc_html( number_format_i18n( (float) $retta ) ); ?> l’anno</small><?php endif; ?>
+					<?php if ( $retta ) : ?><small>€ <?php echo esc_html( number_format( (float) $retta, 0, ',', '.' ) ); ?> l’anno</small><?php endif; ?>
 				<?php elseif ( $retta ) : ?>
-					<strong>€ <?php echo esc_html( number_format_i18n( (float) $retta ) ); ?></strong><span>/anno</span>
+					<strong>€ <?php echo esc_html( number_format( (float) $retta, 0, ',', '.' ) ); ?></strong><span>/anno</span>
 				<?php endif; ?>
 			</p>
 			<?php if ( $cond ) : ?>
 				<details>
 					<summary>Condizioni</summary>
 					<ul><?php foreach ( $cond as $c ) : ?><li><?php echo esc_html( $c ); ?></li><?php endforeach; ?></ul>
+					<?php if ( $det ) : ?><p class="agev-det"><?php echo nl2br( esc_html( $det ) ); ?></p><?php endif; ?>
 				</details>
+			<?php elseif ( $det ) : ?>
+				<details><summary>Dettagli</summary><p class="agev-det"><?php echo nl2br( esc_html( $det ) ); ?></p></details>
 			<?php endif; ?>
 			<a class="agev-cta" href="#richiedi" data-scroll-form data-interest="<?php echo esc_attr( get_the_title( $p ) ); ?>">Verifica se ne hai diritto <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
 		</article>
@@ -142,27 +147,24 @@ function ip_agevolazioni( $limit = -1 ) {
 }
 
 add_shortcode( 'ip_sedi', function () {
-	$rows = array_filter( array_map( 'trim', explode( "\n", (string) ip_opt( 'exam_sites' ) ) ) );
-	$by   = array();
-	foreach ( $rows as $r ) {
-		$p = array_map( 'trim', explode( '|', $r ) );
-		if ( count( $p ) >= 3 ) {
-			$by[ $p[0] ][] = $p;
-		}
+	$by = array();
+	foreach ( ip_rows( 'exam_sites' ) as $r ) {
+		$by[ $r['regione'] ?: 'Altre sedi' ][] = $r;
 	}
 	if ( ! $by ) {
 		return '';
 	}
+	ksort( $by );
 	return ip_buffer( function () use ( $by ) {
 		echo '<div class="sedi">';
 		foreach ( $by as $region => $list ) {
 			echo '<section><h3>' . esc_html( $region ) . '</h3><ul>';
-			foreach ( $list as $s ) {
+			foreach ( $list as $st ) {
 				printf(
 					'<li><strong>%s</strong><a href="%s" target="_blank" rel="noopener">%s</a></li>',
-					esc_html( $s[1] ),
-					esc_url( 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode( $s[2] . ' ' . $s[1] ) ),
-					esc_html( $s[2] )
+					esc_html( $st['citta'] ),
+					esc_url( 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode( $st['indirizzo'] . ' ' . $st['citta'] ) ),
+					esc_html( $st['indirizzo'] )
 				);
 			}
 			echo '</ul></section>';
@@ -227,17 +229,35 @@ add_shortcode( 'ip_passi', function () {
 } );
 
 function ip_steps() {
-	$steps = array(
-		array( 'Ci racconti cosa cerchi', 'Una telefonata o un messaggio: titolo di studio, lavoro, tempo a disposizione, obiettivi.' ),
-		array( 'Valutiamo la tua carriera', 'Se hai già sostenuto esami o hai titoli professionali, chiediamo gratis la prevalutazione dei crediti.' ),
-		array( 'Scegli corso e retta', 'Ti mostriamo piano di studi, costi e agevolazioni a cui hai diritto. Decidi senza fretta.' ),
-		array( 'Ci occupiamo dell’iscrizione', 'Prepariamo con te la domanda di immatricolazione e restiamo il tuo riferimento fino alla laurea.' ),
-	);
+	$steps = ip_rows( 'steps' );
+	if ( ! $steps ) {
+		return;
+	}
 	echo '<ol class="steps">';
-	foreach ( $steps as $s ) {
-		printf( '<li><h3>%s</h3><p>%s</p></li>', esc_html( $s[0] ), esc_html( $s[1] ) );
+	foreach ( $steps as $st ) {
+		printf( '<li><h3>%s</h3><p>%s</p></li>', esc_html( $st['titolo'] ?? '' ), esc_html( $st['testo'] ?? '' ) );
 	}
 	echo '</ol>';
+}
+
+add_shortcode( 'ip_faq', function () {
+	return ip_buffer( function () {
+		ip_faq_list( ip_rows( 'faq' ) );
+	} );
+} );
+
+/**
+ * Elenco domande/risposte apribili.
+ */
+function ip_faq_list( $rows ) {
+	if ( ! $rows ) {
+		return;
+	}
+	echo '<div class="faq">';
+	foreach ( $rows as $r ) {
+		printf( '<details><summary>%s</summary><p>%s</p></details>', esc_html( $r['domanda'] ?? '' ), nl2br( esc_html( $r['risposta'] ?? '' ) ) );
+	}
+	echo '</div>';
 }
 
 add_shortcode( 'ip_cta', function ( $a ) {

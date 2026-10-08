@@ -37,7 +37,7 @@ add_action( 'wp_footer', function () {
 		$cookie = (int) ip_opt( 'cookie_page' );
 		?>
 		<div class="consent" data-consent hidden role="dialog" aria-label="Preferenze cookie">
-			<p>Usiamo cookie tecnici e, solo con il tuo consenso, cookie di statistica e marketing per misurare le visite e migliorare le campagne.<?php if ( $cookie ) : ?> <a href="<?php echo esc_url( get_permalink( $cookie ) ); ?>">Cookie policy</a><?php endif; ?></p>
+			<p><?php echo esc_html( ip_opt( 'consent_text' ) ); ?><?php if ( $cookie ) : ?> <a href="<?php echo esc_url( get_permalink( $cookie ) ); ?>">Cookie policy</a><?php endif; ?></p>
 			<div>
 				<button type="button" class="btn btn-line" data-consent-set="denied">Rifiuta</button>
 				<button type="button" class="btn btn-primary" data-consent-set="granted">Accetta</button>

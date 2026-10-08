@@ -7,7 +7,8 @@ $wa      = ip_wa_href();
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0b3b74">
+<meta name="theme-color" content="<?php echo esc_attr( ip_opt( 'color_brand' ) ? ip_opt( 'color_brand' ) : '#225e48' ); ?>">
+<?php if ( ip_opt( 'font_brand' ) ) : ?><link rel="preload" href="<?php echo esc_url( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>" as="font" type="font/woff2" crossorigin><?php endif; ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -17,7 +18,7 @@ $wa      = ip_wa_href();
 <?php if ( ! $landing ) : ?>
 <div class="topbar">
 	<div class="wrap topbar-in">
-		<p>Iscrizioni aperte tutto l’anno · Valutazione dei crediti gratuita</p>
+		<p><?php echo esc_html( ip_opt( 'topbar_text' ) ); ?></p>
 		<ul>
 			<?php foreach ( array( 'phone1', 'phone2' ) as $p ) : ?>
 				<?php if ( ip_opt( $p ) ) : ?>
@@ -62,7 +63,7 @@ $wa      = ip_wa_href();
 					'fallback_cb'    => 'ip_menu_fallback',
 				) );
 				?>
-				<a class="btn btn-accent nav-cta" href="#richiedi" data-scroll-form>Richiedi informazioni</a>
+				<a class="btn btn-accent nav-cta" href="#richiedi" data-scroll-form><?php echo esc_html( ip_opt( 'nav_cta' ) ); ?></a>
 			</nav>
 		<?php endif; ?>
 	</div>

@@ -36,7 +36,7 @@ function ip_form( $a = array() ) {
 	$course = $a['course'] ? get_post( (int) $a['course'] ) : null;
 	$uid    = 'f' . $count;
 	$titles = array(
-		'info'     => array( 'Ricevi costi e piano di studi', 'Ti rispondiamo entro un giorno lavorativo, anche su WhatsApp se preferisci.', 'Invia la richiesta' ),
+		'info'     => array( ip_opt( 'form_title' ), ip_opt( 'form_text' ), ip_opt( 'form_button' ) ),
 		'cfu'      => array( 'Richiedi la prevalutazione gratuita dei CFU', 'Allega il piano di studi o l’autocertificazione degli esami: ti diciamo quanti crediti puoi farti riconoscere.', 'Invia per la valutazione' ),
 		'callback' => array( 'Ti richiamiamo noi', 'Lascia il numero: un orientatore ti chiama nella fascia oraria che preferisci.', 'Richiamami' ),
 	);
@@ -92,7 +92,7 @@ function ip_form( $a = array() ) {
 					<?php if ( $course ) : ?>
 						<p class="lead-course"><?php echo ip_icon( 'doc', 16 ); // phpcs:ignore ?> <span><?php echo esc_html( ip_course_name( $course->ID ) ); ?></span></p>
 					<?php else : ?>
-						<?php ip_select( $uid, 'interesse', 'Ti interessa', array_filter( array_map( 'trim', explode( "\n", (string) ip_opt( 'form_courses' ) ) ) ), true ); ?>
+						<?php ip_select( $uid, 'interesse', 'Ti interessa', wp_list_pluck( ip_rows( 'form_courses' ), 'voce' ), true ); ?>
 					<?php endif; ?>
 					<details class="more">
 						<summary>Aggiungi un messaggio</summary>
@@ -103,11 +103,11 @@ function ip_form( $a = array() ) {
 
 			<div class="check">
 				<input type="checkbox" id="<?php echo esc_attr( $uid ); ?>-privacy" name="ip_privacy" value="1" required>
-				<label for="<?php echo esc_attr( $uid ); ?>-privacy">Ho letto l’<?php echo $priv ? '<a href="' . esc_url( $priv ) . '" target="_blank" rel="noopener">informativa privacy</a>' : 'informativa privacy'; // phpcs:ignore ?> e acconsento al trattamento dei dati per ricevere le informazioni richieste.</label>
+				<label for="<?php echo esc_attr( $uid ); ?>-privacy"><?php echo $priv ? str_replace( 'informativa privacy', '<a href="' . esc_url( $priv ) . '" target="_blank" rel="noopener">informativa privacy</a>', esc_html( ip_opt( 'privacy_text' ) ) ) : esc_html( ip_opt( 'privacy_text' ) ); // phpcs:ignore ?></label>
 			</div>
 			<div class="check">
 				<input type="checkbox" id="<?php echo esc_attr( $uid ); ?>-mkt" name="ip_marketing" value="1">
-				<label for="<?php echo esc_attr( $uid ); ?>-mkt">Voglio ricevere aggiornamenti su corsi, agevolazioni e scadenze (facoltativo).</label>
+				<label for="<?php echo esc_attr( $uid ); ?>-mkt"><?php echo esc_html( ip_opt( 'mkt_text' ) ); ?></label>
 			</div>
 			<?php $err = 1 === $count && isset( $_GET['ip_err'] ) ? sanitize_text_field( wp_unslash( $_GET['ip_err'] ) ) : ''; ?>
 			<div class="form-msg" role="alert"<?php echo $err ? '' : ' hidden'; ?>><?php echo esc_html( $err ); ?></div>

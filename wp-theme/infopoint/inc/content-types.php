@@ -1,6 +1,7 @@
 <?php
 /**
- * Corsi, tipologie, aree e agevolazioni. Campi nativi: nessun ACF.
+ * Corsi, piani di studio, tipologie, dipartimenti, aree e agevolazioni.
+ * Campi nativi, nessun ACF: tutto si modifica e si aggiunge dal pannello.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -34,8 +35,16 @@ add_action( 'init', function () {
 		'rewrite'           => array( 'slug' => 'tipologia', 'with_front' => false ),
 	) );
 
+	register_taxonomy( 'dipartimento', 'corso', array(
+		'labels'            => array( 'name' => 'Dipartimenti', 'singular_name' => 'Dipartimento', 'add_new_item' => 'Nuovo dipartimento' ),
+		'hierarchical'      => true,
+		'show_admin_column' => true,
+		'show_in_rest'      => true,
+		'rewrite'           => array( 'slug' => 'dipartimento', 'with_front' => false ),
+	) );
+
 	register_taxonomy( 'area', 'corso', array(
-		'labels'            => array( 'name' => 'Aree / Dipartimenti', 'singular_name' => 'Area', 'add_new_item' => 'Nuova area' ),
+		'labels'            => array( 'name' => 'Aree tematiche', 'singular_name' => 'Area tematica', 'add_new_item' => 'Nuova area' ),
 		'hierarchical'      => true,
 		'show_admin_column' => true,
 		'show_in_rest'      => true,
@@ -55,6 +64,23 @@ add_action( 'init', function () {
 		'show_in_menu'       => 'edit.php?post_type=corso',
 		'publicly_queryable' => false,
 		'supports'           => array( 'title', 'page-attributes' ),
+	) );
+
+	register_post_type( 'curriculum', array(
+		'labels'             => array(
+			'name'          => 'Piani di studio',
+			'singular_name' => 'Piano di studio',
+			'add_new'       => 'Aggiungi piano di studio',
+			'add_new_item'  => 'Nuovo piano di studio (curriculum)',
+			'edit_item'     => 'Modifica piano di studio',
+			'all_items'     => 'Piani di studio',
+		),
+		'public'             => false,
+		'show_ui'            => true,
+		'show_in_menu'       => 'edit.php?post_type=corso',
+		'show_in_rest'       => true,
+		'publicly_queryable' => false,
+		'supports'           => array( 'title', 'editor', 'page-attributes', 'revisions' ),
 	) );
 
 	foreach ( array_keys( ip_course_fields() ) as $k ) {
@@ -78,7 +104,9 @@ function ip_course_fields() {
 		'stato'    => array( 'Iscrizioni', 'select', '', array( 'aperte' => 'Aperte', 'presto' => 'In apertura', 'chiuse' => 'Chiuse' ) ),
 		'accesso'  => array( 'Accesso', 'text', 'Es. Libero, senza test d’ingresso.' ),
 		'lingua'   => array( 'Lingua', 'text', 'Vuoto = italiano.' ),
-		'retta'    => array( 'Costo', 'text', 'Es. € 2.760/anno oppure € 1.800. Vuoto = rimanda alle agevolazioni.' ),
+		'retta'    => array( 'Costo', 'text', 'Es. € 2.200. Vuoto per le lauree = retta standard e agevolazioni.' ),
+		'evidenza' => array( 'Nota in evidenza', 'text', 'Es. Abilitante alla professione di Psicologo.' ),
+		'fonte'    => array( 'Pagina ufficiale UniMarconi', 'text', 'Riferimento interno, non mostrato ai visitatori.' ),
 		'featured' => array( 'In evidenza in home', 'checkbox', '' ),
 	);
 }
@@ -90,7 +118,71 @@ function ip_meta( $key, $post_id = null ) {
 add_action( 'add_meta_boxes', function () {
 	add_meta_box( 'ip-course', 'Scheda corso', 'ip_course_box', 'corso', 'side', 'high' );
 	add_meta_box( 'ip-agev', 'Dettagli agevolazione', 'ip_agev_box', 'agevolazione', 'normal', 'high' );
+	add_meta_box( 'ip-curricula', 'Piani di studio (curricula)', 'ip_curricula_box', 'corso', 'normal', 'high' );
+	add_meta_box( 'ip-docs', 'Documenti scaricabili', 'ip_docs_box', 'corso', 'normal', 'default' );
+	add_meta_box( 'ip-faq', 'Domande frequenti sul corso', 'ip_faq_box', 'corso', 'normal', 'default' );
+	add_meta_box( 'ip-curr-course', 'Corso di appartenenza', 'ip_curr_course_box', 'curriculum', 'side', 'high' );
 } );
+
+function ip_docs_box( $post ) {
+	echo '<p class="description">Brochure, regolamento didattico, «il corso in breve», bandi… Carica il PDF dalla Libreria media o incolla un link.</p>';
+	ip_repeater( 'ip_docs', array( 'label' => array( 'Titolo', 'text' ), 'url' => array( 'File o link', 'media' ) ), ip_meta_rows( 'docs', $post->ID ) );
+}
+
+function ip_faq_box( $post ) {
+	echo '<p class="description">Mostrate in fondo alla scheda del corso.</p>';
+	ip_repeater( 'ip_faq', array( 'domanda' => array( 'Domanda', 'text' ), 'risposta' => array( 'Risposta', 'textarea' ) ), ip_meta_rows( 'faq', $post->ID ) );
+}
+
+function ip_meta_rows( $key, $id ) {
+	$v = get_post_meta( $id, '_ip_' . $key, true );
+	return is_array( $v ) ? $v : array();
+}
+
+function ip_course_curricula( $course_id ) {
+	return get_posts( array(
+		'post_type'      => 'curriculum',
+		'posts_per_page' => 50,
+		'post_status'    => 'publish',
+		'meta_key'       => '_ip_course',
+		'meta_value'     => (int) $course_id,
+		'orderby'        => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
+	) );
+}
+
+function ip_curricula_box( $post ) {
+	$list = get_posts( array( 'post_type' => 'curriculum', 'posts_per_page' => 50, 'post_status' => 'any', 'meta_key' => '_ip_course', 'meta_value' => $post->ID, 'orderby' => 'menu_order', 'order' => 'ASC' ) );
+	echo '<p class="description">Ogni curriculum ha il suo piano di studi (tabelle per anno, esami a scelta). Nella scheda pubblica vengono mostrati come elenco apribile.</p>';
+	if ( $list ) {
+		echo '<ul class="ip-curr-list">';
+		foreach ( $list as $c ) {
+			printf( '<li><a href="%s"><strong>%s</strong></a> <span>%s · <a href="%s">Modifica</a></span></li>', esc_url( get_edit_post_link( $c->ID ) ), esc_html( $c->post_title ), 'publish' === $c->post_status ? 'pubblicato' : esc_html( $c->post_status ), esc_url( get_edit_post_link( $c->ID ) ) );
+		}
+		echo '</ul>';
+	}
+	if ( 'auto-draft' !== $post->post_status ) {
+		printf( '<p><a class="button" href="%s">+ Aggiungi curriculum</a></p>', esc_url( admin_url( 'post-new.php?post_type=curriculum&ip_course=' . $post->ID ) ) );
+	} else {
+		echo '<p>Salva il corso per aggiungere i piani di studio.</p>';
+	}
+}
+
+function ip_curr_course_box( $post ) {
+	wp_nonce_field( 'ip_meta', 'ip_meta_nonce' );
+	$cur = (int) get_post_meta( $post->ID, '_ip_course', true );
+	if ( ! $cur && isset( $_GET['ip_course'] ) ) {
+		$cur = absint( $_GET['ip_course'] );
+	}
+	$courses = get_posts( array( 'post_type' => 'corso', 'posts_per_page' => 500, 'orderby' => 'title', 'order' => 'ASC', 'post_status' => 'any' ) );
+	echo '<select name="ip_course" style="width:100%"><option value="">— Scegli il corso —</option>';
+	foreach ( $courses as $c ) {
+		printf( '<option value="%d" %s>%s</option>', (int) $c->ID, selected( $cur, $c->ID, false ), esc_html( $c->post_title ) );
+	}
+	echo '</select><p class="description">L’ordine tra più curricula si imposta in «Attributi» → Ordine.</p>';
+	if ( $cur ) {
+		printf( '<p><a href="%s">← Torna al corso</a></p>', esc_url( get_edit_post_link( $cur ) ) );
+	}
+}
 
 function ip_course_box( $post ) {
 	wp_nonce_field( 'ip_meta', 'ip_meta_nonce' );
@@ -122,6 +214,7 @@ function ip_agev_fields() {
 		'retta' => array( 'Retta annua (€, solo numero)', 'text' ),
 		'rata'  => array( 'Rata mensile (€, solo numero)', 'text' ),
 		'cond'  => array( 'Condizioni (una per riga)', 'textarea' ),
+		'det'   => array( 'Dettagli aggiuntivi (es. elenco enti)', 'textarea' ),
 	);
 }
 
@@ -147,6 +240,27 @@ add_action( 'save_post', function ( $post_id, $post ) {
 	}
 	if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ! current_user_can( 'edit_post', $post_id ) ) {
 		return;
+	}
+	if ( 'curriculum' === $post->post_type ) {
+		$c = isset( $_POST['ip_course'] ) ? absint( $_POST['ip_course'] ) : 0;
+		$c ? update_post_meta( $post_id, '_ip_course', $c ) : delete_post_meta( $post_id, '_ip_course' );
+		return;
+	}
+	if ( 'corso' === $post->post_type ) {
+		foreach ( array( 'docs' => array( 'label', 'url' ), 'faq' => array( 'domanda', 'risposta' ) ) as $key => $cols ) {
+			$rows = array();
+			foreach ( (array) ( $_POST[ 'ip_' . $key ] ?? array() ) as $r ) {
+				$r = wp_unslash( (array) $r );
+				$clean = array(
+					$cols[0] => sanitize_text_field( $r[ $cols[0] ] ?? '' ),
+					$cols[1] => 'url' === $cols[1] ? esc_url_raw( $r[ $cols[1] ] ?? '' ) : sanitize_textarea_field( $r[ $cols[1] ] ?? '' ),
+				);
+				if ( implode( '', $clean ) !== '' ) {
+					$rows[] = $clean;
+				}
+			}
+			$rows ? update_post_meta( $post_id, '_ip_' . $key, $rows ) : delete_post_meta( $post_id, '_ip_' . $key );
+		}
 	}
 	$fields = 'corso' === $post->post_type ? ip_course_fields() : ( 'agevolazione' === $post->post_type ? ip_agev_fields() : array() );
 	$in     = isset( $_POST['ip'] ) ? wp_unslash( (array) $_POST['ip'] ) : array();
@@ -225,9 +339,37 @@ add_action( 'pre_get_posts', function ( $q ) {
 	if ( is_admin() || ! $q->is_main_query() ) {
 		return;
 	}
-	if ( $q->is_post_type_archive( 'corso' ) || $q->is_tax( array( 'tipologia', 'area' ) ) ) {
+	if ( $q->is_post_type_archive( 'corso' ) || $q->is_tax( array( 'tipologia', 'area', 'dipartimento' ) ) ) {
 		$q->set( 'posts_per_page', 300 );
 		$q->set( 'orderby', array( 'menu_order' => 'ASC', 'title' => 'ASC' ) );
 		$q->set( 'no_found_rows', true );
 	}
 } );
+
+add_filter( 'manage_curriculum_posts_columns', function ( $c ) {
+	$c['ip_course'] = 'Corso';
+	return $c;
+} );
+add_action( 'manage_curriculum_posts_custom_column', function ( $col, $id ) {
+	if ( 'ip_course' === $col ) {
+		$c = (int) get_post_meta( $id, '_ip_course', true );
+		echo $c ? '<a href="' . esc_url( get_edit_post_link( $c ) ) . '">' . esc_html( get_the_title( $c ) ) . '</a>' : '—';
+	}
+}, 10, 2 );
+
+// Filtro per corso nell'elenco dei piani di studio.
+add_action( 'pre_get_posts', function ( $q ) {
+	if ( is_admin() && $q->is_main_query() && 'curriculum' === $q->get( 'post_type' ) && ! empty( $_GET['ip_course'] ) ) {
+		$q->set( 'meta_key', '_ip_course' );
+		$q->set( 'meta_value', absint( $_GET['ip_course'] ) );
+	}
+} );
+
+// Ordine delle tipologie anche nella schermata dei termini.
+add_filter( 'manage_edit-tipologia_columns', function ( $c ) {
+	$c['ip_ordine'] = 'Ordine';
+	return $c;
+} );
+add_filter( 'manage_tipologia_custom_column', function ( $out, $col, $term_id ) {
+	return 'ip_ordine' === $col ? (string) (int) get_term_meta( $term_id, 'ordine', true ) : $out;
+}, 10, 3 );

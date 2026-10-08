@@ -4,15 +4,28 @@ Tema classico, senza page builder e senza plugin obbligatori. Sostituisce
 Elementor, Contact Form 7/Flamingo, ACF, Yoast (per l'essenziale) e il banner
 cookie esterno.
 
-**Peso:** home completa ≈ 13 KB compressi (HTML + CSS incorporato), un solo
-file JS da ~5 KB, zero font esterni, zero jQuery, zero CSS dei blocchi core.
+**Peso:** home completa ≈ 15 KB compressi (HTML + CSS incorporato), un solo
+file JS da ~6 KB, font Montserrat incluso nel tema (38 KB, disattivabile),
+zero jQuery, zero CSS dei blocchi core, zero richieste a server esterni.
+
+**Palette ufficiale UniMarconi** (presa dal CSS di unimarconi.it): verde
+`#225e48` (hover `#174f3a`), rosso mattone `#a0300e` (hover `#ca451d`),
+grigio `#f0f0f0`, antracite `#373737`, font Montserrat. Tutti i colori sono
+modificabili da *Infopoint → Impostazioni → Aspetto*.
 
 ## Installazione
 
 1. Comprimi la cartella `infopoint` in `infopoint.zip` (o usa lo zip fornito)
    e caricala da *Aspetto → Temi → Aggiungi nuovo → Carica tema*. Attivala.
-2. *Infopoint → Contenuti iniziali → Crea i contenuti*: crea 9 tipologie,
-   99 corsi, 10 agevolazioni, 15 pagine, menu, home e pagina "grazie".
+2. *Infopoint → Contenuti ufficiali → Avvia*: crea 12 tipologie,
+   **159 corsi ufficiali** (lauree, master, master per la didattica,
+   percorsi abilitanti, sostegno, corsi di formazione, microcredenziali,
+   dottorati) con presentazione, obiettivi, sbocchi, accesso, **65 piani di
+   studio** in tabella, documenti PDF ufficiali; 15 agevolazioni; 37 pagine
+   (tasse, immatricolazione, trasferimenti, pagamenti, ICA, studenti
+   stranieri, Dual Career, DSA, PA 110 e lode…); menu, home, «grazie».
+   Poi *Scarica 20 immagini* (ripetere) per le copertine ufficiali.
+   Si può rilanciare: «Solo ciò che manca», «Completa» o «Sovrascrivi».
 3. *Infopoint → Impostazioni*: città, telefoni, WhatsApp, email, indirizzi,
    ragione sociale e P.IVA, destinatari delle richieste, pagina privacy,
    GTM. *Aspetto → Personalizza → Identità del sito* per il logo.
@@ -22,9 +35,15 @@ file JS da ~5 KB, zero font esterni, zero jQuery, zero CSS dei blocchi core.
 
 | Funzione | Dove |
 |---|---|
-| Corsi con classe, CFU, durata, accesso, stato iscrizioni, in evidenza | *Corsi* (riquadro «Scheda corso») |
-| Tipologie ordinabili, aree/dipartimenti | *Corsi → Tipologie / Aree* |
-| Agevolazioni con retta, rata, condizioni | *Corsi → Agevolazioni* |
+| Corsi: classe, CFU, durata, accesso, lingua, costo, nota in evidenza, stato iscrizioni, in evidenza in home | *Corsi* (riquadro «Scheda corso») |
+| Piani di studio per curriculum (tabelle modificabili) | *Corsi → Piani di studio*, o dal riquadro nel corso |
+| Documenti scaricabili (brochure, regolamento…) e FAQ del corso | riquadri nel corso, con «+ Aggiungi» e Libreria media |
+| Tipologie ordinabili, dipartimenti, aree tematiche | *Corsi → Tipologie / Dipartimenti / Aree* |
+| Agevolazioni con retta, rata, condizioni, dettagli | *Corsi → Agevolazioni* |
+| Home: titolo, punti di forza, numeri, sezioni (attiva/ordina), recensioni, FAQ | *Infopoint → Impostazioni → Home page* |
+| Passi «come funziona», fasce di contatto, testi dei moduli e dei consensi | *Impostazioni → Testi ricorrenti / Moduli* |
+| Sedi d'esame ufficiali (38) | *Impostazioni → Sedi d'esame* |
+| Colori e font | *Impostazioni → Aspetto* |
 | Moduli: informazioni, richiamata, prevalutazione CFU con allegati | ovunque, automatici o con shortcode |
 | Archivio richieste con stato, note, filtri, esportazione CSV per Excel | *Richieste* |
 | Email di notifica con Reply-To e allegati, webhook JSON per CRM | *Impostazioni → Conversione* |
@@ -41,7 +60,7 @@ file JS da ~5 KB, zero font esterni, zero jQuery, zero CSS dei blocchi core.
 ```
 [ip_modulo tipo="info|callback|cfu" titolo="" testo="" pulsante=""]
 [ip_corsi tipologia="laurea-triennale,laurea-magistrale" filtro="si|no"]
-[ip_agevolazioni]   [ip_sedi]   [ip_contatti]   [ip_passi]   [ip_cta titolo=""]
+[ip_agevolazioni]   [ip_sedi]   [ip_contatti]   [ip_passi]   [ip_faq]   [ip_cta titolo=""]
 ```
 
 Ogni pagina senza modulo ne riceve uno in fondo («Parla con un orientatore»),
@@ -55,9 +74,16 @@ così nessuna pagina resta senza conversione.
 
 ## Note
 
-- Le schede corso nascono con i soli dati essenziali: presentazione, sbocchi e
-  piano di studi vanno scritti (tabelle con il blocco *Tabella*, FAQ con il
-  blocco *Dettagli*). Testi originali = migliore posizionamento.
+- I testi dei corsi sono quelli ufficiali dell'Ateneo, in blocchi Gutenberg
+  modificabili. Google tende a non premiare i testi identici a quelli di un
+  altro sito: conviene riscrivere almeno l'introduzione dei corsi su cui si
+  investe in campagne.
+- Rispetto all'offerta ufficiale, 7 corsi del sito dell'Aquila non risultano
+  più attivi (perfezionamento WHA/WBE/WLM, certificazioni LIM e tablet, Master
+  in International Management e Banking and Finance in inglese): con
+  «Metti in bozza i corsi non più in offerta» si nascondono.
+- Importi e scadenze sono aggiornati a ottobre 2026: verificarli prima delle
+  campagne. Gli script per riscaricarli sono in `wp-theme/tools/`.
 - Gli allegati CFU sono salvati in `uploads/ip-leads/<cartella casuale>/`,
   protetti da `.htaccess`; su Nginx aggiungere `location ~ /ip-leads/ { deny all; }`.
 - Per la cache di pagina qualsiasi plugin di cache va bene: i moduli non usano

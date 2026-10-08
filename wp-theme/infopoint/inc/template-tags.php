@@ -50,7 +50,7 @@ function ip_wa_href( $text = '' ) {
 		$n = '39' . $n;
 	}
 	if ( ! $text ) {
-		$text = 'Buongiorno, vorrei informazioni sui corsi UniMarconi.';
+		$text = ip_opt( 'wa_text' );
 	}
 	return 'https://wa.me/' . $n . '?text=' . rawurlencode( $text );
 }
@@ -178,7 +178,7 @@ function ip_breadcrumbs() {
  */
 function ip_cta_band( $title = '' ) {
 	if ( ! $title ) {
-		$title = 'Non sai ancora quale corso scegliere?';
+		$title = ip_opt( 'cta_title' );
 	}
 	$wa = ip_wa_href();
 	?>
@@ -186,7 +186,7 @@ function ip_cta_band( $title = '' ) {
 		<div class="wrap band-in">
 			<div>
 				<h2><?php echo esc_html( $title ); ?></h2>
-				<p>Un orientatore ti richiama, ascolta cosa ti serve e ti propone il percorso più adatto, con costi e agevolazioni. Senza impegno.</p>
+				<p><?php echo esc_html( ip_opt( 'cta_text' ) ); ?></p>
 			</div>
 			<div class="band-actions">
 				<a class="btn btn-accent" href="#richiedi" data-scroll-form>Richiedi informazioni</a>
