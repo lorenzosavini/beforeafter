@@ -1,17 +1,148 @@
 [
- {"title":"Retta standard","slug":"retta-standard","destinatari":"Tutti gli studenti dei corsi di laurea","retta":"2760","rata":"230","ordine":1,"condizioni":"Rateizzazione mensile senza costi aggiuntivi, oppure in 2, 4 o 6 rate annue\nCurriculum in lingua inglese: € 3.000 l'anno (€ 250 al mese)\nDiritti di segreteria e tassa esami inclusi\nEscluse tassa di laurea e tassa regionale\nEsclusi gli orientamenti in partnership"},
- {"title":"Futuro Giovani","slug":"futuro-giovani","destinatari":"Giovani dai 18 ai 21 anni","retta":"1620","rata":"135","ordine":2,"condizioni":"Valida per tutti i corsi di laurea\nRateizzazione mensile o in 2, 4 o 6 rate annue senza costi aggiuntivi\nDiritti di segreteria e tassa esami inclusi\nEscluse tassa di laurea e tassa regionale\nNon valida per fuori corso e tempo parziale\nNon cumulabile con altre agevolazioni\nEsclusi corsi in partnership, Scienze Motorie e corsi in lingua inglese"},
- {"title":"Laurea in Divisa","slug":"laurea-in-divisa","destinatari":"Forze Armate, Forze dell'Ordine e familiari diretti","retta":"1800","rata":"150","ordine":3,"condizioni":"Valida per tutti i corsi di laurea\nMaster: 10% di sconto sulla quota standard, fino a 12 rate\nDiritti di segreteria e tassa esami inclusi\nEscluse tassa di laurea e tassa regionale\nNon valida per fuori corso e tempo parziale\nNon cumulabile con altre agevolazioni","dettagli":"Destinatari: Ministero della Difesa (personale civile e militare), Esercito Italiano, Marina Militare, Aeronautica Militare, Arma dei Carabinieri, Polizia di Stato, Guardia di Finanza, Polizia Penitenziaria, Vigili del Fuoco (effettivi e ausiliari), Capitanerie di Porto – Guardia Costiera, Corpi Forestali delle Regioni a Statuto Speciale, Polizia Locale, Agenzia Dogane, personale civile dei Ministeri dell'Interno, delle Finanze e della Giustizia impiegato presso reparti FFOO/FFAA, Croce Rossa Italiana, Corpo Militare ACISMOM, Croce Bianca, Vigili del Fuoco Volontari dell'Alto Adige. Valida anche per i familiari diretti (coniugi o conviventi, figli, fratelli e sorelle, genitori)."},
- {"title":"Pubblica Amministrazione","slug":"pubblica-amministrazione","destinatari":"Dipendenti pubblici e loro familiari diretti","retta":"1800","rata":"150","ordine":4,"condizioni":"Valida per tutti i corsi di laurea\nMaster di II livello in Scienze della Pubblica Amministrazione a € 1.200 invece di € 1.800\nDiritti di segreteria e tassa esami inclusi\nEscluse tassa di laurea e tassa regionale\nNon valida per fuori corso e tempo parziale\nNon cumulabile con altre agevolazioni"},
- {"title":"PA 110 e lode","slug":"pa-110-e-lode","destinatari":"Personale della Pubblica Amministrazione aderente al programma del Dipartimento della Funzione Pubblica","retta":"2200","rata":"","ordine":5,"condizioni":"Sconto di € 560 sulla retta standard dei corsi di laurea\nRateizzazione in 2, 4, 6 o 12 rate senza costi aggiuntivi\nValida per la durata normale del corso più 2 anni fuori corso\nContributo statale fino a € 1.000 se si sostiene almeno il 50% dei CFU dell'anno (se disponibili i fondi)\nMaster: sconto di € 330 e contributo fino al 50% del costo (max € 2.500) a percorso concluso\nNon è possibile l'iscrizione contemporanea ad altro corso o master"},
- {"title":"Programma Continuità","slug":"programma-continuita","destinatari":"Chi ha già una carriera universitaria (rinuncia, decadenza, trasferimento) e vuole riprendere","retta":"2400","rata":"200","ordine":6,"condizioni":"Retta agevolata per la durata normale del corso\nDiritti di segreteria e tasse d'esame inclusi\nTassa di laurea e tassa regionale escluse\nNon applicabile agli anni fuori corso né al tempo parziale\nNon applicabile a chi ha solo la triennale e si iscrive a una magistrale\nPromozione valida per le richieste presentate entro il 30 novembre 2026"},
- {"title":"Sport&Studio","slug":"sport-e-studio","destinatari":"Atleti agonisti e professionisti del mondo sportivo","retta":"1920","rata":"160","ordine":7,"condizioni":"Valida per tutti i corsi di laurea\nDiritti di segreteria e tassa esami inclusi\nEscluse tassa di laurea e tassa regionale\nNon valida per fuori corso e tempo parziale\nNon cumulabile con altre agevolazioni"},
- {"title":"Laureati UniMarconi","slug":"laureati-unimarconi","destinatari":"Chi si è già laureato in UniMarconi e vuole una seconda laurea","retta":"1980","rata":"165","ordine":8,"condizioni":"Valida per triennali, magistrali e ciclo unico\nMaster: 10% di sconto per iscritti e laureati UniMarconi (esclusi i master con Il Messaggero e Start2Impact)\nDiritti di segreteria e tassa esami inclusi\nNon cumulabile con altre agevolazioni"},
- {"title":"Personale docente e ATA","slug":"docenti-ata","destinatari":"Docenti e personale ATA della scuola","retta":"2020","rata":"","ordine":9,"condizioni":"Valida per lauree di I e II livello e ciclo unico\nPagamento in 2, 4 o 6 rate senza costi aggiuntivi\nDiritti di segreteria e tassa esami inclusi\nNon valida per fuori corso e tempo parziale\nNon cumulabile con altre agevolazioni"},
- {"title":"Professione Ingegnere","slug":"professione-ingegnere","destinatari":"Iscritti alle lauree magistrali di Ingegneria","retta":"2280","rata":"190","ordine":10,"condizioni":"Valida per le lauree magistrali di Ingegneria\nDiritti di segreteria e tassa esami inclusi\nNon valida per fuori corso e tempo parziale\nNon cumulabile con altre agevolazioni"},
- {"title":"Bonus Famiglia","slug":"bonus-famiglia","destinatari":"Familiari di studenti già iscritti (coniuge, figli, fratelli, genitori)","retta":"2346","rata":"195,50","ordine":11,"condizioni":"Riduzione del 15% sulla retta annua\nSi applica al momento dell'immatricolazione\nNon valida per fuori corso e tempo parziale\nNon cumulabile con altre agevolazioni"},
- {"title":"Studenti con disabilità ≥ 45%","slug":"studenti-disabilita","destinatari":"Studenti con invalidità riconosciuta pari o superiore al 45%","retta":"2208","rata":"184","ordine":12,"condizioni":"Riduzione del 20% sulla retta standard, 12 rate senza interessi\nValida anche per fuori corso e tempo parziale\nEsenzione dalla tassa regionale dal 66% di invalidità o con L. 104 art. 3 c. 1\nEscluso il corso in Scienze Motorie e Sportive\nNon cumulabile con altre agevolazioni"},
- {"title":"Borsisti DiSCo Lazio","slug":"borsisti-disco-lazio","destinatari":"Vincitori di borsa di studio DiSCo Lazio","retta":"","rata":"","ordine":13,"condizioni":"Riduzione della contribuzione pari alla differenza tra borsa assegnata e retta dovuta\nNon applicabile agli studenti fuori corso\nServe la documentazione che attesta l'importo della borsa"},
- {"title":"Prestito per Merito","slug":"prestito-per-merito","destinatari":"Chi vuole finanziare gli studi con Intesa Sanpaolo","retta":"","rata":"","ordine":14,"condizioni":"Prestito dedicato agli studenti UniMarconi in collaborazione con Intesa Sanpaolo\nPensato per sostenere retta e spese durante gli studi\nCondizioni e requisiti sul sito di Intesa Sanpaolo"},
- {"title":"Enti convenzionati","slug":"enti-convenzionati","destinatari":"Dipendenti e iscritti di aziende, ordini, sindacati e associazioni convenzionate","retta":"","rata":"","ordine":15,"condizioni":"Retta dedicata secondo la convenzione del tuo ente\nIndicaci il tuo ente: verifichiamo noi la convenzione","dettagli":"ACEA SPA · AECI Avezzano APS · Aletheia holding · ANCIT · ANCOT · ANDOC · ARCA ENEL · Astrea APS · Assiterminal · Associazione Azione Legale · AIGA – Associazione Italiana Giovani Avvocati · Associazione Informatici Professionisti · Associazione Lavoratori Intesa Sanpaolo · Associazione Marco Grassi · Associazione Marinella Bruno · Associazione Nazionale Forense · Assoporti · ASD Top Trainer · Aviapartner Italia · CISL UST Ferrara · Comitato Regionale Liguria FPI · CSE – Confederazione Indipendente Sindacati Europei · Confimprese Roma Capitale · Connection Plus · CONFINTESA funzione pubblica · Consorzio Metropolis · Cooperativa Sociale Società Dolce · CORSI.IT · CRAL ADOLMA MASE · CRAL Aeroporti di Roma · CRAL Generali Italia Roma · CRALT · ENPACL · FAIP Italia Counseling · Federmanager Roma · FEDIR · FELSA CISL · FIADEL-CSA Roma · FIBS · FIM-CISL · Findomestic Banca · FIOM CGIL Taranto · FLP · Fondazione A Voce d'e Creature · ITS Abruzzo Green Academy · ITS Academy Innovaprofessioni · Fondazione Machiavelli · Genesi Group · GdF Circolo Sportivo Calcio Roma · INFN · Kalat SSD · Karma · Karma Was · Liceo Professionale Danza · MASAF · MAECI · Mater Boni Consilii ETS · Mercurio Service · OAM · Open Digital · Open Fiber · Ordine Periti Industriali Trento · Personale dell'Amministrazione Penitenziaria · Roma Capitale · SIAP · Soc. Coop. Operosa · Società Italiana Bricolage · Tecnolife IT Consulting · SPI CGIL Lombardia · SSML Ancona, Gregorio VII, Padova, Palermo, Pinerolo, San Domenico, Varese · STEM · UCIIM · UIL Roma · UPI Lazio · UNIPOL · USMIA"}
+ {
+  "title": "Retta standard",
+  "slug": "retta-standard",
+  "fonte": "retta-standard",
+  "destinatari": "Tutti gli studenti dei corsi di laurea",
+  "retta": "2760",
+  "rata": "230",
+  "ordine": 1,
+  "condizioni": "Valida per tutti i corsi di laurea offerti dall’Ateneo\nRetta annua: € 2760, per i curriculum in lingua inglese la retta è di € 3000\nRateizzazione mensile a € 230 (€ 250 per i curriculum in lingua inglese) senza costi aggiuntivi, o in alternativa 2/4/6 rate annue\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nEsclusi tutti gli orientamenti in partnership"
+ },
+ {
+  "title": "Programma Continuità UniMarconi",
+  "slug": "programma-continuita",
+  "fonte": "programma-continuita-unimarconi",
+  "destinatari": "Rivolta a coloro che hanno già maturato una carriera universitaria e intendono riprendere o proseguire il proprio percorso di studi, anche in…",
+  "retta": "2400",
+  "rata": "200",
+  "ordine": 2,
+  "condizioni": "Retta agevolata pari a € 2.400 annui per la durata normale del corso.\nRateizzazione mensile a € 200 senza costi aggiuntivi\nDiritti di segreteria e tasse d’esame inclusi.\nTassa di laurea e tassa regionale escluse.\nNon applicabile agli anni fuori corso.\nNon cumulabile con altre agevolazioni, promozioni o convenzioni.\nNon applicabile ai percorsi con iscrizione a tempo parziale.\nNon applicabile a chi, in possesso esclusivamente di una laurea triennale, intende iscriversi a un corso di laurea magistrale.\nPromozione valida per le richieste presentate entro il 30 novembre 2026.\nEsclusi tutti gli orientamenti in partnership"
+ },
+ {
+  "title": "Laurea in divisa",
+  "slug": "laurea-in-divisa",
+  "fonte": "laurea-in-divisa",
+  "destinatari": "Dedicata agli appartenenti al mondo delle Forze Armate e dell’Ordine e ai familiari diretti del personale di seguito indicato",
+  "retta": "1800",
+  "rata": "150",
+  "ordine": 3,
+  "condizioni": "Valida per tutti i corsi di laurea offerti dall’Ateneo\nRetta annua: € 1.800\nRateizzazione mensile a € 150 senza costi aggiuntivi, o in alternativa 2/4/6 rate annue\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali",
+  "dettagli": "Destinatari: Ministero della Difesa, personale civile e militare, Esercito Italiano, Marina Militare, Aeronautica Militare, Arma dei Carabinieri, Forze dell’Ordine, Polizia di Stato, Guardia di Finanza, Polizia Penitenziaria, Vigili del Fuoco (effettivi ed ausiliari), Corpo delle Capitanerie di Porto – Guardia Costiera, Corpi Forestali delle Regioni Autonome a Statuto Speciale, Polizia Locale, Agenzia Dogane, Personale civile appartenente ai Ministeri dell’Interno, delle Finanze e della Giustizia qualora impiegato presso i Reparti delle FFOO/FFAA, Personale in servizio attivo dipendente e volontario (non applicabile ad associato “simpatizzante” o “sostenitore”), Croce Rossa Italiana (componente civile e militare), Corpo Militare ACISMOM, Croce Bianca – Weisses Kreuz, Vigili del Fuoco Volontari dell’Alto Adige – Freiwilligen Feuerwehren Südtirols.\nMaster: Agevolazione valida per tutti i master presenti nell’offerta didattica Unimarconi · Sconto del 10% sulla quota di iscrizione standard · Pagamento dilazionato fino a 12 comode rate mensili · Non cumulabile con altre agevolazioni/convenzioni · Esclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese."
+ },
+ {
+  "title": "Pubblica Amministrazione Unimarconi",
+  "slug": "pubblica-amministrazione",
+  "fonte": "pubblica-amministrazione-unimarconi",
+  "destinatari": "Rivolto ai dipendenti della Pubblica Amministrazione e ai familiari diretti",
+  "retta": "1800",
+  "rata": "150",
+  "ordine": 4,
+  "condizioni": "Valida per tutti i corsi di laurea offerti dall’Ateneo\nRetta annua: € 1.800\nRateizzazione mensile a € 150 senza costi aggiuntivi, o in alternativa 2/4/6 rate annue\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese.",
+  "dettagli": "Master: Agevolazione valida per il Master di II livello in Scienze della Pubblica Amministrazione · Quota di iscrizione €1.200 invece di € 1.800 · Pagamento dilazionato fino a 12 comode rate mensili · Non cumulabile con altre agevolazioni/convenzioni"
+ },
+ {
+  "title": "PA 110 e lode",
+  "slug": "pa-110-e-lode",
+  "fonte": "pa-110-e-lode",
+  "destinatari": "Rivolto al personale della Pubblica Amministrazione",
+  "retta": "2200",
+  "ordine": 5,
+  "condizioni": "Importo dello sconto € 560 sulla retta standard d’Ateneo\nRetta annua: € 2.200\nRateizzazione in 2 – 4 – 6 o 12 rate senza costi aggiuntivi\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per i tempi parziali\nValida per la durata normale del corso + 2 anni fuori corso\nContributo massimo € 1.000 se, al termine dell’anno accademico, lo studente ha sostenuto almeno il 50% dei CFU (non esami convalidati)\nI contributi per gli studenti e le Università vengono erogati solo se ci sono fondi disponibili, in base alle risorse assegnate annualmente al DFP\nAderendo al programma PA 110 e lode, non è possibile iscriversi contemporaneamente a un altro corso di laurea o master.\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi in lingua inglese.",
+  "dettagli": "Master: Importo dello sconto € 330 sulla quota di iscrizione standard · Pagamento dilazionato fino a 12 comode rate mensili · Requisiti di merito: contributo fino al 50% del costo del master, per un massimo di € 2.500, solo se il percorso è terminato e concluso · I contributi statali per gli studenti verranno erogati solo qualora ci siano fondi disponibili · Aderendo al programma PA 110 e lode, non è possibile iscriversi contemporaneamente a un altro corso di laurea o master. · Esclusi i master in partnership e quelli in lingua inglese."
+ },
+ {
+  "title": "Futuro Giovani",
+  "slug": "futuro-giovani",
+  "fonte": "futuro-giovani",
+  "destinatari": "Dedicata ai giovani di età compresa tra i 18 e i 21 anni",
+  "retta": "1620",
+  "rata": "135",
+  "ordine": 6,
+  "condizioni": "Valida per tutti i corsi di laurea offerti dall’Ateneo\nRetta annua: € 1.620\nRateizzazione senza costi aggiuntivi, mensile a € 135 o in alternativa in 2 – 4 o 6 rate annue\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese."
+ },
+ {
+  "title": "Sport&Studio",
+  "slug": "sport-e-studio",
+  "fonte": "sportstudio",
+  "destinatari": "Dedicata a tutti gli appartenenti al mondo sportivo a livello professionale o agonisti, desiderosi di intraprendere un percorso di studi universitario che…",
+  "retta": "1920",
+  "rata": "160",
+  "ordine": 7,
+  "condizioni": "Valida per tutti i corsi di laurea offerti dall’Ateneo\nRetta annua: € 1.920\nRateizzazione senza costi aggiuntivi, mensile a € 160 o in alternativa in 2 – 4 o 6 rate annue\nDiritti di segreteria inclusi\nTasse esami incluse\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese."
+ },
+ {
+  "title": "Personale docente e ATA",
+  "slug": "docenti-ata",
+  "fonte": "personale-docente-e-ata",
+  "destinatari": "Dedicata al Personale Docente e Ata interessato ad iscriversi ad un corso di laurea di I, II livello o a ciclo unico",
+  "retta": "2020",
+  "ordine": 8,
+  "condizioni": "Valida per tutti i corsi di laurea offerti dall’Ateneo\nRetta annua: € 2.020\nRateizzazione in 2 – 4 o 6 rate senza costi aggiuntivi\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese."
+ },
+ {
+  "title": "Laureati Unimarconi",
+  "slug": "laureati-unimarconi",
+  "fonte": "laureati-unimarconi",
+  "destinatari": "Per tutti i nostri laureati, è attiva una promo per l’iscrizione ad una seconda laurea",
+  "retta": "1980",
+  "rata": "165",
+  "ordine": 9,
+  "condizioni": "Valida per l’iscrizione a tutti i corsi di laurea (triennali, magistrali, ciclo unico)\nRetta annua: € 1.980\nRateizzazione senza costi aggiuntivi, mensile a € 165 o in alternativa in 2 – 4 o 6 rate annue\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese.",
+  "dettagli": "Master: Sconto del 10% per studenti iscritti e laureati/diplomati Unimarconi. Valido su tutta l’offerta formativa Master, esclusi i Master in collaborazione con Il Messaggero e Start2Impact."
+ },
+ {
+  "title": "Bonus famiglia",
+  "slug": "bonus-famiglia",
+  "fonte": "bonus-famiglia",
+  "destinatari": "È prevista una riduzione della retta annua del 15% per ciascuno dei familiari degli studenti iscritti ad un corso di laurea e…",
+  "retta": "2346",
+  "rata": "195,50",
+  "ordine": 10,
+  "condizioni": "Valida per tutti i corsi di laurea offerti dall’Ateneo\nRetta annua: € 2346, si applica solo al momento dell’immatricolazione.\nRateizzazione mensile a € 195,50 senza costi aggiuntivi, o in alternativa 2/4/6 rate annue\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese."
+ },
+ {
+  "title": "Professione Ingegnere",
+  "slug": "professione-ingegnere",
+  "fonte": "professione-ingegnere",
+  "destinatari": "Il Programma dedicato alle lauree magistrali di ingegneria",
+  "retta": "2280",
+  "rata": "190",
+  "ordine": 11,
+  "condizioni": "Valida per i corsi di laurea magistrali di ingegneria offerti dall’Ateneo\nRetta annua: € 2280\nRateizzazione senza costi aggiuntivi, mensile a € 190 o in alternativa in 2 – 4 o 6 rate annue\nSono inclusi i diritti di segreteria e tassa esami\nSono escluse tassa di laurea e tassa regionale\nNon valida per gli anni fuori corso\nNon cumulabile con altre agevolazioni/convenzioni\nNon valida per i tempi parziali\nEsclusi tutti i corsi e master in partnership, il corso di laurea in scienze motorie e i corsi e master in lingua inglese."
+ },
+ {
+  "title": "Assegnatari di borse di studio DISCoLAZIO",
+  "slug": "borsisti-disco-lazio",
+  "fonte": "assegnatari-di-borse-di-studio-discolazio",
+  "destinatari": "Lo Studente che risulti vincitore e di conseguenza assegnatario di borsa di studio erogata da DISCoLAZIO beneficia di una riduzione della contribuzione…",
+  "ordine": 12,
+  "condizioni": "La suddetta agevolazione non si applica agli studenti fuori corso.\nSi precisa che è onere dello Studente produrre idonea documentazione attestante l’importo della borsa di studio, al fine di consentire agli Uffici l’applicazione della riduzione spettante."
+ },
+ {
+  "title": "Studenti con disabilità pari o superiore al 45%",
+  "slug": "studenti-disabilita",
+  "fonte": "studenti-con-disabilita-pari-o-superiore-al-45",
+  "destinatari": "Studenti con invalidità riconosciuta pari o superiore al 45%",
+  "retta": "2208",
+  "rata": "184",
+  "ordine": 13,
+  "condizioni": "Per tutti i corsi di laurea triennali, magistrali e ciclo unico, ad eccezione di Scienze Motorie e Sportive (classe L22): 20% di riduzione della retta standard che è dunque pari ad € 2208 (184 € al mese)\nL’agevolazione include i diritti di segreteria e la tassa esami\nL’agevolazione non include la tassa di laurea e la tassa regionale\nSono esentati dal pagamento della tassa regionale gli studenti con un grado di invalidità riconosciuta pari o superiore al 66%, o con handicap ai sensi dell’articolo 3, comma 1, della Legge 5 febbraio 1992, n. 104\nL’agevolazione è applicabile anche agli Studenti fuori corso e a tempo parziale\nNon è cumulabile con altre agevolazioni/convenzioni."
+ },
+ {
+  "title": "Prestito per merito",
+  "slug": "prestito-per-merito",
+  "fonte": "prestito-per-merito",
+  "destinatari": "Lo sviluppo formativo e professionale è un investimento importante, per questo Università degli Studi Guglielmo Marconi e Intesa Sanpaolo S.p.A. offrono per…",
+  "ordine": 14,
+  "condizioni": "Prestito per Merito: Studiato per il tuo futuro"
+ },
+ {
+  "title": "Enti convenzionati",
+  "slug": "enti-convenzionati",
+  "fonte": "enti-convenzionati",
+  "destinatari": "Dipendenti e iscritti di aziende, ordini, sindacati e associazioni convenzionate",
+  "ordine": 15,
+  "dettagli": "ACEA SPA\nAECI Avezzano APS\nAletheia holding\nANCIT – ASSOCIAZIONE NAZIONALE CONSULENTI TRIBUTARI\nANCOT – ASSOCIAZIONE NAZIONALE CONSULENTI TRIBUTARI\nANDOC – ASSOC. NAZ. DOTTORI COMMERCIALISTI\nARCA ENEL\nAstrea – Associazione di Promozione Sociale\nAssiterminal\nAssociazione Azione Legale\nAssociazione Italiana Giovani Avvocati (AIGA)\nASSOCIAZIONE INFORMATICI PROFESSIONISTI\nAssociazione Lavoratori Intesa San Paolo\nASSOCIAZIONE MARCO GRASSI (MI)\nAssociazione Marinella Bruno\nAssociazione Nazionale Forense\nAssociazione Porti Italiani (Assoporti)\nAssociazione Sportiva Dilettantistica Top Trainer (Caltanissetta)\nAviapartner Italia Srl\nChiesa Parrocchiale San Vincenzo Martire BRIANO (CE)\nCISL UST Ferrara\nCOMITATO REGIONALE LIGURIA DELLA FEDERAZIONE PUGILISTICA ITALIANA\nConfederazione Indipendente Sindacati Europei – CSE\nConfimprese Roma Capitale\nConnection Plus srl\nCONFINTESA funzione pubblica\nCONSORZIO COOPERATIVE SOCIALI – METROPOLIS (Molfetta – BA)\nCOOPERATIVA SOCIALE SOCIETÀ DOLCE\nCORSI.IT\nCRAL ADOLMA MINISTERO AMBIENTE E SICUREZZA ENERGETICA\nCRAL Aeroporti di Roma Club\nCRAL Generali Italia sede di Roma\nCRALT Circolo ricreativo aziendale per i lavoratori telecomunicazioni\nENPACL – CONSULENTI LAVORO\nFAIP ITALIA COUNSELING\nFedermanager Roma\nFEDIR – Federazione dirigenti e direttivi pubblici\nFELSA CISL\nFIADEL-CSA Federazione Provinciale di Roma\nFIBS – Federazione Italiana Baseball Softball\nFIM-CISL\nFindomestic Banca SpA\nFIOM CGIL Taranto\nFLP – FEDERAZIONE LAVORATORI PUBBLICI E FUNZIONI PUBBLICHEFLP – FEDERAZIONE LAVORATORI PUBBLICI E FUNZIONI PUBBLICHE\nFondazione “A Voce d”e Creature” Onlus – Napoli\nFONDAZIONE ISTITUTO TECNICO SUPERIORE EFFICIENZA ENERGETICA (ITS ABRUZZO GREEN ACADEMY)\nFONDAZIONE ITS ACADEMY INNOVAPROFESSIONI\nFondazione Machiavelli\nGenesi Group srl\nGuardia di Finanza – Circolo Sportivo sez. Calcio ROMA\nINFN – ISTITUTO NAZIONALE FISICA NUCLEARE\nKalat Società Sportiva Dilettantistica Arl\nKarma srl\nKarma Was srl\nLiceo Professionale Danza\nMASAF – Ministero dell’agricoltura, della sovranità alimentare e delle foreste\nMAECI – MINISTERO AFFARI ESTERI\nMater Boni Consilii – ETS\nMERCURIO SERVICE SPA\nOAM – Organismo per la gestione degli elenchi degli Agenti in attività finanziaria e dei Mediatori creditizi\nOPEN DIGITAL SRL – Città Sant’Angelo (PE)\nOpen Fiber S.p.A.\nORDINE DEI PERITI INDUSTRIALI DELLA PROVINCIA DI TRENTO\nPersonale dell’Amministrazione Penitenziaria\nROMA CAPITALE\nSIAP- Sindacato Nazionale Appartenenti Polizia\nSoc. Cooperativa Operosa\nSocietà Italiana Bricolage\nSocietà Tecnolife IT Consulting\nSPI CGIL – Lombardia – Sindacato Pensionati Italiani LOMBARDIA\nSSML ANCONA\nSSML GREGORIO VII (ROMA)\nSSML PADOVA\nSSML PALERMO\nSSML PINEROLO\nSSML SAN DOMENICO (ROMA)\nSSML VARESE\nSTEM\nUCIIM- Unione Cattolica Italiana Insegnanti, Dirigenti, Educatori, Formatori\nUIL – ROMA\nUNIONE PROVINCE DEL LAZIO – UPI LAZIO\nUNIPOL SPA\nUSMIA – Unione Sindacale Militare Interforze Associati\nInformazioni Informazioni"
+ }
 ]

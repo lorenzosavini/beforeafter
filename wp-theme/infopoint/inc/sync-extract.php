@@ -276,6 +276,10 @@ function ip_src_blocks( $x ) {
 		if ( '' === ip_src_text( $inner ) ) {
 			continue;
 		}
+		// Etichette di pulsanti rimaste senza pulsante (moduli dell'Ateneo).
+		if ( in_array( $tag, array( 'p', 'h2', 'h3', 'h4' ), true ) && preg_match( '/^(?:\s*(?:compila il modulo|richiedi informazioni|scopri di più|clicca qui)\s*)+$/iu', ip_src_text( $inner ) ) ) {
+			continue;
+		}
 		if ( 'p' === $tag ) {
 			$inner = trim( preg_replace( '#</?(?:p|h[2-4]|ul|ol|li|table|tr|td|th|thead|tbody|tfoot)>#', ' ', $inner ) );
 			$out[] = "<!-- wp:paragraph -->\n<p>" . $inner . "</p>\n<!-- /wp:paragraph -->";
@@ -600,12 +604,180 @@ function ip_src_exam_sites( $html ) {
 /**
  * Testo principale di una pagina (per accorgersi che è cambiata).
  */
-function ip_src_main_text( $html ) {
+/* ---------------------------------------------------------------------
+ * Agevolazioni: una per sezione della pagina ufficiale
+ * ------------------------------------------------------------------- */
+
+function ip_src_agev_key( $title ) {
+	return sanitize_title( remove_accents( $title ) );
+}
+
+/**
+ * Righe di testo (paragrafi e voci di elenco) di un frammento pulito, senza
+ * i recapiti dell'Ateneo: chi legge deve contattare voi.
+ *
+ * @return array[] [ 'p'|'li', testo ]
+ */
+function ip_src_agev_lines( $x ) {
+	$out = array();
+	$x   = preg_replace( '#</?(ul|ol)>#', '', str_replace( '<br>', "\x01P\x02", (string) $x ) );
+	$x   = preg_replace( array( '#<li>#', '#<p>#', '#</(li|p)>#' ), array( "\x01LI\x02", "\x01P\x02", "\x01" ), $x );
+	$tag = 'p';
+	foreach ( explode( "\x01", $x ) as $part ) {
+		if ( preg_match( '/^(LI|P)\x02/', $part, $m ) ) {
+			$tag  = strtolower( $m[1] );
+			$part = substr( $part, strlen( $m[0] ) );
+		}
+		$t = trim( preg_replace( '/\s+/u', ' ', ip_src_text( $part ) ) );
+		$t = trim( str_replace( '*', '', $t ), " \t\n\r\0\x0B;" );
+		if ( '' === $t || preg_match( '/@|tel\.|^\+?39|^per (maggiori )?informazioni|^gli studenti (già|non ancora)|pagina dedicata\.?$|^informazioni$/iu', $t ) ) {
+			continue;
+		}
+		$out[] = array( $tag, mb_strtoupper( mb_substr( $t, 0, 1 ) ) . mb_substr( $t, 1 ) );
+	}
+	return $out;
+}
+
+function ip_src_agev_amount( $n, $decimals = false ) {
+	$n = str_replace( '.', '', $n );
+	if ( ! $decimals ) {
+		return (string) (int) round( (float) str_replace( ',', '.', $n ) );
+	}
+	return preg_replace( '/,00$/', '', $n );
+}
+
+/**
+ * Retta annua e rata mensile citate in un testo.
+ */
+function ip_src_agev_prices( $text ) {
+	$retta = '';
+	$rata  = '';
+	if ( preg_match( '/(?:retta|quota)[^€\n]{0,60}?€\s*([\d.]+(?:,\d{1,2})?)/iu', $text, $m ) || preg_match( '/(?:retta|quota)[^€\n]{0,60}?([\d.]{3,})\s*€/iu', $text, $m ) ) {
+		$retta = ip_src_agev_amount( $m[1] );
+	}
+	if ( preg_match( '/mensil\w*[^€\n]{0,30}?€\s*([\d.]+(?:,\d{1,2})?)/iu', $text, $m ) || preg_match( '/([\d.]+(?:,\d{1,2})?)\s*€\s*al mese/iu', $text, $m ) ) {
+		$rata = ip_src_agev_amount( $m[1], true );
+	}
+	return array( $retta, $rata );
+}
+
+/**
+ * «A chi è rivolta»: la frase ufficiale, accorciata per stare in tabella.
+ */
+function ip_src_agev_dest( $t ) {
+	if ( preg_match( '/^(.{40,}?[a-z\)])\.\s/u', $t . ' ', $m ) ) {
+		$t = $m[1];
+	}
+	$t = preg_replace( '/^.{0,40}?è un[’\']agevolazione dedicat([ao])/u', 'Dedicat$1', $t );
+	$t = preg_replace( '/^L[’\']agevolazione è dedicat([ao])/u', 'Dedicat$1', $t );
+	if ( mb_strlen( $t ) > 110 ) {
+		$t = trim( preg_replace( '/\s*\([^)]*\)/u', '', $t ) );
+	}
+	return mb_strlen( $t ) > 160 ? wp_trim_words( $t, 22, '…' ) : rtrim( $t, '.' );
+}
+
+/**
+ * Legge la pagina ufficiale delle agevolazioni.
+ *
+ * @param string        $html  Pagina.
+ * @param callable|null $fetch Per leggere le pagine dedicate citate nelle sezioni vuote.
+ * @return array[] key, title, dest, retta, rata, cond, det, link
+ */
+function ip_src_agevolazioni( $html, $fetch = null ) {
 	$a = ip_src_body_start( $html );
 	$b = strpos( $html, '</main>' );
 	if ( false === $a || false === $b ) {
-		return '';
+		return array();
 	}
-	$clean = ip_src_clean( substr( $html, $a, $b - $a ) );
-	return preg_replace( '/\s+/u', ' ', ip_src_text( str_replace( array( '</p>', '</li>', '</h2>', '</h3>', '</tr>' ), "\n", $clean['html'] ) ) );
+	$raw = substr( $html, $a, $b - $a );
+
+	// Pagine dedicate citate nelle sezioni («vai alla pagina dedicata»).
+	$links = array();
+	foreach ( preg_split( '#<h2\b#i', $raw ) as $chunk ) {
+		if ( preg_match( '#^[^>]*>(.*?)</h2>#is', $chunk, $t ) && preg_match( '#<a[^>]+href="(https://www\.unimarconi\.it/[^"]+)"[^>]*>[^<]*pagina dedicata#iu', $chunk, $l ) ) {
+			$links[ ip_src_agev_key( trim( ip_src_text( $t[1] ), " *\t\n" ) ) ] = $l[1];
+		}
+	}
+
+	$clean            = ip_src_clean( $raw );
+	// Il riquadro laterale (contatti, orari, link utili) inizia con un h4.
+	list( , $secs )   = ip_src_sections( preg_replace( '#<h4>.*$#s', '', $clean['html'] ) );
+	$out              = array();
+	$valid            = '/^(valida|retta|rateizz|sono |non |diritti|tass|importo|sconto|pagamento|agevolazione valida)/iu';
+	foreach ( $secs as $s ) {
+		$title = trim( preg_replace( '/\s*\*+\s*$/u', '', $s[0] ) );
+		if ( '' === $title || preg_match( '/^(contatti|informazioni|link utili|orari)/iu', $title ) ) {
+			continue;
+		}
+		$key   = ip_src_agev_key( $title );
+		$parts = preg_split( '#<h3>(.*?)</h3>#u', $s[1], -1, PREG_SPLIT_DELIM_CAPTURE );
+		$intro = ip_src_agev_lines( array_shift( $parts ) );
+		$subs  = array();
+		for ( $i = 0; $i + 1 < count( $parts ); $i += 2 ) {
+			$subs[] = array( trim( preg_replace( '/\s*\*+\s*$/u', '', ip_src_text( $parts[ $i ] ) ) ), ip_src_agev_lines( $parts[ $i + 1 ] ) );
+		}
+		// Parte principale: i corsi di laurea; le altre (es. master) vanno nei dettagli.
+		$main  = array();
+		$other = array();
+		foreach ( $subs as $sub ) {
+			if ( ! $main && ! preg_match( '/master/iu', $sub[0] ) ) {
+				$main = $sub[1];
+			} else {
+				$other[] = $sub;
+			}
+		}
+		$dest = '';
+		$det  = array();
+		if ( $subs ) {
+			$rest = $intro;
+			if ( $rest && 'p' === $rest[0][0] ) {
+				$dest = array_shift( $rest )[1];
+			}
+			if ( $rest ) {
+				$det[] = 'Destinatari: ' . implode( ', ', wp_list_pluck( $rest, 1 ) ) . '.';
+			}
+			if ( ! $main && ! $other ) {
+				$main = $intro;
+			}
+		} else {
+			$main = $intro;
+		}
+		$lis = wp_list_filter( $main, array( 0 => 'li' ) );
+		if ( count( $lis ) > 8 && count( $lis ) === count( $main ) && ! $subs ) {
+			// Solo un lungo elenco (es. enti convenzionati).
+			$det  = array( implode( "\n", wp_list_pluck( $main, 1 ) ) );
+			$main = array();
+		} elseif ( ! $dest && $main && ! preg_match( $valid, $main[0][1] ) ) {
+			$dest = array_shift( $main )[1];
+		}
+		foreach ( $other as $sub ) {
+			if ( $sub[1] ) {
+				$det[] = $sub[0] . ': ' . implode( ' · ', wp_list_pluck( $sub[1], 1 ) );
+			}
+		}
+		$cond = wp_list_pluck( $main, 1 );
+		$link = isset( $links[ $key ] ) ? $links[ $key ] : '';
+		// Sezione che rimanda a una pagina dedicata: i dati sono lì.
+		if ( ! $cond && ! $det && $link && $fetch ) {
+			$h = call_user_func( $fetch, $link );
+			if ( is_string( $h ) && false !== ( $pa = ip_src_body_start( $h ) ) && false !== ( $pb = strpos( $h, '</main>' ) ) ) {
+				$c2   = ip_src_clean( substr( $h, $pa, $pb - $pa ) );
+				$l2   = ip_src_agev_lines( $c2['html'] );
+				$li2  = wp_list_filter( $l2, array( 0 => 'li' ) );
+				$cond = wp_list_pluck( $li2 ? $li2 : $l2, 1 );
+			}
+		}
+		list( $retta, $rata ) = ip_src_agev_prices( implode( "\n", $cond ) . "\n" . $dest );
+		$out[] = array(
+			'key'   => $key,
+			'title' => $title,
+			'dest'  => $dest ? ip_src_agev_dest( $dest ) : '',
+			'retta' => $retta,
+			'rata'  => $rata,
+			'cond'  => implode( "\n", $cond ),
+			'det'   => implode( "\n", $det ),
+			'link'  => $link,
+		);
+	}
+	return $out;
 }

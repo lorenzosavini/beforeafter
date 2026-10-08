@@ -82,7 +82,7 @@ function ip_seo_desc_for( $id, $custom = true ) {
 		return sprintf( '%s in %s all’Università Marconi: %s. Piano di studi, costi, agevolazioni e iscrizione con l’aiuto di un orientatore.', $tip ? $tip->name : 'Corso', ip_course_name( $id ), implode( ', ', $facts ) );
 	}
 	if ( $p->post_excerpt ) {
-		return wp_strip_all_tags( $p->post_excerpt );
+		return wp_strip_all_tags( ip_fill( $p->post_excerpt ) );
 	}
 	return wp_trim_words( wp_strip_all_tags( strip_shortcodes( $p->post_content ) ), 26, '…' );
 }

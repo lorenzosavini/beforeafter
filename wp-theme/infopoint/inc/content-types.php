@@ -216,6 +216,7 @@ function ip_agev_fields() {
 		'rata'  => array( 'Rata mensile (€, solo numero)', 'text' ),
 		'cond'  => array( 'Condizioni (una per riga)', 'textarea' ),
 		'det'   => array( 'Dettagli aggiuntivi (es. elenco enti)', 'textarea' ),
+		'sync'  => array( 'Aggiornamento automatico', 'select', 'Importi e condizioni arrivano dalla pagina ufficiale delle agevolazioni.', array( '' => 'Aggiorna tutto', 'dati' => 'Solo importi e condizioni (non titolo e destinatari)', 'no' => 'Non aggiornare' ) ),
 	);
 }
 
@@ -227,8 +228,17 @@ function ip_agev_box( $post ) {
 		echo '<tr><th><label for="ip-' . esc_attr( $k ) . '">' . esc_html( $f[0] ) . '</label></th><td>';
 		if ( 'textarea' === $f[1] ) {
 			printf( '<textarea id="ip-%1$s" name="ip[%1$s]" rows="6" class="large-text">%2$s</textarea>', esc_attr( $k ), esc_textarea( $v ) );
+		} elseif ( 'select' === $f[1] ) {
+			printf( '<select id="ip-%s" name="ip[%s]">', esc_attr( $k ), esc_attr( $k ) );
+			foreach ( $f[3] as $ov => $ol ) {
+				printf( '<option value="%s" %s>%s</option>', esc_attr( $ov ), selected( $v, $ov, false ), esc_html( $ol ) );
+			}
+			echo '</select>';
 		} else {
 			printf( '<input type="text" id="ip-%1$s" name="ip[%1$s]" value="%2$s" class="regular-text">', esc_attr( $k ), esc_attr( $v ) );
+		}
+		if ( ! empty( $f[2] ) ) {
+			echo '<p class="description">' . esc_html( $f[2] ) . '</p>';
 		}
 		echo '</td></tr>';
 	}

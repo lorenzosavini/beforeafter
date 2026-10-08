@@ -218,8 +218,84 @@ function ip_legal_line() {
 
 function ip_price_from() {
 	$p = trim( (string) ip_opt( 'price_from' ) );
-	return $p ? '€ ' . $p : '';
+	if ( $p ) {
+		return '€ ' . $p;
+	}
+	$f = ip_fees();
+	return $f['min_rata'] ? ip_eur( $f['min_rata'] ) : '';
 }
+
+/**
+ * Retta standard dei corsi di laurea, es. «€ 2.760 l’anno (€ 230 al mese)».
+ */
+function ip_retta_std() {
+	$p = trim( (string) ip_opt( 'retta_std' ) );
+	if ( $p ) {
+		return $p;
+	}
+	$f = ip_fees();
+	if ( ! $f['std_retta'] ) {
+		return '';
+	}
+	return ip_eur( $f['std_retta'] ) . ' l’anno' . ( $f['std_rata'] ? ' (' . ip_eur( $f['std_rata'] ) . ' al mese)' : '' );
+}
+
+function ip_eur( $v ) {
+	$v = trim( (string) $v );
+	if ( '' === $v ) {
+		return '';
+	}
+	return '€ ' . ( false !== strpos( $v, ',' ) ? $v : number_format( (float) $v, 0, ',', '.' ) );
+}
+
+/**
+ * Importi presi dalle agevolazioni, che si aggiornano dal sito ufficiale:
+ * retta standard e importi minimi. Nessuna cifra scritta a mano nei testi.
+ */
+function ip_fees() {
+	static $f = null;
+	if ( null !== $f ) {
+		return $f;
+	}
+	$f = array( 'std_retta' => '', 'std_rata' => '', 'min_rata' => '', 'min_retta' => '' );
+	$num = function ( $v ) {
+		return (float) str_replace( ',', '.', str_replace( '.', '', (string) $v ) );
+	};
+	foreach ( get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => -1, 'orderby' => 'menu_order', 'order' => 'ASC' ) ) as $p ) {
+		$retta = ip_meta( 'retta', $p->ID );
+		$rata  = ip_meta( 'rata', $p->ID );
+		$key   = get_post_meta( $p->ID, '_ip_fonte', true );
+		if ( 'retta-standard' === ( $key ? $key : $p->post_name ) ) {
+			$f['std_retta'] = $retta;
+			$f['std_rata']  = $rata;
+		}
+		if ( $num( $rata ) > 0 && ( '' === $f['min_rata'] || $num( $rata ) < $num( $f['min_rata'] ) ) ) {
+			$f['min_rata'] = $rata;
+		}
+		if ( $num( $retta ) > 0 && ( '' === $f['min_retta'] || $num( $retta ) < $num( $f['min_retta'] ) ) ) {
+			$f['min_retta'] = $retta;
+		}
+	}
+	return $f;
+}
+
+/**
+ * Sostituisce i segnaposto degli importi: {retta_std}, {retta_min}, {rata_min}.
+ */
+function ip_fill( $t ) {
+	$t = (string) $t;
+	if ( false === strpos( $t, '{' ) ) {
+		return $t;
+	}
+	$f = ip_fees();
+	return strtr( $t, array(
+		'{retta_std}' => ip_retta_std(),
+		'{retta_min}' => ip_eur( $f['min_retta'] ),
+		'{rata_min}'  => ip_price_from(),
+	) );
+}
+add_filter( 'the_content', 'ip_fill', 1 );
+add_filter( 'get_the_excerpt', 'ip_fill', 20 );
 
 /**
  * Menu di riserva finché non ne viene assegnato uno.

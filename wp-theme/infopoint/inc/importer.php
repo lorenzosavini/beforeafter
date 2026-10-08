@@ -183,6 +183,10 @@ function ip_import_course( $c, $mode, $tip_ids, $o = array() ) {
 	}
 	foreach ( $meta as $k => $v ) {
 		if ( '' === (string) $v ) {
+			// Nota e costo tolti dalla scheda ufficiale: via anche dal sito.
+			if ( ! $is_new && 'overwrite' === $mode && in_array( $k, array( 'evidenza', 'retta' ), true ) ) {
+				delete_post_meta( $id, '_ip_' . $k );
+			}
 			continue;
 		}
 		if ( $is_new || 'overwrite' === $mode || '' === ip_meta( $k, $id ) ) {
@@ -192,10 +196,17 @@ function ip_import_course( $c, $mode, $tip_ids, $o = array() ) {
 	if ( $c['image'] ) {
 		update_post_meta( $id, '_ip_image_src', esc_url_raw( $c['image'] ) );
 	}
-	if ( $c['docs'] && ( $is_new || 'overwrite' === $mode || ! ip_meta_rows( 'docs', $id ) ) ) {
-		update_post_meta( $id, '_ip_docs', array_map( function ( $d ) {
+	if ( ( $c['docs'] && ( $is_new || ! ip_meta_rows( 'docs', $id ) ) ) || ( ! $is_new && 'overwrite' === $mode ) ) {
+		$docs = array_map( function ( $d ) {
 			return array( 'label' => $d[0], 'url' => $d[1] );
-		}, $c['docs'] ) );
+		}, $c['docs'] );
+		// I documenti aggiunti a mano (non dell'Ateneo) restano.
+		foreach ( $is_new ? array() : ip_meta_rows( 'docs', $id ) as $d ) {
+			if ( ! empty( $d['url'] ) && false === strpos( $d['url'], 'unimarconi.it' ) ) {
+				$docs[] = $d;
+			}
+		}
+		$docs ? update_post_meta( $id, '_ip_docs', $docs ) : delete_post_meta( $id, '_ip_docs' );
 	}
 	if ( isset( $tip_ids[ $c['tipologia'] ] ) && ( $is_new || 'overwrite' === $mode || ! get_the_terms( $id, 'tipologia' ) ) ) {
 		wp_set_object_terms( $id, $tip_ids[ $c['tipologia'] ], 'tipologia' );
@@ -207,13 +218,19 @@ function ip_import_course( $c, $mode, $tip_ids, $o = array() ) {
 	}
 
 	// Piani di studio.
+	if ( ! $is_new && 'overwrite' === $mode && function_exists( 'ip_sync_stale_curricula' ) ) {
+		foreach ( ip_sync_stale_curricula( $id, $c ) as $cid ) {
+			wp_update_post( array( 'ID' => $cid, 'post_status' => 'draft' ) );
+		}
+	}
 	foreach ( $c['curricula'] as $j => $cu ) {
 		$ex = get_page_by_path( $cu['slug'], OBJECT, 'curriculum' );
 		if ( $ex ) {
 			if ( 'overwrite' === $mode ) {
-				wp_update_post( array( 'ID' => $ex->ID, 'post_title' => $cu['name'], 'post_content' => wp_slash( $cu['content'] ), 'menu_order' => $j ) );
+				wp_update_post( array( 'ID' => $ex->ID, 'post_title' => $cu['name'], 'post_content' => wp_slash( $cu['content'] ), 'menu_order' => $j, 'post_status' => 'publish' ) );
 			}
 			update_post_meta( $ex->ID, '_ip_course', $id );
+			update_post_meta( $ex->ID, '_ip_fonte', $cu['slug'] );
 			continue;
 		}
 		$cid = wp_insert_post( array(
@@ -226,6 +243,7 @@ function ip_import_course( $c, $mode, $tip_ids, $o = array() ) {
 		) );
 		if ( $cid && ! is_wp_error( $cid ) ) {
 			update_post_meta( $cid, '_ip_course', $id );
+			update_post_meta( $cid, '_ip_fonte', $cu['slug'] );
 			$curr++;
 		}
 	}
@@ -321,6 +339,9 @@ function ip_run_import( $o ) {
 			wp_update_post( array( 'ID' => $id, 'post_title' => $a['title'], 'menu_order' => $a['ordine'] ) );
 		}
 		if ( $id && ! is_wp_error( $id ) ) {
+			if ( ! empty( $a['fonte'] ) ) {
+				update_post_meta( $id, '_ip_fonte', $a['fonte'] );
+			}
 			foreach ( array( 'dest' => 'destinatari', 'retta' => 'retta', 'rata' => 'rata', 'cond' => 'condizioni', 'det' => 'dettagli' ) as $k => $src ) {
 				$v = isset( $a[ $src ] ) ? $a[ $src ] : '';
 				'' !== $v ? update_post_meta( $id, '_ip_' . $k, $v ) : delete_post_meta( $id, '_ip_' . $k );
@@ -370,6 +391,7 @@ function ip_run_import( $o ) {
 
 	// Pagine informative ufficiali, sotto «Iscriversi».
 	$parent = $pages['iscriversi'] ?? 0;
+	$embed  = ip_embedded_sources();
 	foreach ( ip_import_data( 'pagine' ) as $slug => $p ) {
 		$path = $parent ? get_page_uri( $parent ) . '/' . $slug : $slug;
 		$ex   = get_page_by_path( $path );
@@ -392,6 +414,10 @@ function ip_run_import( $o ) {
 		if ( $id && ! is_wp_error( $id ) ) {
 			update_post_meta( $id, '_wp_page_template', 'page-templates/sidebar-form.php' );
 			update_post_meta( $id, '_ip_fonte', $p['source'] );
+			// Testo già mostrato dentro una pagina del tema: niente doppioni nei motori di ricerca.
+			if ( in_array( trailingslashit( $p['source'] ), $embed, true ) ) {
+				update_post_meta( $id, '_ip_seo_noindex', '1' );
+			}
 			$pages[ $slug ] = $id;
 			$n++;
 		}
@@ -558,11 +584,11 @@ function ip_import_pages() {
 
 		'master' => array(
 			'title'   => 'Master di I e II livello',
-			'excerpt' => 'Master online da 60 CFU in management, marketing, diritto, sanità, comunicazione e tecnologie. Durata di norma 12 mesi.',
+			'excerpt' => 'Master online di I e II livello in management, marketing, diritto, sanità, comunicazione e tecnologie.',
 			'content' => $sc( '[ip_corsi tipologia="master-di-i-livello,master-di-ii-livello"]' )
 				. $h( 'I o II livello: quale scegliere' )
-				. $p( 'Il master di I livello è aperto a chi ha una laurea triennale; quello di II livello richiede una laurea magistrale, a ciclo unico o del vecchio ordinamento. Entrambi valgono 60 CFU.' )
-				. $p( 'Studenti e laureati UniMarconi, appartenenti alle Forze Armate e dell’Ordine e dipendenti pubblici possono avere condizioni agevolate: <a href="/convenzioni-e-agevolazioni/">vedi le agevolazioni</a>.' ),
+				. $p( 'Il master di I livello è aperto a chi ha una laurea triennale; quello di II livello richiede una laurea magistrale, a ciclo unico o del vecchio ordinamento. Durata, crediti e costo di ciascun master sono nella sua scheda, aggiornata dal sito ufficiale.' )
+				. $p( 'Per alcune categorie di iscritti l’Ateneo prevede condizioni agevolate anche sui master: <a href="/convenzioni-e-agevolazioni/">vedi le agevolazioni</a>.' ),
 		),
 
 		'corsi-insegnanti' => array(
@@ -578,17 +604,7 @@ function ip_import_pages() {
 			'template' => 'page-templates/sidebar-form.php',
 			'excerpt'  => 'I percorsi di formazione iniziale per ottenere l’abilitazione all’insegnamento nella scuola secondaria di primo e secondo grado (DPCM 4 agosto 2023).',
 			'content'  => $sc( '[ip_corsi tipologia="percorsi-abilitanti,specializzazione-sostegno" filtro="no"]' ) . "<!-- wp:group {\"className\":\"box\"} -->\n<div class=\"wp-block-group box\"><!-- wp:paragraph -->\n<p>Le iscrizioni seguono i bandi dell’Ateneo e restano aperte poche settimane. Lasciaci il tuo contatto: ti avvisiamo all’uscita del prossimo bando e verifichiamo con te quale percorso ti spetta.</p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:group -->\n\n"
-				. $h( 'Percorso da 60 CFU' )
-				. $ul( array( 'Laureati con titolo valido per la classe di concorso', 'Iscritti a una laurea magistrale o a ciclo unico con almeno 180 CFU (la prova finale si sostiene dopo la laurea)', 'Laureati con i 24 CFU conseguiti entro il 31 ottobre 2022, che possono chiederne il riconoscimento' ) )
-				. $p( 'Accesso a numero programmato, con graduatoria.' )
-				. $h( 'Percorsi da 30 CFU' )
-				. $ul( array( 'Docenti con almeno 3 anni di servizio negli ultimi 5, di cui almeno uno nella classe di concorso scelta (accesso con graduatoria)', 'Chi ha superato la prova del concorso straordinario (art. 59, c. 9-bis, D.L. 73/2021)', 'Vincitori di concorso senza abilitazione con i requisiti di servizio (accesso libero)', 'Docenti già abilitati su un’altra classe di concorso o grado, o specializzati sul sostegno (art. 13)' ) )
-				. $h( 'Percorso da 36 CFU' )
-				. $p( 'Riservato ai vincitori di concorso che vi hanno partecipato con i 24 CFU conseguiti entro il 31 ottobre 2022. Accesso libero.' )
-				. $h( 'Come si svolgono' )
-				. $ul( array( 'Frequenza obbligatoria: almeno il 70% di ogni attività formativa', 'Lezioni online in diretta per non più della metà delle ore, il resto in presenza presso la sede dell’Ateneo a Roma', 'Tirocinio diretto nelle scuole e tirocinio indiretto in presenza', 'Prova finale con prova scritta e lezione simulata' ) )
-				. $h( 'Specializzazione sul sostegno' )
-				. $p( 'L’Ateneo attiva anche i percorsi di specializzazione sul sostegno da 40 CFU per chi ha almeno tre anni di servizio sul sostegno nello stesso grado. I posti sono limitati e fissati dal Ministero: chiedici le date della prossima edizione.' ),
+				. $p( 'Requisiti di accesso, posti disponibili, costi e calendario sono fissati da ciascun bando: li trovi aggiornati nella scheda di ogni percorso, presa dal sito ufficiale dell’Ateneo.' ),
 		),
 
 		'altri-corsi' => array(
@@ -620,7 +636,7 @@ function ip_import_pages() {
 
 		'convenzioni-e-agevolazioni' => array(
 			'title'   => 'Agevolazioni e convenzioni',
-			'excerpt' => 'Retta standard € 2.760 l’anno (€ 230 al mese), ridotta fino a € 1.620 con le agevolazioni per giovani, Forze Armate e dell’Ordine, dipendenti pubblici, sportivi, docenti, famiglie e laureati UniMarconi.',
+			'excerpt' => 'Retta standard {retta_std}; con le agevolazioni dell’Ateneo si parte da {rata_min} al mese. Ecco a chi spettano e a quali condizioni, aggiornate dal sito ufficiale.',
 			'content' => $p( 'Tutte le agevolazioni economiche si applicano al momento dell’immatricolazione e non hanno effetto retroattivo. Ti confermiamo sempre l’importo esatto prima dell’iscrizione.' )
 				. $sc( '[ip_agevolazioni]' ),
 		),
@@ -628,53 +644,40 @@ function ip_import_pages() {
 		'riconoscimento-cfu' => array(
 			'title'   => 'Riconoscimento CFU',
 			'excerpt' => 'Esami già sostenuti, una prima laurea o titoli professionali possono valere crediti e accorciare il percorso. La prevalutazione è gratuita e non ti impegna.',
-			'content' => $h( 'Come funziona' )
-				. $p( 'Ci invii il piano di studi o l’autocertificazione degli esami con voti e settori disciplinari, insieme a eventuali certificazioni e titoli professionali. La Facoltà valuta quali crediti possono essere riconosciuti sul corso che ti interessa (D.M. 270/04, art. 5, c. 7) e ricevi l’esito via email.' )
-				. $h( 'A quale anno puoi iscriverti' )
-				. $ul( array( '<strong>II anno</strong>: almeno 30 CFU riconosciuti (tutti i corsi)', '<strong>III anno</strong>: almeno 90 CFU (lauree triennali e ciclo unico)', '<strong>IV anno</strong>: almeno 150 CFU (ciclo unico)', '<strong>V anno</strong>: almeno 210 CFU (ciclo unico)' ) )
-				. $p( 'Per le lauree magistrali la stessa procedura serve a verificare i requisiti curriculari: se mancano crediti, si recuperano con i <a href="/corsi-singoli/">corsi singoli</a> prima dell’immatricolazione.' )
+			'content' => $p( 'Ci invii il piano di studi o l’autocertificazione degli esami, insieme a eventuali certificazioni e titoli professionali: prepariamo con te la richiesta di prevalutazione all’Ateneo e ti spieghiamo l’esito.' )
+				. $h( 'Le regole dell’Ateneo' )
+				. $sc( '[ip_ufficiale fonte="https://www.unimarconi.it/riconoscimento-cfu/"]' )
 				. $sc( '[ip_modulo tipo="cfu"]' ),
 		),
 
 		'area-studenti' => array(
 			'title'    => 'Requisiti e iscrizione',
 			'template' => 'page-templates/sidebar-form.php',
-			'excerpt'  => 'Titoli di accesso, test di ingresso, tempo parziale e trasferimenti: quello che serve sapere prima di immatricolarsi.',
-			'content'  => $h( 'Titoli di accesso' )
-				. $ul( array( '<strong>Laurea triennale</strong>: diploma di scuola secondaria di secondo grado o titolo estero riconosciuto idoneo', '<strong>Laurea magistrale</strong>: laurea o diploma universitario triennale, o titolo estero riconosciuto idoneo', '<strong>Ciclo unico in Giurisprudenza</strong>: diploma di scuola secondaria di secondo grado' ) )
-				. $h( 'Test di ingresso' )
-				. $p( 'I corsi sono ad accesso libero. Chi si immatricola senza carriera pregressa sostiene un test non selettivo di verifica delle conoscenze iniziali (art. 6 D.M. 270/04): serve a impostare lo studio, non a escludere.' )
-				. $h( 'Studiare a tempo parziale' )
-				. $p( 'Se lavori o hai altri impegni puoi chiedere l’iscrizione a tempo parziale, distribuendo gli esami su più anni secondo il regolamento d’Ateneo.' )
-				. $h( 'Trasferimenti e passaggi' )
-				. $p( 'Arrivi da un’altra università? Con la <a href="/riconoscimento-cfu/">prevalutazione dei CFU</a> sai in anticipo quali esami ti vengono convalidati e a quale anno puoi iscriverti.' )
-				. $h( 'Perché UniMarconi' )
-				. $ul( array( 'Iscrizioni aperte tutto l’anno', 'Lezioni e materiali online 24 ore su 24', 'Esami in presenza in sedi in tutta Italia', 'Retta rateizzabile fino a 12 mensilità senza interessi', 'Tutor e segreteria durante tutto il percorso', 'Career service e associazione Alumni' ) ),
+			'excerpt'  => 'Titoli di accesso, procedura di immatricolazione e trasferimenti: quello che serve sapere prima di iscriversi.',
+			'content'  => $p( 'Requisiti di accesso e procedura di immatricolazione, come li descrive l’Ateneo e sempre aggiornati. Noi ti affianchiamo in ogni passaggio, dalla scelta del corso al caricamento dei documenti.' )
+				. $sc( '[ip_ufficiale fonte="https://www.unimarconi.it/immatricolazione-corso-di-laurea/"]' )
+				. $h( 'Arrivi da un’altra università?' )
+				. $p( 'Con la <a href="/riconoscimento-cfu/">prevalutazione dei CFU</a> sai in anticipo quali esami ti vengono riconosciuti e a quale anno puoi iscriverti. Leggi anche come funziona il <a href="/iscriversi/trasferimento-da-altro-ateneo/">trasferimento da un altro ateneo</a>.' ),
 		),
 
 		'doppia-laurea' => array(
 			'title'    => 'Doppia iscrizione',
 			'template' => 'page-templates/sidebar-form.php',
 			'excerpt'  => 'Dal 2022 puoi iscriverti contemporaneamente a due corsi universitari (Legge 33/2022, D.M. 930/2022). Ecco quando è possibile.',
-			'content'  => $h( 'Combinazioni consentite' )
-				. $ul( array( 'Due lauree triennali, due magistrali, oppure una triennale e una magistrale', 'Una laurea e un master, un dottorato o una specializzazione non medica', 'Due master diversi', 'Un corso universitario e un corso AFAM (conservatori, accademie)' ) )
-				. $p( 'I due corsi, se di laurea, devono appartenere a classi diverse e differire per almeno due terzi delle attività formative.' )
-				. $h( 'Combinazioni non consentite' )
-				. $ul( array( 'Due corsi della stessa classe', 'Due corsi di classi diverse ma con meno di due terzi di attività differenti', 'Due corsi entrambi a frequenza obbligatoria', 'Due dottorati o due specializzazioni' ) )
-				. $h( 'Come si fa' )
-				. $p( 'In fase di pre-immatricolazione si presenta un’autocertificazione dei requisiti, a entrambi gli atenei se diversi. L’immatricolazione resta quella ordinaria. Per i benefici del diritto allo studio si indica una sola delle due iscrizioni.' ),
+			'content'  => $p( 'Puoi iscriverti contemporaneamente a due corsi di studio, anche in atenei diversi, se la combinazione rispetta le condizioni di legge. Verifichiamo con te se quella che ti interessa è consentita e ti seguiamo nelle due iscrizioni.' )
+				. $h( 'Cosa prevede la normativa' )
+				. $sc( '[ip_ufficiale fonte="https://www.unimarconi.it/iscrizione-contemporanea-a-due-corsi-di-studio-di-istruzione-superiore/"]' ),
 		),
 
 		'corsi-singoli' => array(
 			'title'    => 'Corsi singoli',
 			'template' => 'page-templates/sidebar-form.php',
 			'excerpt'  => 'Sostieni singoli esami senza iscriverti a un corso di laurea: per integrare i requisiti di una magistrale, per un concorso o per aggiornarti.',
-			'content'  => $h( 'A cosa servono' )
-				. $ul( array( 'Raggiungere i requisiti curriculari per l’accesso a una laurea magistrale', 'Ottenere i crediti richiesti da concorsi pubblici', 'Aggiornamento culturale e professionale' ) )
-				. $h( 'Regole principali' )
-				. $ul( array( 'Serve il titolo richiesto dal corso che eroga l’insegnamento', 'L’iscrizione dura un anno e permette di sostenere l’esame negli appelli di quell’anno', 'Massimo 4 esami', 'Non è possibile essere iscritti contemporaneamente a un corso di laurea dello stesso Ateneo', 'Prima del pagamento serve l’autorizzazione dell’ufficio immatricolazioni: ce ne occupiamo noi' ) )
-				. $h( 'Costi' )
-				. $p( '€ 400 per un insegnamento da 6 CFU, € 450 da 12 CFU. Per Ingegneria € 450 e € 500. Al termine, superato l’esame, puoi chiedere il certificato.' ),
+			'content'  => $p( 'Con i corsi singoli sostieni uno o più esami senza iscriverti a un intero corso di laurea: servono, per esempio, a raggiungere i requisiti di una laurea magistrale o i crediti richiesti da un concorso. Ti aiutiamo a scegliere gli insegnamenti e a chiedere la conferma dell’Ateneo prima del pagamento.' )
+				. $h( 'Insegnamenti e costi' )
+				. $sc( '[ip_ufficiale fonte="https://www.unimarconi.it/corsi-singoli/"]' )
+				. $h( 'Come ci si iscrive' )
+				. $sc( '[ip_ufficiale fonte="https://www.unimarconi.it/iscrizione-ai-corsi-singoli/"]' ),
 		),
 
 		'sedi-esame' => array(

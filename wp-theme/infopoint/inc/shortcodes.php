@@ -10,6 +10,7 @@
  * [ip_passi]
  * [ip_cta titolo=""]
  * [ip_faq]
+ * [ip_ufficiale fonte="https://www.unimarconi.it/…/"]
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -256,7 +257,7 @@ function ip_faq_list( $rows ) {
 	}
 	echo '<div class="faq">';
 	foreach ( $rows as $r ) {
-		printf( '<details><summary>%s</summary><p>%s</p></details>', esc_html( $r['domanda'] ?? '' ), nl2br( esc_html( $r['risposta'] ?? '' ) ) );
+		printf( '<details><summary>%s</summary><p>%s</p></details>', esc_html( $r['domanda'] ?? '' ), nl2br( esc_html( ip_fill( $r['risposta'] ?? '' ) ) ) );
 	}
 	echo '</div>';
 }
@@ -337,4 +338,49 @@ function ip_agevolazioni_table( $limit = -1 ) {
 		);
 	}
 	echo '</tbody></table></div>';
+}
+
+/**
+ * Testo ufficiale incorporato: [ip_ufficiale fonte="https://www.unimarconi.it/…/"]
+ * Mostra la pagina importata da quell'indirizzo, che il sistema di
+ * aggiornamento tiene allineata al sito dell'Ateneo.
+ */
+add_shortcode( 'ip_ufficiale', function ( $a ) {
+	$a  = shortcode_atts( array( 'fonte' => '' ), $a );
+	$id = ip_official_page( $a['fonte'] );
+	if ( ! $id ) {
+		return '';
+	}
+	$html = do_blocks( get_post_field( 'post_content', $id ) );
+	return '<div class="ufficiale">' . $html . '<p class="source">Testo dell’Università degli Studi Guglielmo Marconi, aggiornato automaticamente dal <a href="' . esc_url( $a['fonte'] ) . '" target="_blank" rel="noopener">sito ufficiale</a>.</p></div>';
+} );
+
+/**
+ * Pagina del sito importata da un indirizzo ufficiale.
+ */
+function ip_official_page( $url ) {
+	if ( ! $url ) {
+		return 0;
+	}
+	$q = get_posts( array(
+		'post_type'      => 'page',
+		'post_status'    => 'publish',
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+		'meta_query'     => array( array( 'key' => '_ip_fonte', 'value' => array( untrailingslashit( $url ), trailingslashit( $url ) ), 'compare' => 'IN' ) ),
+	) );
+	return $q ? (int) $q[0] : 0;
+}
+
+/**
+ * Indirizzi ufficiali incorporati nelle pagine del tema con [ip_ufficiale].
+ */
+function ip_embedded_sources() {
+	$out = array();
+	foreach ( ip_import_pages() as $p ) {
+		if ( ! empty( $p['content'] ) && preg_match_all( '/\[ip_ufficiale fonte="([^"]+)"/', $p['content'], $m ) ) {
+			$out = array_merge( $out, array_map( 'trailingslashit', $m[1] ) );
+		}
+	}
+	return $out;
 }

@@ -21,7 +21,7 @@ modificabili da *Infopoint → Impostazioni → Aspetto*.
    **159 corsi ufficiali** (lauree, master, master per la didattica,
    percorsi abilitanti, sostegno, corsi di formazione, microcredenziali,
    dottorati) con presentazione, obiettivi, sbocchi, accesso, **65 piani di
-   studio** in tabella, documenti PDF ufficiali; 15 agevolazioni; 37 pagine
+   studio** in tabella, documenti PDF ufficiali; 15 agevolazioni; 38 pagine
    (tasse, immatricolazione, trasferimenti, pagamenti, ICA, studenti
    stranieri, Dual Career, DSA, PA 110 e lode…); menu, home, «grazie».
    Poi *Scarica 20 immagini* (ripetere) per le copertine ufficiali.
@@ -63,11 +63,14 @@ automatici*).
 - Ogni giorno (o settimana) il sito legge le sitemap di unimarconi.it e
   rilegge **solo le pagine modificate**, 4 alla volta, in background.
 - Confronta ogni corso con la scheda ufficiale: classe, CFU, durata, costo,
-  stato iscrizioni, nota in evidenza, testo, documenti PDF, piani di studio.
-  Trova anche **corsi nuovi** e **corsi tolti** dall'offerta.
-- Controlla le pagine informative importate (tasse, immatricolazione…), la
-  pagina delle agevolazioni (segnalazione delle righe cambiate) e le sedi
-  d'esame.
+  stato iscrizioni, nota in evidenza (anche quando viene tolta), tipologia,
+  dipartimento, testo, documenti PDF, piani di studio (nuovi, cambiati e
+  tolti). Trova anche **corsi nuovi** e **corsi tolti** dall'offerta.
+- **Agevolazioni**: rilegge a ogni controllo la pagina ufficiale (e le pagine
+  dedicate, es. disabilità) e aggiorna retta, rata, destinatari, condizioni e
+  dettagli; crea le agevolazioni nuove e mette in bozza quelle tolte.
+- Controlla le pagine informative importate (tasse, immatricolazione, corsi
+  singoli…) e le sedi d'esame.
 - **Con approvazione** (predefinito): ogni differenza compare con «Applica» /
   «Ignora» e arriva un'email di riepilogo. **Automatico**: le modifiche
   vengono applicate subito. In entrambi i casi la versione precedente resta
@@ -75,6 +78,13 @@ automatici*).
 - In ogni corso, «Aggiornamento automatico»: *Aggiorna tutto*, *Solo dati,
   piani e documenti* (per i corsi di cui avete riscritto il testo) o *Non
   aggiornare*. Le pagine importate hanno la stessa opzione.
+- **Nessuna cifra scritta a mano.** «Retta da … al mese» e retta standard
+  si calcolano dalle agevolazioni ufficiali; nei testi (FAQ, riassunti delle
+  pagine) si usano i segnaposto `{retta_std}`, `{rata_min}`, `{retta_min}`.
+  Le pagine del tema con regole dell'Ateneo (corsi singoli, riconoscimento
+  CFU, doppia iscrizione, requisiti) incorporano il testo ufficiale con
+  `[ip_ufficiale fonte="…"]`, che si aggiorna da solo.
+- Ogni agevolazione ha la stessa opzione «Aggiornamento automatico».
 - «Verifica completa» rilegge tutte le ~225 pagine ufficiali (circa 5 minuti).
 
 WP-Cron parte quando qualcuno visita il sito. Su hosting con poco traffico
@@ -88,6 +98,7 @@ ogni 15 minuti su `https://tuodominio.it/wp-cron.php`.
 [ip_modulo tipo="info|callback|cfu" titolo="" testo="" pulsante=""]
 [ip_corsi tipologia="laurea-triennale,laurea-magistrale" filtro="si|no"]
 [ip_agevolazioni]   [ip_sedi]   [ip_contatti]   [ip_passi]   [ip_faq]   [ip_cta titolo=""]
+[ip_ufficiale fonte="https://www.unimarconi.it/…/"]   testo ufficiale sempre aggiornato
 ```
 
 Ogni pagina senza modulo ne riceve uno in fondo («Parla con un orientatore»),

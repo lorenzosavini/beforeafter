@@ -12,7 +12,7 @@
  * - corsi (dati, testo, documenti, stato iscrizioni) e loro piani di studio;
  * - corsi nuovi e corsi tolti dall'offerta;
  * - pagine informative importate (tasse, immatricolazione…);
- * - pagina delle agevolazioni (segnalazione, la modifica resta manuale);
+ * - agevolazioni: importi, rate, condizioni, agevolazioni nuove o tolte;
  * - sedi d'esame.
  */
 
@@ -201,7 +201,7 @@ function ip_sync_check( $full = false ) {
 
 	if ( in_array( 'pagine', $scope, true ) ) {
 		foreach ( ip_sync_known_pages() as $url => $page_id ) {
-			$lm = isset( $maps['pagine'][ $url ] ) ? $maps['pagine'][ $url ] : '';
+			$lm = isset( $maps['pagine'][ $url ] ) ? $maps['pagine'][ $url ] : ( isset( $maps['formazione'][ $url ] ) ? $maps['formazione'][ $url ] : '' );
 			if ( $full || ( $state['baseline'] && ( ! isset( $state['lastmod'][ $url ] ) || $state['lastmod'][ $url ] !== $lm ) ) ) {
 				$add( 'pagina', $url );
 			}
@@ -213,7 +213,9 @@ function ip_sync_check( $full = false ) {
 			continue;
 		}
 		$lm = isset( $maps['pagine'][ $url ] ) ? $maps['pagine'][ $url ] : '';
-		if ( $full || ! isset( $state['hash'][ $url ] ) || ( isset( $state['lastmod'][ $url ] ) && $state['lastmod'][ $url ] !== $lm ) ) {
+		// Le agevolazioni si rileggono a ogni controllo: dipendono anche da
+		// pagine dedicate la cui data di modifica non compare qui.
+		if ( $full || 'agevolazioni' === $type || ! isset( $state['hash'][ $url ] ) || ( isset( $state['lastmod'][ $url ] ) && $state['lastmod'][ $url ] !== $lm ) ) {
 			$add( $type, $url );
 		}
 		$state['lastmod'][ $url ] = $lm;
@@ -305,7 +307,7 @@ function ip_sync_process( $type, $url ) {
 		case 'pagina':
 			return ip_sync_page( $url, $html );
 		case 'agevolazioni':
-			return ip_sync_watch_page( 'agevolazioni', $url, $html );
+			return ip_sync_agevolazioni( $url, $html );
 		case 'sedi':
 			return ip_sync_sites( $url, $html );
 	}
@@ -373,8 +375,23 @@ function ip_sync_course_diff( $post_id, $c, $with_text ) {
 	foreach ( $label as $k => $l ) {
 		$new = trim( (string) $c[ $k ] );
 		$old = trim( ip_meta( $k, $post_id ) );
-		if ( '' !== $new && $new !== $old ) {
-			$ch[] = sprintf( '%s: «%s» → «%s»', $l, '' === $old ? '—' : $old, $new );
+		// Nota e costo spariti dalla scheda ufficiale vanno tolti anche qui.
+		$gone = '' === $new && '' !== $old && in_array( $k, array( 'evidenza', 'retta' ), true );
+		if ( ( '' !== $new && $new !== $old ) || $gone ) {
+			$ch[] = sprintf( '%s: «%s» → «%s»', $l, '' === $old ? '—' : $old, '' === $new ? '—' : $new );
+		}
+	}
+	$tip = wp_get_post_terms( $post_id, 'tipologia', array( 'fields' => 'slugs' ) );
+	if ( $c['tipologia'] && ! is_wp_error( $tip ) && ! in_array( $c['tipologia'], $tip, true ) ) {
+		$ch[] = sprintf( 'Tipologia: «%s» → «%s»', $tip ? implode( ', ', $tip ) : '—', $c['tipologia'] );
+	}
+	foreach ( array( 'dipartimento' => 'Dipartimento', 'area' => 'Area' ) as $tax => $l ) {
+		$names = wp_get_post_terms( $post_id, $tax, array( 'fields' => 'names' ) );
+		$names = is_wp_error( $names ) ? array() : array_map( function ( $n ) {
+			return html_entity_decode( $n, ENT_QUOTES, 'UTF-8' );
+		}, $names );
+		if ( $c[ $tax ] && ! in_array( html_entity_decode( $c[ $tax ], ENT_QUOTES, 'UTF-8' ), $names, true ) ) {
+			$ch[] = sprintf( '%s: «%s» → «%s»', $l, $names ? implode( ', ', $names ) : '—', $c[ $tax ] );
 		}
 	}
 	$st_new = $c['stato'] ? $c['stato'] : 'aperte';
@@ -408,11 +425,40 @@ function ip_sync_course_diff( $post_id, $c, $with_text ) {
 		$ex = get_page_by_path( $cu['slug'], OBJECT, 'curriculum' );
 		if ( ! $ex ) {
 			$ch[] = 'Nuovo piano di studio: ' . $cu['name'];
-		} elseif ( ip_sync_norm( $ex->post_content ) !== ip_sync_norm( $cu['content'] ) ) {
+		} elseif ( ip_sync_norm( $ex->post_content ) !== ip_sync_norm( $cu['content'] ) || 'publish' !== $ex->post_status ) {
 			$ch[] = 'Piano di studio aggiornato: ' . $cu['name'];
 		}
 	}
+	foreach ( ip_sync_stale_curricula( $post_id, $c ) as $cid ) {
+		$ch[] = 'Piano di studio non più presente: ' . html_entity_decode( get_the_title( $cid ), ENT_QUOTES, 'UTF-8' );
+	}
 	return $ch;
+}
+
+/**
+ * Piani di studio presi dal sito ufficiale e collegati al corso che la scheda
+ * ufficiale non elenca più.
+ */
+function ip_sync_stale_curricula( $post_id, $c ) {
+	// Senza l'elenco ufficiale dei piani (sitemap) o senza piani letti non si
+	// può dire che uno sia stato tolto: meglio non toccare nulla.
+	if ( ! $c['curricula'] || ! ip_sync_piano_urls() ) {
+		return array();
+	}
+	$keep = wp_list_pluck( $c['curricula'], 'slug' );
+	$ids  = get_posts( array(
+		'post_type'      => 'curriculum',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+		'meta_query'     => array(
+			array( 'key' => '_ip_course', 'value' => (int) $post_id ),
+			array( 'key' => '_ip_fonte', 'compare' => 'EXISTS' ),
+		),
+	) );
+	return array_values( array_filter( $ids, function ( $id ) use ( $keep ) {
+		return ! in_array( get_post_field( 'post_name', $id ), $keep, true );
+	} ) );
 }
 
 function ip_sync_page( $url, $html ) {
@@ -434,30 +480,171 @@ function ip_sync_page( $url, $html ) {
 }
 
 /**
- * Pagine solo da sorvegliare (es. agevolazioni): segnala le righe cambiate.
+ * Agevolazioni collegate al sito ufficiale.
+ *
+ * @return array map: chiave ufficiale => post_id; linked: post_id => true per
+ *               quelle importate (le sole che possono essere ritirate).
  */
-function ip_sync_watch_page( $type, $url, $html ) {
+function ip_sync_agev_posts() {
+	$legacy = array();
+	foreach ( ip_import_data( 'agevolazioni' ) as $a ) {
+		if ( ! empty( $a['fonte'] ) ) {
+			$legacy[ $a['slug'] ] = $a['fonte'];
+		}
+	}
+	$map    = array();
+	$linked = array();
+	$posts  = get_posts( array( 'post_type' => 'agevolazione', 'post_status' => array( 'publish', 'draft', 'pending' ), 'posts_per_page' => -1, 'orderby' => 'ID', 'order' => 'ASC' ) );
+	foreach ( $posts as $p ) {
+		$k = get_post_meta( $p->ID, '_ip_fonte', true );
+		if ( ! $k && isset( $legacy[ $p->post_name ] ) ) {
+			$k = $legacy[ $p->post_name ];
+		}
+		if ( $k ) {
+			$linked[ $p->ID ] = true;
+		} else {
+			$k = $p->post_name;
+		}
+		if ( ! isset( $map[ $k ] ) ) {
+			$map[ $k ] = $p->ID;
+		}
+	}
+	return array( $map, $linked );
+}
+
+function ip_sync_eur( $v ) {
+	return '' === (string) $v ? '—' : '€ ' . ( false !== strpos( $v, ',' ) ? $v : number_format( (float) $v, 0, ',', '.' ) );
+}
+
+/**
+ * Differenze tra un'agevolazione del sito e quella ufficiale.
+ */
+function ip_sync_agev_diff( $id, $a ) {
+	$lock = get_post_meta( $id, '_ip_sync', true );
+	if ( 'no' === $lock ) {
+		return array();
+	}
+	$name = $a['title'];
+	$ch   = array();
+	if ( 'dati' !== $lock ) {
+		$old_title = html_entity_decode( get_post_field( 'post_title', $id ), ENT_QUOTES, 'UTF-8' );
+		if ( $old_title !== $a['title'] ) {
+			$ch[] = sprintf( '%s – titolo: «%s» → «%s»', $name, $old_title, $a['title'] );
+		}
+		if ( '' !== $a['dest'] && ip_meta( 'dest', $id ) !== $a['dest'] ) {
+			$ch[] = sprintf( '%s – a chi è rivolta: «%s»', $name, $a['dest'] );
+		}
+	}
+	foreach ( array( 'retta' => 'retta annua', 'rata' => 'rata mensile' ) as $k => $l ) {
+		if ( (string) ip_meta( $k, $id ) !== (string) $a[ $k ] ) {
+			$ch[] = sprintf( '%s – %s: %s → %s', $name, $l, ip_sync_eur( ip_meta( $k, $id ) ), ip_sync_eur( $a[ $k ] ) );
+		}
+	}
+	foreach ( array( 'cond' => 'condizioni aggiornate', 'det' => 'dettagli aggiornati' ) as $k => $l ) {
+		if ( ip_sync_norm( ip_meta( $k, $id ) ) === ip_sync_norm( $a[ $k ] ) ) {
+			continue;
+		}
+		$old = array_filter( array_map( 'trim', explode( "\n", ip_meta( $k, $id ) ) ) );
+		$new = array_filter( array_map( 'trim', explode( "\n", $a[ $k ] ) ) );
+		$add = array_diff( $new, $old );
+		$ch[] = sprintf( '%s – %s%s', $name, $l, $add ? ': + ' . wp_trim_words( implode( ' / ', array_slice( $add, 0, 2 ) ), 30, '…' ) : '' );
+	}
+	if ( 'publish' !== get_post_status( $id ) && get_post_meta( $id, '_ip_ritirata', true ) ) {
+		$ch[] = $name . ' – di nuovo presente sul sito ufficiale: torna online';
+	}
+	return $ch;
+}
+
+function ip_sync_agevolazioni( $url, $html ) {
+	$list = ip_src_agevolazioni( $html, 'ip_src_fetch' );
+	if ( count( $list ) < 5 ) {
+		return new WP_Error( 'ip_agev', 'Pagina delle agevolazioni non riconosciuta: nessuna modifica proposta.' );
+	}
 	$state = ip_sync_state();
-	$text  = ip_src_main_text( $html );
-	$hash  = md5( $text );
-	$prev  = isset( $state['hash'][ $url ] ) ? $state['hash'][ $url ] : '';
-	$old   = (string) get_option( 'ip_sync_text_' . md5( $url ), '' );
-	$state['hash'][ $url ] = $hash;
+	$state['hash'][ $url ] = md5( wp_json_encode( $list ) );
 	ip_sync_state( $state );
-	update_option( 'ip_sync_text_' . md5( $url ), $text, false );
-	if ( ! $prev || $prev === $hash ) {
+
+	list( $map, $linked ) = ip_sync_agev_posts();
+	$ch   = array();
+	$keys = array();
+	foreach ( $list as $a ) {
+		$keys[] = $a['key'];
+		if ( isset( $map[ $a['key'] ] ) ) {
+			$ch = array_merge( $ch, ip_sync_agev_diff( $map[ $a['key'] ], $a ) );
+		} else {
+			$ch[] = 'Nuova agevolazione: ' . $a['title'] . ( $a['retta'] ? ' (' . ip_sync_eur( $a['retta'] ) . ' l’anno)' : '' );
+		}
+	}
+	$gone = array();
+	foreach ( $map as $k => $id ) {
+		if ( ! in_array( $k, $keys, true ) && isset( $linked[ $id ] ) && 'publish' === get_post_status( $id ) && 'no' !== get_post_meta( $id, '_ip_sync', true ) ) {
+			$gone[] = $id;
+			$ch[]   = 'Non più presente sul sito ufficiale: ' . html_entity_decode( get_the_title( $id ), ENT_QUOTES, 'UTF-8' );
+		}
+	}
+	// Se sparisce più di metà delle agevolazioni è più probabile un errore di lettura.
+	if ( count( $gone ) > count( $linked ) / 2 ) {
+		return new WP_Error( 'ip_agev', 'Troppe agevolazioni non trovate sulla pagina ufficiale: verifica manuale consigliata.' );
+	}
+	if ( ! $ch ) {
+		ip_sync_close( 'agevolazioni', 0, $url );
 		return false;
 	}
-	$a   = array_filter( array_map( 'trim', explode( "\n", $old ) ) );
-	$b   = array_filter( array_map( 'trim', explode( "\n", $text ) ) );
-	$ch  = array();
-	foreach ( array_slice( array_diff( $b, $a ), 0, 12 ) as $l ) {
-		$ch[] = '+ ' . wp_trim_words( $l, 30 );
+	return ip_sync_propose( 'agevolazioni', 0, $url, array( 'title' => 'pagina ufficiale', 'items' => $list ), $ch );
+}
+
+/**
+ * Applica le agevolazioni ufficiali.
+ *
+ * @param bool $retire Mette in bozza quelle non più presenti.
+ */
+function ip_sync_apply_agev( $list, $retire ) {
+	list( $map, $linked ) = ip_sync_agev_posts();
+	$order = (int) $GLOBALS['wpdb']->get_var( "SELECT MAX(menu_order) FROM {$GLOBALS['wpdb']->posts} WHERE post_type = 'agevolazione'" ); // phpcs:ignore
+	$keys  = array();
+	foreach ( $list as $a ) {
+		$keys[] = $a['key'];
+		$id     = isset( $map[ $a['key'] ] ) ? $map[ $a['key'] ] : 0;
+		$lock   = $id ? get_post_meta( $id, '_ip_sync', true ) : '';
+		if ( 'no' === $lock ) {
+			continue;
+		}
+		if ( ! $id ) {
+			$id = wp_insert_post( array( 'post_type' => 'agevolazione', 'post_status' => 'publish', 'post_title' => $a['title'], 'post_name' => $a['key'], 'menu_order' => ++$order ) );
+			if ( ! $id || is_wp_error( $id ) ) {
+				continue;
+			}
+		} else {
+			$up = array( 'ID' => $id );
+			if ( 'dati' !== $lock ) {
+				$up['post_title'] = $a['title'];
+			}
+			if ( 'publish' !== get_post_status( $id ) && get_post_meta( $id, '_ip_ritirata', true ) ) {
+				$up['post_status'] = 'publish';
+				delete_post_meta( $id, '_ip_ritirata' );
+			}
+			if ( count( $up ) > 1 ) {
+				wp_update_post( $up );
+			}
+		}
+		update_post_meta( $id, '_ip_fonte', $a['key'] );
+		$fields = 'dati' === $lock ? array( 'retta', 'rata', 'cond', 'det' ) : array( 'dest', 'retta', 'rata', 'cond', 'det' );
+		foreach ( $fields as $k ) {
+			if ( 'dest' === $k && '' === $a['dest'] ) {
+				continue; // La pagina ufficiale non lo dice: si tiene il vostro testo.
+			}
+			'' !== (string) $a[ $k ] ? update_post_meta( $id, '_ip_' . $k, $a[ $k ] ) : delete_post_meta( $id, '_ip_' . $k );
+		}
 	}
-	foreach ( array_slice( array_diff( $a, $b ), 0, 12 ) as $l ) {
-		$ch[] = '− ' . wp_trim_words( $l, 30 );
+	if ( $retire ) {
+		foreach ( $map as $k => $id ) {
+			if ( ! in_array( $k, $keys, true ) && isset( $linked[ $id ] ) && 'publish' === get_post_status( $id ) && 'no' !== get_post_meta( $id, '_ip_sync', true ) ) {
+				wp_update_post( array( 'ID' => $id, 'post_status' => 'draft' ) );
+				update_post_meta( $id, '_ip_ritirata', '1' );
+			}
+		}
 	}
-	return ip_sync_propose( $type, 0, $url, array(), $ch ? $ch : array( 'La pagina ufficiale è cambiata.' ) );
+	return true;
 }
 
 function ip_sync_sites( $url, $html ) {
@@ -491,7 +678,7 @@ function ip_sync_sites( $url, $html ) {
 		}
 	}
 	if ( ! $ch ) {
-		ip_sync_close( 'sedi', 0 );
+		ip_sync_close( 'sedi', 0, $url );
 		return false;
 	}
 	return ip_sync_propose( 'sedi', 0, $url, array( 'sites' => $sites ), $ch );
@@ -524,7 +711,7 @@ function ip_sync_propose( $type, $target, $url, $payload, $changes ) {
 		'corso'        => 'Corso aggiornato',
 		'rimosso'      => 'Corso tolto dall’offerta',
 		'pagina'       => 'Pagina aggiornata',
-		'agevolazioni' => 'Agevolazioni da rivedere',
+		'agevolazioni' => 'Agevolazioni aggiornate',
 		'sedi'         => 'Sedi d’esame cambiate',
 	);
 	$name = $target ? html_entity_decode( get_post_field( 'post_title', $target ), ENT_QUOTES, 'UTF-8' ) : ( isset( $payload['title'] ) ? $payload['title'] : ip_src_slug( $url ) );
@@ -557,7 +744,7 @@ function ip_sync_propose( $type, $target, $url, $payload, $changes ) {
 	update_post_meta( $id, '_sig', $sig );
 
 	$auto = 'auto' === ip_opt( 'sync_mode' );
-	if ( $auto && ( 'rimosso' !== $type || ip_opt( 'sync_retire' ) ) && 'agevolazioni' !== $type ) {
+	if ( $auto && ( 'rimosso' !== $type || ip_opt( 'sync_retire' ) ) ) {
 		ip_sync_apply( $id, 'automatica' );
 	}
 	return true;
@@ -600,6 +787,13 @@ function ip_sync_apply( $id, $state = 'applicata' ) {
 				wp_update_post( array( 'ID' => $target, 'post_content' => wp_slash( $payload['content'] ) ) );
 			}
 			break;
+		case 'agevolazioni':
+			if ( empty( $payload['items'] ) ) {
+				return false;
+			}
+			// In automatico le agevolazioni tolte vanno in bozza solo se lo prevedono le impostazioni.
+			ip_sync_apply_agev( $payload['items'], 'automatica' !== $state || ip_opt( 'sync_retire' ) );
+			break;
 		case 'sedi':
 			if ( ! empty( $payload['sites'] ) ) {
 				$o               = get_option( 'ip_settings', array() );
@@ -618,8 +812,8 @@ function ip_sync_apply( $id, $state = 'applicata' ) {
 /**
  * Chiude una proposta aperta che non ha più ragione di esistere.
  */
-function ip_sync_close( $type, $target ) {
-	$id = ip_sync_find_open( $type, $target, '' );
+function ip_sync_close( $type, $target, $url = '' ) {
+	$id = ip_sync_find_open( $type, $target, $url );
 	if ( $id ) {
 		update_post_meta( $id, '_state', 'superata' );
 	}
@@ -694,7 +888,7 @@ add_action( 'admin_post_ip_sync', function () {
 		$ids = get_posts( array( 'post_type' => 'ip_update', 'posts_per_page' => -1, 'fields' => 'ids', 'meta_key' => '_state', 'meta_value' => 'aperta' ) );
 		$n   = 0;
 		foreach ( $ids as $id ) {
-			if ( 'agevolazioni' !== get_post_meta( $id, '_type', true ) && ip_sync_apply( $id ) ) {
+			if ( ip_sync_apply( $id ) ) {
 				$n++;
 			}
 		}
@@ -759,13 +953,8 @@ function ip_sync_page_render() {
 						</td>
 						<td><ul class="ip-sync-changes"><?php foreach ( (array) get_post_meta( $p->ID, '_changes', true ) as $c ) : ?><li><?php echo esc_html( $c ); ?></li><?php endforeach; ?></ul></td>
 						<td>
-							<?php if ( 'agevolazioni' === $type ) : ?>
-								<a class="button" href="<?php echo esc_url( admin_url( 'edit.php?post_type=agevolazione' ) ); ?>">Aggiorna a mano</a>
-								<a class="button-link" href="<?php echo esc_url( ip_sync_action_url( 'ignore', $p->ID ) ); ?>">Fatto</a>
-							<?php else : ?>
-								<a class="button button-primary" href="<?php echo esc_url( ip_sync_action_url( 'apply', $p->ID ) ); ?>"><?php echo 'rimosso' === $type ? 'Metti in bozza' : 'Applica'; ?></a>
-								<a class="button-link" href="<?php echo esc_url( ip_sync_action_url( 'ignore', $p->ID ) ); ?>">Ignora</a>
-							<?php endif; ?>
+							<a class="button button-primary" href="<?php echo esc_url( ip_sync_action_url( 'apply', $p->ID ) ); ?>"><?php echo 'rimosso' === $type ? 'Metti in bozza' : 'Applica'; ?></a>
+							<a class="button-link" href="<?php echo esc_url( ip_sync_action_url( 'ignore', $p->ID ) ); ?>">Ignora</a>
 						</td>
 					</tr>
 				<?php endforeach; ?>

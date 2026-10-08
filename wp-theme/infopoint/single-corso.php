@@ -119,7 +119,7 @@ while ( have_posts() ) :
 								<p><span>Costo</span><strong><?php echo esc_html( $cost ); ?></strong></p>
 							<?php else : ?>
 								<p><span>Retta</span><strong>da <?php echo esc_html( ip_price_from() ); ?>/mese</strong></p>
-								<p class="muted">importi stabiliti dall’Ateneo e pagati direttamente all’Università, con le agevolazioni e rateizzabili senza interessi.<?php echo ip_opt( 'retta_std' ) ? ' Retta standard ' . esc_html( ip_opt( 'retta_std' ) ) . '.' : ''; ?></p>
+								<p class="muted">importi stabiliti dall’Ateneo e pagati direttamente all’Università, con le agevolazioni e rateizzabili senza interessi.<?php echo ip_retta_std() ? ' Retta standard ' . esc_html( ip_retta_std() ) . '.' : ''; ?></p>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>

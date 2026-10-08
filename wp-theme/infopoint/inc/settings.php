@@ -116,8 +116,8 @@ function ip_settings_fields() {
 		'conversione' => array(
 			'title'  => 'Moduli e richieste',
 			'fields' => array(
-				'price_from'   => array( 'Retta mensile a partire da (€)', 'text', '135', 'Solo il numero. Vuoto = non mostrato.' ),
-				'retta_std'    => array( 'Retta standard corsi di laurea', 'text', '€ 2.760/anno (€ 230/mese)', 'Mostrata nelle schede delle lauree senza un costo specifico.' ),
+				'price_from'   => array( 'Retta mensile a partire da (€)', 'text', '', 'Vuoto = calcolata in automatico dalle agevolazioni ufficiali (la rata mensile più bassa). Compila solo per forzare un valore.' ),
+				'retta_std'    => array( 'Retta standard corsi di laurea', 'text', '', 'Vuoto = presa in automatico dall’agevolazione «Retta standard». Nei testi puoi scrivere {retta_std}, {rata_min} e {retta_min}: diventano gli importi aggiornati.' ),
 				'lead_to'      => array( 'Email che ricevono le richieste', 'text', '', 'Più indirizzi separati da virgola. Vuoto = email dell’amministratore.' ),
 				'thanks_page'  => array( 'Pagina di ringraziamento', 'page', '' ),
 				'privacy_page' => array( 'Pagina informativa privacy', 'page', '' ),
@@ -197,8 +197,8 @@ function ip_default_faq() {
 		array( 'domanda' => 'La laurea online UniMarconi ha lo stesso valore di una laurea tradizionale?', 'risposta' => 'Sì. L’Università degli Studi Guglielmo Marconi è un ateneo riconosciuto dal Ministero dell’Università e della Ricerca dal 2004. I titoli hanno pieno valore legale: valgono per i concorsi pubblici, per l’accesso a master e abilitazioni e per l’iscrizione agli ordini professionali, dove previsto dal corso.' ),
 		array( 'domanda' => 'Dove si sostengono gli esami?', 'risposta' => 'Gli esami si svolgono in presenza, nelle sedi d’esame autorizzate distribuite in tutta Italia. Prenoti l’appello dalla piattaforma MyUnimarconi e scegli la sede più comoda.' ),
 		array( 'domanda' => 'Quando posso iscrivermi? Serve un test d’ingresso?', 'risposta' => 'Ai corsi di laurea ad accesso libero ci si iscrive in qualsiasi periodo dell’anno, senza test d’ingresso. Dopo l’immatricolazione è previsto solo un test orientativo non selettivo.' ),
-		array( 'domanda' => 'Quanto costa?', 'risposta' => 'La retta standard dei corsi di laurea è di € 2.760 l’anno (€ 230 al mese), comprensiva di diritti di segreteria e tasse d’esame; per i curriculum in lingua inglese è di € 3.000. Con le agevolazioni si parte da € 135 al mese. Tassa regionale e tassa di laurea sono a parte.' ),
-		array( 'domanda' => 'Lavoro: riuscirò a seguire le lezioni?', 'risposta' => 'Videolezioni e materiali sono disponibili sulla piattaforma 24 ore su 24 e non c’è obbligo di frequenza. È possibile anche l’iscrizione a tempo parziale, con retta al 50%.' ),
+		array( 'domanda' => 'Quanto costa?', 'risposta' => 'La retta standard dei corsi di laurea è di {retta_std}, comprensiva di diritti di segreteria e tasse d’esame. Con le agevolazioni dell’Ateneo si parte da {rata_min} al mese. Tassa regionale e tassa di laurea sono a parte. Gli importi e le condizioni aggiornati sono nella pagina delle agevolazioni.' ),
+		array( 'domanda' => 'Lavoro: riuscirò a seguire le lezioni?', 'risposta' => 'Videolezioni e materiali sono disponibili sulla piattaforma 24 ore su 24 e non c’è obbligo di frequenza. È possibile anche l’iscrizione a tempo parziale.' ),
 		array( 'domanda' => 'Che cosa fa l’infopoint e quanto costa la consulenza?', 'risposta' => 'Siamo un punto informativo per l’orientamento e le iscrizioni all’Università Marconi: ti aiutiamo a scegliere il corso, chiediamo per te la valutazione dei crediti, seguiamo l’immatricolazione e restiamo un riferimento durante il percorso. La consulenza è gratuita.' ),
 	);
 }
@@ -294,7 +294,7 @@ function ip_text( $key ) {
 	if ( ! ip_opt( 'vat' ) ) {
 		$t = preg_replace( '/\s*\(P\.?\s?IVA \{piva\}\)/i', '', $t );
 	}
-	return strtr( $t, array(
+	return strtr( ip_fill( $t ), array(
 		'{brand}'   => ip_opt( 'brand' ),
 		'{azienda}' => ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ),
 		'{ruolo}'   => ip_opt( 'partner_role' ),
