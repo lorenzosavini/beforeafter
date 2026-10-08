@@ -102,6 +102,11 @@ ogni 15 minuti su `https://tuodominio.it/wp-cron.php`.
 - Su computer, un solo invito «Prima di andare, ti richiamiamo noi?» quando il mouse esce dalla finestra. Il tasto Indietro **non** viene bloccato: Google Ads lo considera una pratica scorretta.
 - Ogni richiesta registra la landing di provenienza; nell'elenco landing c'è il conteggio delle richieste.
 - Non indicizzate di default (servono alle campagne).
+- **Mappa delle sedi d'esame**: l'Italia per regioni con un punto per ogni sede (elenco ufficiale sincronizzato); un clic sulla regione apre gli indirizzi. Le sedi nuove si posizionano da sole sulla città, o al centro della regione se la città non è in elenco.
+- **Scheda del corso a schede** (obiettivi, sbocchi, accesso…) letta dalla scheda ufficiale.
+- **Chi ti segue**: testo, foto della sede e persone in *Infopoint → Impostazioni → Landing*. Una foto vera della sede o del gruppo è l'elemento che rende la pagina credibile: caricatela.
+- Titoli in *Source Serif 4* (OFL, `assets/fonts/`), testi in Montserrat.
+- Confini regionali: [openpolis/geojson-italy](https://github.com/openpolis/geojson-italy) (CC BY 4.0), semplificati con `tools/map.py`; coordinate delle città da OpenStreetMap/Nominatim (ODbL), con `tools/geo.py`.
 
 ## Shortcode
 

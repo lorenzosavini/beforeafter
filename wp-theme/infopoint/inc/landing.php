@@ -49,7 +49,9 @@ function ip_lp_sections() {
 		'scheda'     => 'Contenuto: scheda del corso, elenco corsi o condizioni dell’agevolazione',
 		'piani'      => 'Piani di studio (solo corso)',
 		'costi'      => 'Costi e agevolazioni',
+		'sedi'       => 'Mappa delle sedi d’esame',
 		'passi'      => 'Come funziona con noi',
+		'team'       => 'Chi ti segue (testi e foto in Infopoint → Impostazioni → Landing)',
 		'recensioni' => 'Recensioni',
 		'faq'        => 'Domande frequenti',
 		'finale'     => 'Modulo finale «ti richiamiamo»',
@@ -688,5 +690,117 @@ add_action( 'wp_head', function () {
 		$css = str_replace( array( ' {', '{ ', ' }', '; ', ': ', ', ' ), array( '{', '{', '}', ';', ':', ',' ), $css );
 		set_transient( 'ip_lpcss_' . IP_VERSION, $css, WEEK_IN_SECONDS );
 	}
+	$css = str_replace( 'url("fonts/', 'url("' . IP_URI . '/assets/fonts/', $css );
 	echo '<style id="ip-lp-css">' . $css . '</style>' . "\n"; // phpcs:ignore
 }, 8 );
+
+/* ---------------------------------------------------------------------
+ * Mappa delle sedi d'esame
+ * ------------------------------------------------------------------- */
+
+function ip_lp_norm_city( $s ) {
+	$s = mb_strtolower( remove_accents( html_entity_decode( (string) $s, ENT_QUOTES, 'UTF-8' ) ) );
+	return trim( preg_replace( '/[^a-z]+/', ' ', str_replace( array( '’', "'" ), ' ', $s ) ) );
+}
+
+/**
+ * Sedi raggruppate per regione, con la posizione sulla mappa.
+ *
+ * @return array regions: nome => sedi [citta, indirizzo, x, y]; svg data.
+ */
+function ip_lp_map_data() {
+	static $out = null;
+	if ( null !== $out ) {
+		return $out;
+	}
+	$map    = ip_import_data( 'italia' );
+	$coords = array();
+	foreach ( ip_import_data( 'coordinate' ) as $c => $ll ) {
+		$coords[ ip_lp_norm_city( $c ) ] = $ll;
+	}
+	$out = array( 'map' => $map, 'regions' => array(), 'count' => 0 );
+	if ( empty( $map['regions'] ) ) {
+		return $out;
+	}
+	$xy = function ( $ll ) use ( $map ) {
+		return array( round( ( $ll[1] - $map['lon0'] ) * $map['cx'] * $map['k'], 1 ), round( ( $map['lat0'] - $ll[0] ) * $map['k'], 1 ) );
+	};
+	foreach ( ip_rows( 'exam_sites' ) as $r ) {
+		$reg  = trim( $r['regione'] ) ? trim( $r['regione'] ) : 'Altre sedi';
+		$city = trim( $r['citta'] );
+		$pos  = null;
+		// «Venezia-Mestre», «Reggio nell’Emilia»…: si prova il nome intero, poi le sue parti.
+		foreach ( array_merge( array( $city ), preg_split( '/\s*[-\/]\s*/u', $city ) ) as $try ) {
+			$k = ip_lp_norm_city( $try );
+			if ( isset( $coords[ $k ] ) ) {
+				$pos = $xy( $coords[ $k ] );
+				break;
+			}
+		}
+		if ( ! $pos && isset( $map['centers'][ $reg ] ) ) {
+			$pos = $map['centers'][ $reg ];
+		}
+		$out['regions'][ $reg ][] = array( 'citta' => $city, 'indirizzo' => $r['indirizzo'], 'pos' => $pos );
+		$out['count']++;
+	}
+	ksort( $out['regions'] );
+	return $out;
+}
+
+function ip_lp_map_svg( $m ) {
+	$map = $m['map'];
+	$svg = sprintf( '<svg class="lp-map-svg" viewBox="0 0 %s %s" role="img" aria-label="Mappa delle sedi d’esame in Italia">', esc_attr( $map['w'] ), esc_attr( $map['h'] ) );
+	foreach ( $map['regions'] as $name => $d ) {
+		$svg .= sprintf( '<path d="%s" data-region="%s" class="%s"><title>%s</title></path>', esc_attr( $d ), esc_attr( $name ), isset( $m['regions'][ $name ] ) ? 'on' : '', esc_html( $name . ( isset( $m['regions'][ $name ] ) ? ' · ' . count( $m['regions'][ $name ] ) . ' sedi' : '' ) ) );
+	}
+	foreach ( $m['regions'] as $name => $sites ) {
+		foreach ( $sites as $s ) {
+			if ( $s['pos'] ) {
+				$svg .= sprintf( '<circle cx="%s" cy="%s" r="5" data-region="%s"><title>%s</title></circle>', esc_attr( $s['pos'][0] ), esc_attr( $s['pos'][1] ), esc_attr( $name ), esc_html( $s['citta'] . ' – ' . $s['indirizzo'] ) );
+			}
+		}
+	}
+	return $svg . '</svg>';
+}
+
+/* ---------------------------------------------------------------------
+ * Scheda del corso divisa in schede (obiettivi, sbocchi, accesso…)
+ * ------------------------------------------------------------------- */
+
+/**
+ * @return array[] title, html, chips (voci brevi di un elenco, es. sbocchi).
+ */
+function ip_lp_tabs( $html ) {
+	$parts = preg_split( '#<h2[^>]*>(.*?)</h2>#su', (string) $html, -1, PREG_SPLIT_DELIM_CAPTURE );
+	$intro = trim( array_shift( $parts ) );
+	$tabs  = array();
+	if ( '' !== trim( wp_strip_all_tags( $intro ) ) ) {
+		$tabs[] = array( 'title' => 'Presentazione', 'html' => $intro );
+	}
+	for ( $i = 0; $i + 1 < count( $parts ); $i += 2 ) {
+		$title = trim( wp_strip_all_tags( $parts[ $i ] ) );
+		$body  = trim( $parts[ $i + 1 ] );
+		if ( '' === $title || '' === trim( wp_strip_all_tags( $body ) ) ) {
+			continue;
+		}
+		$tabs[] = array( 'title' => $title, 'html' => $body );
+	}
+	foreach ( $tabs as &$t ) {
+		$t['long'] = mb_strlen( wp_strip_all_tags( $t['html'] ) ) > 2200;
+		$t['key']  = sanitize_title( $t['title'] );
+	}
+	unset( $t );
+	return $tabs;
+}
+
+/**
+ * Chi ti segue: le persone e la sede dell'agenzia.
+ */
+function ip_lp_team() {
+	return array(
+		'title'  => ip_opt( 'lp_team_title' ),
+		'text'   => ip_text( 'lp_team_text' ),
+		'photo'  => (int) ip_opt( 'lp_team_photo' ),
+		'people' => ip_rows( 'lp_team' ),
+	);
+}

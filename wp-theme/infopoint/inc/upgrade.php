@@ -14,6 +14,15 @@ function ip_upgrade() {
 	if ( version_compare( $v, '2.4.0', '<' ) ) {
 		ip_upgrade_240();
 	}
+	if ( version_compare( $v, '2.6.0', '<' ) ) {
+		// Nuove sezioni delle landing (mappa delle sedi, chi ti segue): attive anche su quelle già create.
+		foreach ( get_posts( array( 'post_type' => 'ip_landing', 'post_status' => 'any', 'posts_per_page' => -1, 'fields' => 'ids' ) ) as $id ) {
+			$sez = get_post_meta( $id, '_lp_sezioni', true );
+			if ( is_array( $sez ) ) {
+				update_post_meta( $id, '_lp_sezioni', array_values( array_unique( array_merge( $sez, array( 'sedi', 'team' ) ) ) ) );
+			}
+		}
+	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.

@@ -32,11 +32,13 @@ $spec    = ip_lp_spec( $d );
 $figures = ip_lp_figures();
 $img     = $d['image'];
 
+$name    = $d['name'] ? $d['name'] : ip_opt( 'brand' );
+
 /**
- * Intestazione di sezione: occhiello con filetto e titolo.
+ * Titolo di sezione, con una riga di contesto facoltativa.
  */
-$head = function ( $kicker, $title ) {
-	printf( '<header class="lp-sh"><p class="lp-k">%s</p><h2>%s</h2></header>', esc_html( $kicker ), esc_html( $title ) );
+$head = function ( $title, $sub = '' ) {
+	printf( '<header class="lp-sh"><h2>%s</h2>%s</header>', esc_html( $title ), $sub ? '<p>' . esc_html( $sub ) . '</p>' : '' );
 };
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
@@ -45,6 +47,7 @@ $head = function ( $kicker, $title ) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0e261d">
 <?php if ( ip_opt( 'font_brand' ) ) : ?><link rel="preload" href="<?php echo esc_url( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>" as="font" type="font/woff2" crossorigin><?php endif; ?>
+<link rel="preload" href="<?php echo esc_url( IP_URI . '/assets/fonts/sourceserif4-latin-var.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -145,23 +148,36 @@ $head = function ( $kicker, $title ) {
 
 	<?php if ( $on( 'scheda' ) ) : ?>
 		<?php if ( 'corso' === $d['type'] && trim( wp_strip_all_tags( $d['content'] ) ) ) : ?>
+			<?php $tabs = ip_lp_tabs( $d['content'] ); ?>
 			<section class="lp-sec">
-				<div class="lp-w lp-split">
-					<div class="lp-split-h">
-						<?php $head( 'Il corso', 'Cosa studierai e dove ti porta' ); ?>
-						<p class="lp-note">Testo della scheda ufficiale dell’Ateneo, aggiornato automaticamente.</p>
-						<a class="lp-btn lp-btn-line" href="#richiedi" data-scroll-form>Ricevi il piano di studi completo</a>
-					</div>
-					<div>
-						<div class="lp-prose lp-clip" id="lp-scheda"><?php echo $d['content']; // phpcs:ignore ?></div>
-						<button type="button" class="lp-more" data-lp-expand="lp-scheda">Leggi tutta la scheda</button>
+				<div class="lp-w">
+					<?php $head( 'Cosa studi in ' . $name, 'Dalla scheda ufficiale del corso, aggiornata automaticamente.' ); ?>
+					<div class="lp-tabs" data-lp-tabs>
+						<div class="lp-tabs-nav" role="tablist">
+							<?php foreach ( $tabs as $i => $t ) : ?>
+								<button type="button" role="tab" id="tab-<?php echo esc_attr( $t['key'] ); ?>" aria-controls="pan-<?php echo esc_attr( $t['key'] ); ?>" aria-selected="<?php echo 0 === $i ? 'true' : 'false'; ?>"><?php echo esc_html( $t['title'] ); ?></button>
+							<?php endforeach; ?>
+						</div>
+						<div class="lp-tabs-body">
+							<?php foreach ( $tabs as $i => $t ) : ?>
+								<div class="lp-pan" role="tabpanel" id="pan-<?php echo esc_attr( $t['key'] ); ?>" aria-labelledby="tab-<?php echo esc_attr( $t['key'] ); ?>">
+									<h3 class="lp-pan-h"><?php echo esc_html( $t['title'] ); ?></h3>
+									<div class="lp-prose<?php echo $t['long'] ? ' lp-clip' : ''; ?>" id="txt-<?php echo esc_attr( $t['key'] ); ?>"><?php echo $t['html']; // phpcs:ignore ?></div>
+									<?php if ( $t['long'] ) : ?><button type="button" class="lp-more" data-lp-expand="txt-<?php echo esc_attr( $t['key'] ); ?>">Leggi tutto</button><?php endif; ?>
+								</div>
+							<?php endforeach; ?>
+							<aside class="lp-tabs-cta">
+								<p>Vuoi il piano di studi completo, con esami e crediti di ogni anno?</p>
+								<a class="lp-btn" href="#richiedi" data-scroll-form>Ricevilo gratis</a>
+							</aside>
+						</div>
 					</div>
 				</div>
 			</section>
 		<?php elseif ( 'tipologia' === $d['type'] && $d['courses'] ) : ?>
 			<section class="lp-sec">
 				<div class="lp-w">
-					<?php $head( count( $d['courses'] ) . ' corsi', 'Scegli il corso che ti interessa' ); ?>
+					<?php $head( count( $d['courses'] ) . ' corsi: scegli quello che fa per te', 'Tocca un corso: lo aggiungiamo alla tua richiesta.' ); ?>
 					<div class="lp-cards">
 						<?php foreach ( $d['courses'] as $cid ) : ?>
 							<?php
@@ -188,7 +204,7 @@ $head = function ( $kicker, $title ) {
 				<section class="lp-sec">
 					<div class="lp-w lp-split">
 						<div class="lp-split-h">
-							<?php $head( 'Condizioni', 'Come funziona l’agevolazione' ); ?>
+							<?php $head( 'Come funziona ' . $name ); ?>
 							<p class="lp-note">Importi e condizioni stabiliti dall’Università Marconi e aggiornati automaticamente dal sito ufficiale. Ti confermiamo l’importo esatto prima dell’iscrizione.</p>
 							<a class="lp-btn lp-btn-line" href="#richiedi" data-scroll-form>Verifica se ne hai diritto</a>
 						</div>
@@ -204,7 +220,7 @@ $head = function ( $kicker, $title ) {
 		<?php elseif ( 'generica' === $d['type'] && ip_tipologie() ) : ?>
 			<section class="lp-sec">
 				<div class="lp-w">
-					<?php $head( 'Offerta formativa', 'Cosa puoi studiare' ); ?>
+					<?php $head( 'Cosa puoi studiare all’Università Marconi', 'Scegli un’area: un orientatore ti presenta i corsi adatti a te.' ); ?>
 					<div class="lp-index">
 						<?php foreach ( ip_tipologie() as $tt ) : ?>
 							<a href="#richiedi" data-scroll-form data-set-interest="<?php echo esc_attr( $tt->name ); ?>"><strong><?php echo esc_html( $tt->name ); ?></strong><span><?php echo (int) $tt->count; ?> corsi</span><?php echo ip_icon( 'arrow', 18 ); // phpcs:ignore ?></a>
@@ -219,7 +235,7 @@ $head = function ( $kicker, $title ) {
 		<section class="lp-sec lp-sec-soft">
 			<div class="lp-w lp-split">
 				<div class="lp-split-h">
-					<?php $head( count( $d['curricula'] ) > 1 ? count( $d['curricula'] ) . ' percorsi' : 'Piano di studi', 'Piani di studio' ); ?>
+					<?php $head( count( $d['curricula'] ) > 1 ? count( $d['curricula'] ) . ' piani di studio tra cui scegliere' : 'Il piano di studi' ); ?>
 					<p class="lp-note">Esami, settori e crediti di ogni anno, come pubblicati dall’Ateneo.</p>
 				</div>
 				<div class="lp-acc">
@@ -239,7 +255,7 @@ $head = function ( $kicker, $title ) {
 		<?php if ( $cost ) : ?>
 			<section class="lp-sec">
 				<div class="lp-w lp-split">
-					<div class="lp-split-h"><?php $head( 'Costi', 'Quanto costa' ); ?></div>
+					<div class="lp-split-h"><?php $head( 'Quanto costa ' . $name ); ?></div>
 					<div class="lp-cost">
 						<p class="lp-cost-n"><?php echo esc_html( $cost ); ?></p>
 						<p>Importo stabilito dall’Ateneo e pagato direttamente all’Università. Ti spieghiamo rateizzazione e agevolazioni a cui hai diritto.</p>
@@ -252,7 +268,7 @@ $head = function ( $kicker, $title ) {
 			<section class="lp-sec">
 				<div class="lp-w lp-split">
 					<div class="lp-split-h">
-						<?php $head( 'Costi', 'Quanto costa' ); ?>
+						<?php $head( 'Quanto costa' . ( 'corso' === $d['type'] ? ' ' . $name : ' la laurea' ) ); ?>
 						<?php if ( $fees['std_retta'] ) : ?>
 							<div class="lp-std">
 								<p><span>Retta standard</span><strong><?php echo esc_html( ip_eur( $fees['std_retta'] ) ); ?></strong> l’anno</p>
@@ -294,10 +310,30 @@ $head = function ( $kicker, $title ) {
 		<?php endif; ?>
 	<?php endif; ?>
 
+	<?php $m = $on( 'sedi' ) ? ip_lp_map_data() : array( 'count' => 0 ); ?>
+	<?php if ( $m['count'] && ! empty( $m['map']['regions'] ) ) : ?>
+		<section class="lp-sec lp-sedi">
+			<div class="lp-w lp-map-grid">
+				<div class="lp-map" data-lp-map><?php echo ip_lp_map_svg( $m ); // phpcs:ignore ?></div>
+				<div class="lp-map-t">
+					<?php $head( 'Gli esami li sostieni in presenza, in ' . $m['count'] . ' sedi', count( $m['regions'] ) . ' regioni: scegli la più comoda quando prenoti l’appello. Elenco ufficiale dell’Ateneo, aggiornato automaticamente.' ); ?>
+					<div class="lp-regs">
+						<?php foreach ( $m['regions'] as $reg => $sites ) : ?>
+							<details data-region="<?php echo esc_attr( $reg ); ?>">
+								<summary><strong><?php echo esc_html( $reg ); ?></strong><span><?php echo esc_html( implode( ', ', array_unique( wp_list_pluck( $sites, 'citta' ) ) ) ); ?></span></summary>
+								<ul><?php foreach ( $sites as $st ) : ?><li><strong><?php echo esc_html( $st['citta'] ); ?></strong> <?php echo esc_html( $st['indirizzo'] ); ?></li><?php endforeach; ?></ul>
+							</details>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
+		</section>
+	<?php endif; ?>
+
 	<?php if ( $on( 'passi' ) && ip_rows( 'steps' ) ) : ?>
 		<section class="lp-sec lp-sec-soft">
 			<div class="lp-w">
-				<?php $head( 'Con noi', ip_opt( 't_passi' ) ); ?>
+				<?php $head( ip_opt( 't_passi' ) ); ?>
 				<ol class="lp-steps">
 					<?php foreach ( ip_rows( 'steps' ) as $st ) : ?>
 						<li><h3><?php echo esc_html( $st['titolo'] ?? '' ); ?></h3><p><?php echo esc_html( $st['testo'] ?? '' ); ?></p></li>
@@ -307,10 +343,47 @@ $head = function ( $kicker, $title ) {
 		</section>
 	<?php endif; ?>
 
+	<?php $team = ip_lp_team(); ?>
+	<?php if ( $on( 'team' ) && ( $team['text'] || $team['photo'] || $team['people'] ) ) : ?>
+		<section class="lp-sec lp-team has-img">
+			<div class="lp-w lp-team-grid">
+				<?php if ( $team['photo'] ) : ?>
+					<figure class="lp-team-img"><?php echo wp_get_attachment_image( $team['photo'], 'large', false, array( 'loading' => 'lazy', 'alt' => esc_attr( ip_opt( 'brand' ) ) ) ); ?></figure>
+				<?php else : ?>
+					<div class="lp-team-call">
+						<p class="lp-team-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></p>
+						<p>Chiamaci o scrivici: ti risponde un orientatore di <?php echo esc_html( ip_opt( 'brand' ) ); ?>.</p>
+						<?php if ( ip_opt( 'phone1' ) ) : ?><a class="lp-team-tel" href="<?php echo esc_attr( ip_tel_href( ip_opt( 'phone1' ) ) ); ?>" data-track="call"><?php echo esc_html( ip_opt( 'phone1' ) ); ?></a><?php endif; ?>
+						<?php if ( $wa ) : ?><a class="lp-team-wa" href="<?php echo esc_url( $wa ); ?>" target="_blank" rel="noopener" data-track="whatsapp"><?php echo ip_icon( 'whatsapp', 18 ); // phpcs:ignore ?> Scrivici su WhatsApp</a><?php endif; ?>
+					</div>
+				<?php endif; ?>
+				<div class="lp-team-t">
+					<?php $head( $team['title'] ); ?>
+					<p class="lp-team-lead"><?php echo esc_html( $team['text'] ); ?></p>
+					<?php if ( $team['people'] ) : ?>
+						<ul class="lp-people">
+							<?php foreach ( $team['people'] as $pp ) : ?>
+								<li>
+									<?php if ( ! empty( $pp['foto'] ) ) : ?><img src="<?php echo esc_url( $pp['foto'] ); ?>" alt="" loading="lazy" width="64" height="64"><?php else : ?><span class="lp-ini" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( $pp['nome'], 0, 1 ) ) ); ?></span><?php endif; ?>
+									<span><strong><?php echo esc_html( $pp['nome'] ); ?></strong><?php echo esc_html( $pp['ruolo'] ); ?></span>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endif; ?>
+					<dl class="lp-office">
+						<?php if ( ip_opt( 'address' ) ) : ?><div><dt>Sede</dt><dd><?php echo nl2br( esc_html( ip_opt( 'address' ) ) ); ?></dd></div><?php endif; ?>
+						<?php if ( ip_opt( 'hours' ) ) : ?><div><dt>Orari</dt><dd><?php echo nl2br( esc_html( ip_opt( 'hours' ) ) ); ?></dd></div><?php endif; ?>
+						<?php if ( ip_opt( 'company_name' ) ) : ?><div><dt>Chi siamo</dt><dd><?php echo esc_html( ip_legal_line() ); ?> <button type="button" class="lp-link" data-lp-open="lp-chi">Leggi di più</button></dd></div><?php endif; ?>
+					</dl>
+				</div>
+			</div>
+		</section>
+	<?php endif; ?>
+
 	<?php if ( $on( 'recensioni' ) && ip_rows( 'reviews' ) ) : ?>
 		<section class="lp-sec">
 			<div class="lp-w">
-				<?php $head( 'Esperienze', ip_opt( 't_reviews' ) ); ?>
+				<?php $head( ip_opt( 't_reviews' ) ); ?>
 				<div class="lp-quotes">
 					<?php foreach ( ip_rows( 'reviews' ) as $r ) : ?>
 						<?php $stars = min( 5, max( 0, (int) $r['voto'] ) ); ?>
@@ -328,7 +401,7 @@ $head = function ( $kicker, $title ) {
 		<section class="lp-sec">
 			<div class="lp-w lp-split">
 				<div class="lp-split-h">
-					<?php $head( 'Domande', ip_opt( 't_faq' ) ); ?>
+					<?php $head( ip_opt( 't_faq' ) ); ?>
 					<?php if ( ip_opt( 'phone1' ) ) : ?>
 						<p class="lp-note">Non trovi la risposta? Chiamaci al <a href="<?php echo esc_attr( ip_tel_href( ip_opt( 'phone1' ) ) ); ?>" data-track="call"><?php echo esc_html( ip_opt( 'phone1' ) ); ?></a>.</p>
 					<?php endif; ?>

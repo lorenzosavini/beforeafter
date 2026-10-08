@@ -139,6 +139,15 @@ function ip_settings_fields() {
 				'exam_sites' => array( 'Sedi d’esame', 'repeater', ip_default_exam_sites(), 'Mostrate con lo shortcode [ip_sedi], raggruppate per regione.', array( 'regione' => array( 'Regione', 'text' ), 'citta' => array( 'Città', 'text' ), 'indirizzo' => array( 'Struttura e indirizzo', 'text' ) ) ),
 			),
 		),
+		'landing'     => array(
+			'title'  => 'Landing',
+			'fields' => array(
+				'lp_team_title' => array( 'Riquadro persone: titolo', 'text', 'Chi ti segue' ),
+				'lp_team_text'  => array( 'Riquadro persone: testo', 'textarea', 'Siamo {azienda}, {ruolo}. Ti seguiamo al telefono, su WhatsApp o di persona in sede, dalla scelta del corso all’immatricolazione. La consulenza è gratuita.' ),
+				'lp_team_photo' => array( 'Foto della sede o del gruppo', 'image', '', 'Una foto vera della vostra sede o delle persone vale più di qualsiasi testo. Vuoto = riquadro senza foto.' ),
+				'lp_team'       => array( 'Le persone che rispondono', 'repeater', array(), 'Facoltativo: nome, ruolo e foto (ritratto quadrato).', array( 'nome' => array( 'Nome', 'text' ), 'ruolo' => array( 'Ruolo', 'text' ), 'foto' => array( 'Foto', 'media' ) ) ),
+			),
+		),
 		'sync'        => array(
 			'title'  => 'Aggiornamenti automatici',
 			'fields' => array(

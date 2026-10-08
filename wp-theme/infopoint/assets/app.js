@@ -176,6 +176,47 @@
 		b.hidden = true;
 	});
 
+	/* Landing: scheda del corso a schede */
+	d.querySelectorAll('[data-lp-tabs]').forEach(function (box) {
+		var tabs = box.querySelectorAll('[role=tab]');
+		var pans = box.querySelectorAll('[role=tabpanel]');
+		box.classList.add('js');
+		function sel(i, focus) {
+			tabs.forEach(function (t, j) { t.setAttribute('aria-selected', i === j); t.tabIndex = i === j ? 0 : -1; });
+			pans.forEach(function (p, j) { p.hidden = i !== j; });
+			if (focus) tabs[i].focus();
+		}
+		tabs.forEach(function (t, i) {
+			t.addEventListener('click', function () { sel(i); });
+			t.addEventListener('keydown', function (e) {
+				if (e.key === 'ArrowRight') sel((i + 1) % tabs.length, true);
+				if (e.key === 'ArrowLeft') sel((i - 1 + tabs.length) % tabs.length, true);
+			});
+		});
+		if (tabs.length) sel(0);
+	});
+
+	/* Landing: mappa delle sedi, una regione alla volta */
+	d.querySelectorAll('[data-lp-map]').forEach(function (map) {
+		var list = map.parentNode.querySelector('.lp-regs');
+		function mark(reg) {
+			map.querySelectorAll('[data-region]').forEach(function (el) { el.classList.toggle('sel', el.getAttribute('data-region') === reg); });
+		}
+		map.addEventListener('click', function (e) {
+			var el = e.target.closest('[data-region]');
+			if (!el || !list) return;
+			var reg = el.getAttribute('data-region');
+			list.querySelectorAll('details').forEach(function (x) {
+				x.open = x.getAttribute('data-region') === reg;
+				if (x.open) x.scrollIntoView({ block: 'nearest' });
+			});
+			mark(reg);
+		});
+		if (list) list.addEventListener('toggle', function (e) {
+			if (e.target.open) mark(e.target.getAttribute('data-region'));
+		}, true);
+	});
+
 	/* Landing: un solo invito prima di uscire (solo con il mouse, mai sul tasto Indietro) */
 	var exitDlg = d.querySelector('dialog[data-lp-exit]');
 	if (exitDlg && exitDlg.showModal && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
