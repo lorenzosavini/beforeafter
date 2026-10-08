@@ -1,0 +1,992 @@
+[
+ {
+  "slug": "scienze-della-pubblica-amministrazione",
+  "title": "Scienze della Pubblica Amministrazione",
+  "short": "Scienze della Pubblica Amministrazione",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "fashion-management-and-design-lingua-inglese",
+  "title": "Fashion Management and Design (lingua inglese)",
+  "short": "Fashion Management and Design (lingua inglese)",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "interior-design-in-lingua-inglese",
+  "title": "Interior Design (in lingua inglese)",
+  "short": "Interior Design (in lingua inglese)",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "mediazione-familiare",
+  "title": "Mediazione Familiare",
+  "short": "Mediazione Familiare",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "medicina-integrata",
+  "title": "Medicina Integrata",
+  "short": "Medicina Integrata",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "scienze-criminologiche-e-forensi",
+  "title": "Scienze Criminologiche e Forensi",
+  "short": "Scienze Criminologiche e Forensi",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "diritto-tributario",
+  "title": "Diritto Tributario",
+  "short": "Diritto Tributario",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "master-in-international-management-in-lingua-inglese",
+  "title": "Master in International Management (in lingua inglese)",
+  "short": "Master in International Management (in lingua inglese)",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "business-administration-english-language",
+  "title": "Business Administration (English language)",
+  "short": "Business Administration (English language)",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "management-sanitario",
+  "title": "Management Sanitario",
+  "short": "Management Sanitario",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "ergonomia-e-fattori-umani-nelle-organizzazioni-complesse",
+  "title": "Ergonomia e Fattori Umani nelle Organizzazioni Complesse",
+  "short": "Ergonomia e Fattori Umani nelle Organizzazioni Complesse",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "risorse-umane-ed-organizzazione",
+  "title": "Risorse Umane ed Organizzazione",
+  "short": "Risorse Umane ed Organizzazione",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "business-e-imprenditoria",
+  "title": "Business e Imprenditoria",
+  "short": "Business e Imprenditoria",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "executive-mba",
+  "title": "Executive MBA",
+  "short": "Executive MBA",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "biblioteconomia-e-organizzazione-archivistica",
+  "title": "Biblioteconomia e Organizzazione Archivistica (1AB)",
+  "short": "Biblioteconomia e Organizzazione Archivistica",
+  "code": "1AB",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "didattica-della-storia-moderna-e-contemporanea",
+  "title": "Didattica della Storia Moderna e Contemporanea (1SM)",
+  "short": "Didattica della Storia Moderna e Contemporanea",
+  "code": "1SM",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "la-letteratura-italiana-nel-suo-sviluppo-metodi-e-tecniche-didattiche",
+  "title": "La Letteratura Italiana nel suo Sviluppo: Metodi e Tecniche Didattiche (1LI)",
+  "short": "La Letteratura Italiana nel suo Sviluppo: Metodi e Tecniche Didattiche",
+  "code": "1LI",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "archivista-bibliotecario",
+  "title": "Archivista Bibliotecario (2AB)",
+  "short": "Archivista Bibliotecario",
+  "code": "2AB",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "filosofia-moderna-e-contemporanea",
+  "title": "Filosofia Moderna e Contemporanea (FMC)",
+  "short": "Filosofia Moderna e Contemporanea",
+  "code": "FMC",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "forma-e-storia-della-civilta-musicale",
+  "title": "Forma e Storia della Civiltà Musicale (FCM)",
+  "short": "Forma e Storia della Civiltà Musicale",
+  "code": "FCM",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "la-civilta-letteraria-di-roma-antica",
+  "title": "La Civiltà Letteraria di Roma Antica (CRA)",
+  "short": "La Civiltà Letteraria di Roma Antica",
+  "code": "CRA",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "storia-e-forme-della-letteratura-italiana",
+  "title": "Storia e Forme della Letteratura Italiana (SFL)",
+  "short": "Storia e Forme della Letteratura Italiana",
+  "code": "SFL",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "storia-e-storiografia-delle-eta-moderne-e-contemporanee",
+  "title": "Storia e Storiografia delle Età Moderne e Contemporanee (SSM)",
+  "short": "Storia e Storiografia delle Età Moderne e Contemporanee",
+  "code": "SSM",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "teorie-e-metodi-della-storia-dell-arte",
+  "title": "Teorie e Metodi della Storia dell’Arte (MSAD)",
+  "short": "Teorie e Metodi della Storia dell’Arte",
+  "code": "MSAD",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Umanistico – Letteraria",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "didattica-dell-apprendimento-linguistico-in-l2",
+  "title": "Didattica dell’Apprendimento Linguistico in L2 (1L2)",
+  "short": "Didattica dell’Apprendimento Linguistico in L2",
+  "code": "1L2",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze del Linguaggio – Letterature Straniere",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "tecniche-per-l-insegnamento-e-didattica-dell-apprendimento-dell-italiano-per-stranieri",
+  "title": "Tecniche per l’Insegnamento e Didattica dell’Apprendimento dell’Italiano per Stranieri (1ST)",
+  "short": "Tecniche per l’Insegnamento e Didattica dell’Apprendimento dell’Italiano per Stranieri",
+  "code": "1ST",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Scienze del Linguaggio – Letterature Straniere",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "didattica-della-civilta-della-cultura-e-della-lingua-inglese",
+  "title": "Didattica della Civiltà, della Cultura e della Lingua Inglese (DCI)",
+  "short": "Didattica della Civiltà, della Cultura e della Lingua Inglese",
+  "code": "DCI",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze del Linguaggio – Letterature Straniere",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "glottodidattica-delle-lingue-straniere-e-moderne",
+  "title": "Glottodidattica delle Lingue Straniere e Moderne (GLS)",
+  "short": "Glottodidattica delle Lingue Straniere e Moderne",
+  "code": "GLS",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze del Linguaggio – Letterature Straniere",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "scienze-del-linguaggio-e-didattica-della-lingua-italiana",
+  "title": "Scienze del Linguaggio e Didattica della Lingua Italiana (SLL)",
+  "short": "Scienze del Linguaggio e Didattica della Lingua Italiana",
+  "code": "SLL",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze del Linguaggio – Letterature Straniere",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "didattica-delle-scienze-motorie",
+  "title": "Didattica delle Scienze Motorie (1MO)",
+  "short": "Didattica delle Scienze Motorie",
+  "code": "1MO",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "esperto-di-didattica-laboratoriale",
+  "title": "Esperto di Didattica Laboratoriale (1EL)",
+  "short": "Esperto di Didattica Laboratoriale",
+  "code": "1EL",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "pedagogia-e-didattica-speciale-metodologie-educative-per-le-diverse-abilita",
+  "title": "Pedagogia e Didattica Speciale: Metodologie Educative per le Diverse Abilità (1DS)",
+  "short": "Pedagogia e Didattica Speciale: Metodologie Educative per le Diverse Abilità",
+  "code": "1DS",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "bisogni-educativi-speciali-i-disturbi-evolutivi-specifici",
+  "title": "Bisogni Educativi Speciali: I Disturbi Evolutivi Specifici (BES)",
+  "short": "Bisogni Educativi Speciali: I Disturbi Evolutivi Specifici",
+  "code": "BES",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "bisogni-educativi-speciali-lo-svantaggio-socio-economico-e-culturale",
+  "title": "Bisogni Educativi Speciali: Lo Svantaggio Socio-Economico e Culturale (SEC)",
+  "short": "Bisogni Educativi Speciali: Lo Svantaggio Socio-Economico e Culturale",
+  "code": "SEC",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "didattica-2-0-strumenti-informatici-per-una-nuova-scuola-digitale",
+  "title": "Didattica 2.0: Strumenti Informatici per una Nuova Scuola Digitale (DIG)",
+  "short": "Didattica 2.0: Strumenti Informatici per una Nuova Scuola Digitale",
+  "code": "DIG",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "l-integrazione-della-disabilita-nella-scuola",
+  "title": "L’integrazione della Disabilità nella Scuola (IND)",
+  "short": "L’integrazione della Disabilità nella Scuola",
+  "code": "IND",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "principi-per-la-prevenzione-del-disagio",
+  "title": "Principi per la Prevenzione del Disagio (PPS)",
+  "short": "Principi per la Prevenzione del Disagio",
+  "code": "PPS",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "tecnologie-dell-istruzione",
+  "title": "Tecnologie dell’Istruzione (TIC)",
+  "short": "Tecnologie dell’Istruzione",
+  "code": "TIC",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "teoria-e-metodologia-della-valutazione-nella-scuola",
+  "title": "Teoria e Metodologia della Valutazione nella Scuola (TVS)",
+  "short": "Teoria e Metodologia della Valutazione nella Scuola",
+  "code": "TVS",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "economia-aziendale",
+  "title": "Economia Aziendale (ENA)",
+  "short": "Economia Aziendale",
+  "code": "ENA",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Giuridiche ed Economiche",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "teoria-e-metodologia-del-diritto",
+  "title": "Teoria e Metodologia del Diritto (TMD)",
+  "short": "Teoria e Metodologia del Diritto",
+  "code": "TMD",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Giuridiche ed Economiche",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "didattica-della-matematica-e-della-geometria",
+  "title": "Didattica della Matematica e della Geometria (1MG)",
+  "short": "Didattica della Matematica e della Geometria",
+  "code": "1MG",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Tecnico – Scientifica",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "l-insegnamento-delle-scienze-naturali",
+  "title": "L’insegnamento delle Scienze Naturali (1SN)",
+  "short": "L’insegnamento delle Scienze Naturali",
+  "code": "1SN",
+  "tipologia": "master-di-i-livello-discipline-per-la-didattica",
+  "area": "Area Tecnico – Scientifica",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "teoria-generale-delle-scienze-matematiche",
+  "title": "Teoria Generale delle Scienze Matematiche (TSM)",
+  "short": "Teoria Generale delle Scienze Matematiche",
+  "code": "TSM",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Tecnico – Scientifica",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "teoria-generale-delle-scienze-naturali",
+  "title": "Teoria Generale delle Scienze Naturali (TSN)",
+  "short": "Teoria Generale delle Scienze Naturali",
+  "code": "TSN",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Tecnico – Scientifica",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "pedagogia-didattica-nel-metodo-montessori",
+  "title": "Pedagogia Didattica nel Metodo Montessori (MTMD)",
+  "short": "Pedagogia Didattica nel Metodo Montessori",
+  "code": "MTMD",
+  "tipologia": "master-di-ii-livello-discipline-per-la-didattica",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "didattica-speciale-per-l-handicap-la-disabilita-e-l-integrazione",
+  "title": "Didattica speciale per l’handicap, la disabilità e l’integrazione (WHA)",
+  "short": "Didattica speciale per l’handicap, la disabilità e l’integrazione",
+  "code": "WHA",
+  "tipologia": "corsi-di-perfezionamento",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "1500 ore"
+ },
+ {
+  "slug": "i-bisogni-educativi-speciali-gestione-dei-disturbi-evolutivi-e-sociali",
+  "title": "I Bisogni Educativi Speciali: Gestione dei Disturbi Evolutivi e Sociali (WBE)",
+  "short": "I Bisogni Educativi Speciali: Gestione dei Disturbi Evolutivi e Sociali",
+  "code": "WBE",
+  "tipologia": "corsi-di-perfezionamento",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "1500 ore"
+ },
+ {
+  "slug": "insegnare-nel-laboratorio-multimediale",
+  "title": "Insegnare nel Laboratorio Multimediale (WLM)",
+  "short": "Insegnare nel Laboratorio Multimediale",
+  "code": "WLM",
+  "tipologia": "corsi-di-perfezionamento",
+  "area": "Area Scienze Pedagogiche e dell’Educazione",
+  "cfu": "60",
+  "durata": "1500 ore"
+ },
+ {
+  "slug": "uso-didattico-delle-lim",
+  "title": "Uso didattico delle LIM",
+  "short": "Uso didattico delle LIM",
+  "code": "DIM",
+  "tipologia": "certificazioni-informatiche",
+  "area": "",
+  "cfu": "",
+  "durata": "Variabile"
+ },
+ {
+  "slug": "uso-didattico-dei-tablet",
+  "title": "Uso didattico dei tablet",
+  "short": "Uso didattico dei tablet",
+  "code": "UDT",
+  "tipologia": "certificazioni-informatiche",
+  "area": "",
+  "cfu": "",
+  "durata": "Variabile"
+ },
+ {
+  "slug": "fenomeno-migratorio-e-mediazione-culturale",
+  "title": "Fenomeno Migratorio e Mediazione Culturale",
+  "short": "Fenomeno Migratorio e Mediazione Culturale",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "scienze-e-tecniche-psicologiche",
+  "title": "Corso di laurea in Scienze e Tecniche Psicologiche",
+  "short": "Scienze e Tecniche Psicologiche",
+  "code": "L-24",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "scienze-motorie-e-sportive",
+  "title": "Corso di laurea in Scienze Motorie e Sportive",
+  "short": "Scienze Motorie e Sportive",
+  "code": "L-22",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "business-administration",
+  "title": "Business Administration",
+  "short": "Business Administration",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "amministrazione-finanza-e-controllo",
+  "title": "Amministrazione finanza e controllo",
+  "short": "Amministrazione finanza e controllo",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "Dipartimento di Scienze Economico-Aziendali, Giuridiche e Politiche",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "scrittura-creativa",
+  "title": "Scrittura Creativa",
+  "short": "Scrittura Creativa",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "1500 ore"
+ },
+ {
+  "slug": "legislazione-antiriciclaggio",
+  "title": "Legislazione Antiriciclaggio",
+  "short": "Legislazione Antiriciclaggio",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "",
+  "durata": ""
+ },
+ {
+  "slug": "ingegneria-informatica-magistrale",
+  "title": "Corso di laurea magistrale in Ingegneria Informatica",
+  "short": "Ingegneria Informatica",
+  "code": "LM-32",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Ingegneristiche",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "filologia-e-letterature-moderne",
+  "title": "Corso di laurea magistrale in Filologia e Letterature Moderne",
+  "short": "Filologia e Letterature Moderne",
+  "code": "LM-14",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "master-in-banking-and-finance-english-language",
+  "title": "Master in Banking and Finance (English language)",
+  "short": "Master in Banking and Finance (English language)",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "scienze-pedagogiche-e-strategie-didattiche",
+  "title": "Corso di laurea magistrale in Scienze Pedagogiche e Strategie Didattiche",
+  "short": "Scienze Pedagogiche e Strategie Didattiche",
+  "code": "LM-85",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "ingegneria-civile-per-la-progettazione-ecosostenibile",
+  "title": "Corso di laurea magistrale in Ingegneria Civile per la Progettazione Ecosostenibile",
+  "short": "Ingegneria Civile per la Progettazione Ecosostenibile",
+  "code": "LM-23",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Ingegneristiche",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "ingegneria-industriale-per-l-innovazione-sostenibile",
+  "title": "Corso di laurea magistrale in Ingegneria Industriale per l’innovazione Sostenibile",
+  "short": "Ingegneria Industriale per l’innovazione Sostenibile",
+  "code": "LM-33",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Ingegneristiche",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "beni-culturali-conoscenza-gestione-valorizzazione",
+  "title": "Corso di Laurea in Beni Culturali: Conoscenza, Gestione, Valorizzazione",
+  "short": "Beni Culturali: Conoscenza, Gestione, Valorizzazione",
+  "code": "L-1",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "lettere",
+  "title": "Corso di laurea in Lettere",
+  "short": "Lettere",
+  "code": "L-10",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "scienze-dell-educazione-e-della-formazione",
+  "title": "Corso di laurea in Scienze dell’Educazione e della Formazione",
+  "short": "Scienze dell’Educazione e della Formazione",
+  "code": "L-19",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "ingegneria-informatica",
+  "title": "Corso di laurea in Ingegneria Informatica",
+  "short": "Ingegneria Informatica",
+  "code": "L-8",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Ingegneristiche",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "scienze-giuridiche",
+  "title": "Corso di laurea in Scienze Giuridiche",
+  "short": "Scienze Giuridiche",
+  "code": "L-14",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Economico-Aziendali, Giuridiche e Politiche",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "scienze-della-comunicazione-e-media-digitali",
+  "title": "Corso di laurea in Scienze della Comunicazione e Media Digitali",
+  "short": "Scienze della Comunicazione e Media Digitali",
+  "code": "L-20",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "scienze-politiche-e-delle-relazioni-internazionali",
+  "title": "Corso di laurea in Scienze Politiche e delle Relazioni Internazionali",
+  "short": "Scienze Politiche e delle Relazioni Internazionali",
+  "code": "L-36",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Economico-Aziendali, Giuridiche e Politiche",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "psicologia",
+  "title": "Corso di laurea Magistrale in Psicologia",
+  "short": "Psicologia",
+  "code": "LM-51",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "lingue-moderne-per-la-comunicazione-internazionale",
+  "title": "Corso di laurea magistrale in Lingue moderne per la comunicazione internazionale",
+  "short": "Lingue moderne per la comunicazione internazionale",
+  "code": "LM-38",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Umane",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "ingegneria-per-l-innovazione-e-la-sostenibilita",
+  "title": "Corso di laurea interclasse in Ingegneria per l’Innovazione e la Sostenibilità",
+  "short": "Ingegneria per l’Innovazione e la Sostenibilità",
+  "code": "L-7 / L-9",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Ingegneristiche",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "economia-e-management-per-l-innovazione-e-la-sostenibilita",
+  "title": "Corso di Laurea Magistrale in Economia e Management per l’Innovazione e la Sostenibilità",
+  "short": "Economia e Management per l’Innovazione e la Sostenibilità",
+  "code": "LM-77",
+  "tipologia": "laurea-magistrale",
+  "area": "Dipartimento di Scienze Economico-Aziendali, Giuridiche e Politiche",
+  "cfu": "120",
+  "durata": "2 anni"
+ },
+ {
+  "slug": "economia-aziendale-e-management",
+  "title": "Corso di laurea in Economia Aziendale e Management",
+  "short": "Economia Aziendale e Management",
+  "code": "L-18",
+  "tipologia": "laurea-triennale",
+  "area": "Dipartimento di Scienze Economico-Aziendali, Giuridiche e Politiche",
+  "cfu": "180",
+  "durata": "3 anni"
+ },
+ {
+  "slug": "giurisprudenza",
+  "title": "Corso di Laurea Magistrale in Giurisprudenza",
+  "short": "Giurisprudenza",
+  "code": "LMG-01",
+  "tipologia": "laurea-magistrale-a-ciclo-unico",
+  "area": "Dipartimento di Scienze Economico-Aziendali, Giuridiche e Politiche",
+  "cfu": "300",
+  "durata": "5 anni"
+ },
+ {
+  "slug": "ai-e-agenti-ai-per-il-business",
+  "title": "AI e Agenti AI per il Business",
+  "short": "AI e Agenti AI per il Business",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "Dipartimento di Scienze Economico-Aziendali, Giuridiche e Politiche",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "antiterrorismo",
+  "title": "Antiterrorismo",
+  "short": "Antiterrorismo",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "global-marketing-e-mercati-internazionali",
+  "title": "Global Marketing e Mercati Internazionali",
+  "short": "Global Marketing e Mercati Internazionali",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "corporate-media-communication",
+  "title": "Corporate & Media Communication",
+  "short": "Corporate & Media Communication",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "cybersecurity-e-digital-forensics",
+  "title": "Cybersecurity e Digital Forensics",
+  "short": "Cybersecurity e Digital Forensics",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "digital-marketing-e-agenti-ai",
+  "title": "Digital Marketing e Agenti AI",
+  "short": "Digital Marketing e Agenti AI",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "diritto-e-salvaguardia-dell-ambiente-e-tutela-del-territorio",
+  "title": "Diritto e salvaguardia dell’ambiente e tutela del territorio",
+  "short": "Diritto e salvaguardia dell’ambiente e tutela del territorio",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "general-management",
+  "title": "General Management",
+  "short": "General Management",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "gestione-e-coordinamento-delle-professioni-sanitarie",
+  "title": "Gestione e Coordinamento delle Professioni Sanitarie",
+  "short": "Gestione e Coordinamento delle Professioni Sanitarie",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "giornalismo-e-media-communication",
+  "title": "Giornalismo e Media Communication",
+  "short": "Giornalismo e Media Communication",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "growth-marketing-e-agenti-ai",
+  "title": "Growth Marketing e Agenti AI",
+  "short": "Growth Marketing e Agenti AI",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "health-safety-environment",
+  "title": "Health Safety Environment",
+  "short": "Health Safety Environment",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "life-skills-education",
+  "title": "Life Skills Education",
+  "short": "Life Skills Education",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "marketing-e-communication-management",
+  "title": "Marketing e Communication Management",
+  "short": "Marketing e Communication Management",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "sales-marketing-management",
+  "title": "Sales & Marketing Management",
+  "short": "Sales & Marketing Management",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "marketing-comunicazione-e-fundraising-per-gli-eventi",
+  "title": "Marketing, comunicazione e fundraising per gli eventi",
+  "short": "Marketing, comunicazione e fundraising per gli eventi",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "servizi-e-politiche-attive-del-lavoro",
+  "title": "Servizi e Politiche Attive del Lavoro",
+  "short": "Servizi e Politiche Attive del Lavoro",
+  "code": "",
+  "tipologia": "master-di-i-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "corporate-finance-e-risk-management",
+  "title": "Corporate Finance e Risk Management",
+  "short": "Corporate Finance e Risk Management",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "market-access-ai-e-cybersecurity-in-ambito-sanitario",
+  "title": "Market Access, AI e Cybersecurity in ambito sanitario",
+  "short": "Market Access, AI e Cybersecurity in ambito sanitario",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "gestione-d-impresa-per-le-pmi-e-passaggio-generazionale",
+  "title": "Gestione d’impresa per le PMI e passaggio generazionale",
+  "short": "Gestione d’impresa per le PMI e passaggio generazionale",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "medicina-tradizionale-complementare-e-integrativa",
+  "title": "Medicina Tradizionale Complementare e Integrativa (MTCI)",
+  "short": "Medicina Tradizionale Complementare e Integrativa",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ },
+ {
+  "slug": "ricerca-clinica-e-medical-affairs-farmaci-e-medical-devices",
+  "title": "Ricerca Clinica e Medical Affairs. Farmaci e Medical Devices",
+  "short": "Ricerca Clinica e Medical Affairs. Farmaci e Medical Devices",
+  "code": "",
+  "tipologia": "master-di-ii-livello",
+  "area": "",
+  "cfu": "60",
+  "durata": "12 mesi"
+ }
+]

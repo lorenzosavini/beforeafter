@@ -1,0 +1,8 @@
+/* Anteprima nell'editor coerente con il sito. */
+body { font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #14202e; }
+h1, h2, h3, h4 { line-height: 1.2; font-weight: 700; letter-spacing: -.01em; }
+a { color: #0b3b74; }
+table { border-collapse: collapse; width: 100%; font-size: .94rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #d8dde4; }
+th { background: #f2f4f7; }
+.box { background: #f2f4f7; border-left: 4px solid #0b3b74; padding: 22px 24px; }
