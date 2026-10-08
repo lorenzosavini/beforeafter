@@ -116,24 +116,127 @@ function ip_import_find_course( $c ) {
 	return 0;
 }
 
-function ip_import_term( $name, $tax ) {
-	if ( ! $name ) {
-		return 0;
+/**
+ * Crea o aggiorna un corso dai dati ufficiali (stesso formato di corsi.json).
+ * Usata dall'importazione e dagli aggiornamenti automatici.
+ *
+ * @param array  $c       Dati del corso.
+ * @param string $mode    new | fill | overwrite.
+ * @param array  $tip_ids Mappa slug tipologia => term_id.
+ * @param array  $o       order, featured, status, content (false = non toccare titolo e testo).
+ * @return array|null id, new, curricula.
+ */
+function ip_import_course( $c, $mode, $tip_ids, $o = array() ) {
+	$o    = wp_parse_args( $o, array( 'order' => 0, 'featured' => array(), 'status' => 'publish', 'content' => true ) );
+	$curr = 0;
+	$id     = ip_import_find_course( $c );
+	$is_new = ! $id;
+	if ( $is_new ) {
+		$id = wp_insert_post( array(
+			'post_type'    => 'corso',
+			'post_title'   => $c['title'],
+			'post_name'    => $c['slug'],
+			'post_content' => wp_slash( $c['content'] ),
+			'menu_order'   => $o['order'],
+			'post_status'  => $o['status'],
+		) );
+		if ( ! $id || is_wp_error( $id ) ) {
+			return null;
+		}
+	} elseif ( 'new' === $mode ) {
+		return array( 'id' => $id, 'new' => false, 'curricula' => 0 );
+	} else {
+		$post   = get_post( $id );
+		$update = array( 'ID' => $id );
+		if ( $o['content'] && ( 'overwrite' === $mode || ! trim( $post->post_content ) ) ) {
+			$update['post_content'] = wp_slash( $c['content'] );
+		}
+		if ( 'overwrite' === $mode && $o['content'] ) {
+			$update['post_title'] = $c['title'];
+		}
+		if ( count( $update ) > 1 ) {
+			wp_update_post( $update );
+		}
 	}
-	$t = term_exists( $name, $tax );
-	if ( ! $t ) {
-		$t = wp_insert_term( $name, $tax );
+
+	$meta = array(
+		'short'  => $c['short'] !== $c['title'] ? $c['short'] : '',
+		'code'   => $c['code'],
+		'cfu'    => $c['cfu'],
+		'durata' => $c['durata'],
+		'retta'  => $c['retta'],
+		'lingua' => $c['lingua'],
+		'fonte'  => $c['source'],
+		'evidenza' => $c['evidenza'] ?? '',
+	);
+	if ( 0 === strpos( $c['tipologia'], 'laurea' ) ) {
+		$meta['accesso'] = 'laurea-magistrale' === $c['tipologia'] ? 'Libero, con verifica dei requisiti' : 'Libero, senza test';
 	}
-	return is_wp_error( $t ) ? 0 : (int) $t['term_id'];
+	if ( ! $is_new && 'overwrite' === $mode ) {
+		update_post_meta( $id, '_ip_stato', ! empty( $c['stato'] ) ? $c['stato'] : 'aperte' );
+	}
+	if ( $is_new ) {
+		$meta['stato'] = ! empty( $c['stato'] ) ? $c['stato'] : 'aperte';
+		if ( in_array( $c['slug'], $o['featured'], true ) ) {
+			$meta['featured'] = '1';
+		}
+	}
+	foreach ( $meta as $k => $v ) {
+		if ( '' === (string) $v ) {
+			continue;
+		}
+		if ( $is_new || 'overwrite' === $mode || '' === ip_meta( $k, $id ) ) {
+			update_post_meta( $id, '_ip_' . $k, $v );
+		}
+	}
+	if ( $c['image'] ) {
+		update_post_meta( $id, '_ip_image_src', esc_url_raw( $c['image'] ) );
+	}
+	if ( $c['docs'] && ( $is_new || 'overwrite' === $mode || ! ip_meta_rows( 'docs', $id ) ) ) {
+		update_post_meta( $id, '_ip_docs', array_map( function ( $d ) {
+			return array( 'label' => $d[0], 'url' => $d[1] );
+		}, $c['docs'] ) );
+	}
+	if ( isset( $tip_ids[ $c['tipologia'] ] ) && ( $is_new || 'overwrite' === $mode || ! get_the_terms( $id, 'tipologia' ) ) ) {
+		wp_set_object_terms( $id, $tip_ids[ $c['tipologia'] ], 'tipologia' );
+	}
+	foreach ( array( 'dipartimento' => $c['dipartimento'], 'area' => $c['area'] ) as $tax => $name ) {
+		if ( $name && ( $is_new || 'overwrite' === $mode || ! get_the_terms( $id, $tax ) ) ) {
+			wp_set_object_terms( $id, ip_import_term( $name, $tax ), $tax );
+		}
+	}
+
+	// Piani di studio.
+	foreach ( $c['curricula'] as $j => $cu ) {
+		$ex = get_page_by_path( $cu['slug'], OBJECT, 'curriculum' );
+		if ( $ex ) {
+			if ( 'overwrite' === $mode ) {
+				wp_update_post( array( 'ID' => $ex->ID, 'post_title' => $cu['name'], 'post_content' => wp_slash( $cu['content'] ), 'menu_order' => $j ) );
+			}
+			update_post_meta( $ex->ID, '_ip_course', $id );
+			continue;
+		}
+		$cid = wp_insert_post( array(
+			'post_type'    => 'curriculum',
+			'post_status'  => 'publish',
+			'post_title'   => $cu['name'],
+			'post_name'    => $cu['slug'],
+			'post_content' => wp_slash( $cu['content'] ),
+			'menu_order'   => $j,
+		) );
+		if ( $cid && ! is_wp_error( $cid ) ) {
+			update_post_meta( $cid, '_ip_course', $id );
+			$curr++;
+		}
+	}
+
+	return array( 'id' => $id, 'new' => $is_new, 'curricula' => $curr );
 }
 
-function ip_run_import( $o ) {
-	@set_time_limit( 600 ); // phpcs:ignore
-	wp_defer_term_counting( true );
-	$mode = $o['mode'];
-	$log  = array();
-
-	// Tipologie.
+/**
+ * Tipologie ufficiali: le crea se mancano e restituisce slug => term_id.
+ */
+function ip_import_tip_ids( $mode = 'fill' ) {
 	$tip_ids = array();
 	foreach ( ip_import_tipologie() as $slug => $t ) {
 		$term = get_term_by( 'slug', $slug, 'tipologia' );
@@ -153,6 +256,28 @@ function ip_run_import( $o ) {
 		}
 	}
 
+	return $tip_ids;
+}
+
+function ip_import_term( $name, $tax ) {
+	if ( ! $name ) {
+		return 0;
+	}
+	$t = term_exists( $name, $tax );
+	if ( ! $t ) {
+		$t = wp_insert_term( $name, $tax );
+	}
+	return is_wp_error( $t ) ? 0 : (int) $t['term_id'];
+}
+
+function ip_run_import( $o ) {
+	@set_time_limit( 600 ); // phpcs:ignore
+	wp_defer_term_counting( true );
+	$mode = $o['mode'];
+	$log  = array();
+
+	$tip_ids = ip_import_tip_ids( $mode );
+
 	// Corsi.
 	$featured = ip_import_featured();
 	$created  = 0;
@@ -160,110 +285,13 @@ function ip_run_import( $o ) {
 	$curr_n   = 0;
 	$seen     = array();
 	foreach ( ip_import_data( 'corsi' ) as $i => $c ) {
-		$id     = ip_import_find_course( $c );
-		$is_new = ! $id;
-		if ( $is_new ) {
-			$id = wp_insert_post( array(
-				'post_type'    => 'corso',
-				'post_status'  => 'publish',
-				'post_title'   => $c['title'],
-				'post_name'    => $c['slug'],
-				'post_content' => wp_slash( $c['content'] ),
-				'menu_order'   => $i,
-			) );
-			if ( ! $id || is_wp_error( $id ) ) {
-				continue;
-			}
-			$created++;
-		} elseif ( 'new' === $mode ) {
-			$seen[] = $id;
+		$r = ip_import_course( $c, $mode, $tip_ids, array( 'order' => $i, 'featured' => $featured ) );
+		if ( ! $r ) {
 			continue;
-		} else {
-			$post   = get_post( $id );
-			$update = array( 'ID' => $id );
-			if ( 'overwrite' === $mode || ! trim( $post->post_content ) ) {
-				$update['post_content'] = wp_slash( $c['content'] );
-			}
-			if ( 'overwrite' === $mode ) {
-				$update['post_title'] = $c['title'];
-			}
-			if ( count( $update ) > 1 ) {
-				wp_update_post( $update );
-			}
-			$updated++;
 		}
-		$seen[] = $id;
-
-		$meta = array(
-			'short'  => $c['short'] !== $c['title'] ? $c['short'] : '',
-			'code'   => $c['code'],
-			'cfu'    => $c['cfu'],
-			'durata' => $c['durata'],
-			'retta'  => $c['retta'],
-			'lingua' => $c['lingua'],
-			'fonte'  => $c['source'],
-			'evidenza' => $c['evidenza'] ?? '',
-		);
-		if ( 0 === strpos( $c['tipologia'], 'laurea' ) ) {
-			$meta['accesso'] = 'laurea-magistrale' === $c['tipologia'] ? 'Libero, con verifica dei requisiti' : 'Libero, senza test';
-		}
-		if ( ! empty( $c['stato'] ) && ( $is_new || 'overwrite' === $mode ) ) {
-			update_post_meta( $id, '_ip_stato', $c['stato'] );
-		}
-		if ( $is_new ) {
-			$meta['stato'] = ! empty( $c['stato'] ) ? $c['stato'] : 'aperte';
-			if ( in_array( $c['slug'], $featured, true ) ) {
-				$meta['featured'] = '1';
-			}
-		}
-		foreach ( $meta as $k => $v ) {
-			if ( '' === (string) $v ) {
-				continue;
-			}
-			if ( $is_new || 'overwrite' === $mode || '' === ip_meta( $k, $id ) ) {
-				update_post_meta( $id, '_ip_' . $k, $v );
-			}
-		}
-		if ( $c['image'] ) {
-			update_post_meta( $id, '_ip_image_src', esc_url_raw( $c['image'] ) );
-		}
-		if ( $c['docs'] && ( $is_new || 'overwrite' === $mode || ! ip_meta_rows( 'docs', $id ) ) ) {
-			update_post_meta( $id, '_ip_docs', array_map( function ( $d ) {
-				return array( 'label' => $d[0], 'url' => $d[1] );
-			}, $c['docs'] ) );
-		}
-		if ( isset( $tip_ids[ $c['tipologia'] ] ) && ( $is_new || 'overwrite' === $mode || ! get_the_terms( $id, 'tipologia' ) ) ) {
-			wp_set_object_terms( $id, $tip_ids[ $c['tipologia'] ], 'tipologia' );
-		}
-		foreach ( array( 'dipartimento' => $c['dipartimento'], 'area' => $c['area'] ) as $tax => $name ) {
-			if ( $name && ( $is_new || 'overwrite' === $mode || ! get_the_terms( $id, $tax ) ) ) {
-				wp_set_object_terms( $id, ip_import_term( $name, $tax ), $tax );
-			}
-		}
-
-		// Piani di studio.
-		foreach ( $c['curricula'] as $j => $cu ) {
-			$ex = get_page_by_path( $cu['slug'], OBJECT, 'curriculum' );
-			if ( $ex ) {
-				if ( 'overwrite' === $mode ) {
-					wp_update_post( array( 'ID' => $ex->ID, 'post_title' => $cu['name'], 'post_content' => wp_slash( $cu['content'] ), 'menu_order' => $j ) );
-				}
-				update_post_meta( $ex->ID, '_ip_course', $id );
-				continue;
-			}
-			$cid = wp_insert_post( array(
-				'post_type'    => 'curriculum',
-				'post_status'  => 'publish',
-				'post_title'   => $cu['name'],
-				'post_name'    => $cu['slug'],
-				'post_content' => wp_slash( $cu['content'] ),
-				'menu_order'   => $j,
-			) );
-			if ( $cid && ! is_wp_error( $cid ) ) {
-				update_post_meta( $cid, '_ip_course', $id );
-				$curr_n++;
-			}
-		}
+		$seen[] = $r['id'];
+		$r['new'] ? $created++ : ( 'new' !== $mode ? $updated++ : null );
+		$curr_n += $r['curricula'];
 	}
 	$log[] = $created . ' corsi creati';
 	if ( 'new' !== $mode ) {

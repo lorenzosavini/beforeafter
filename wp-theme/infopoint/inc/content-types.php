@@ -108,6 +108,7 @@ function ip_course_fields() {
 		'evidenza' => array( 'Nota in evidenza', 'text', 'Es. Abilitante alla professione di Psicologo.' ),
 		'fonte'    => array( 'Pagina ufficiale UniMarconi', 'text', 'Riferimento interno, non mostrato ai visitatori.' ),
 		'featured' => array( 'In evidenza in home', 'checkbox', '' ),
+		'sync'     => array( 'Aggiornamento automatico', 'select', 'Dal sito ufficiale UniMarconi.', array( '' => 'Aggiorna tutto', 'dati' => 'Solo dati, piani e documenti (non il testo)', 'no' => 'Non aggiornare' ) ),
 	);
 }
 
@@ -195,7 +196,7 @@ function ip_course_box( $post ) {
 		} elseif ( 'select' === $f[1] ) {
 			printf( '<label for="ip-%1$s">%2$s</label><select id="ip-%1$s" name="ip[%1$s]">', esc_attr( $k ), esc_html( $f[0] ) );
 			foreach ( $f[3] as $ok => $ol ) {
-				printf( '<option value="%s" %s>%s</option>', esc_attr( $ok ), selected( $v ? $v : 'aperte', $ok, false ), esc_html( $ol ) );
+				printf( '<option value="%s" %s>%s</option>', esc_attr( $ok ), selected( $v ? $v : ( 'stato' === $k ? 'aperte' : '' ), $ok, false ), esc_html( $ol ) );
 			}
 			echo '</select>';
 		} else {

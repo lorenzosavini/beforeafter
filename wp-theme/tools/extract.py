@@ -16,7 +16,9 @@ def piano_extract(s):
     p=D+'/html/'+s+'.html'
     if not os.path.exists(p): return None
     h=open(p,errors='ignore').read()
-    a=h.find('</h1>'); b=h.find('</main>')
+    a=h.find('</h1>')
+    if a<0: a=h.find('<main')
+    b=h.find('</main>')
     x,_,_=clean(h[a:b]); intro,secs=sections(x)
     name=None; body=[]
     for t,c in secs:

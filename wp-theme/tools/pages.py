@@ -34,7 +34,9 @@ for slug,title,src,_ in PAGES:
     p=D+'/html/'+src+'.html'
     if not os.path.exists(p): print('missing',src); continue
     h=open(p,errors='ignore').read()
-    a=h.find('</h1>'); b=h.find('</main>')
+    a=h.find('</h1>')
+    if a<0: a=h.find('<main')
+    b=h.find('</main>')
     if a<0: continue
     x,pdfs,_=clean(h[a:b]); intro,secs=sections(x)
     parts=[strip(intro)] if re.sub('<[^>]+>','',intro).strip() else []

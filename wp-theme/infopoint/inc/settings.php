@@ -139,6 +139,23 @@ function ip_settings_fields() {
 				'exam_sites' => array( 'Sedi d’esame', 'repeater', ip_default_exam_sites(), 'Mostrate con lo shortcode [ip_sedi], raggruppate per regione.', array( 'regione' => array( 'Regione', 'text' ), 'citta' => array( 'Città', 'text' ), 'indirizzo' => array( 'Struttura e indirizzo', 'text' ) ) ),
 			),
 		),
+		'sync'        => array(
+			'title'  => 'Aggiornamenti automatici',
+			'fields' => array(
+				'sync_enabled' => array( 'Controlla il sito ufficiale', 'checkbox', '1', 'Legge le sitemap di unimarconi.it e rilegge solo le pagine modificate. I risultati sono in <a href="admin.php?page=ip-sync">Infopoint → Aggiornamenti</a>.' ),
+				'sync_freq'    => array( 'Frequenza', 'select', 'daily', '', array( 'daily' => 'Ogni giorno', 'weekly' => 'Ogni settimana' ) ),
+				'sync_mode'    => array( 'Cosa fare con le novità', 'select', 'approva', 'Con l’approvazione vedi ogni differenza e decidi tu. In automatico le modifiche vengono applicate subito (le versioni precedenti restano nelle revisioni).', array( 'approva' => 'Proponi, approvo io (consigliato)', 'auto' => 'Applica in automatico' ) ),
+				'sync_scope'   => array( 'Cosa controllare', 'checklist', array( 'corsi', 'pagine', 'agevolazioni', 'sedi' ), '', array(
+					'corsi'        => 'Corsi, piani di studio, documenti, corsi nuovi e tolti',
+					'pagine'       => 'Pagine informative importate (tasse, immatricolazione…)',
+					'agevolazioni' => 'Pagina ufficiale delle agevolazioni (solo segnalazione)',
+					'sedi'         => 'Sedi d’esame',
+				) ),
+				'sync_new'     => array( 'Corsi nuovi in modalità automatica', 'select', 'bozza', '', array( 'bozza' => 'Crea in bozza, li pubblico io', 'pubblica' => 'Pubblica subito' ) ),
+				'sync_retire'  => array( 'Corsi tolti dall’offerta', 'checkbox', '', 'In modalità automatica mette in bozza i corsi che non compaiono più nell’offerta ufficiale.' ),
+				'sync_email'   => array( 'Email per le notifiche', 'text', '', 'Vuoto = email dell’amministratore.' ),
+			),
+		),
 		'aspetto'     => array(
 			'title'  => 'Aspetto',
 			'fields' => array(
@@ -346,6 +363,8 @@ function ip_sanitize_field( $f, $v ) {
 			return sanitize_textarea_field( (string) $v );
 		case 'checklist':
 			return array_values( array_intersect( (array) $v, array_keys( $f[4] ) ) );
+		case 'select':
+			return isset( $f[4][ $v ] ) ? (string) $v : $f[2];
 		case 'repeater':
 			$rows = array();
 			foreach ( (array) $v as $row ) {
@@ -422,6 +441,13 @@ function ip_settings_field( $k, $f ) {
 	$val   = is_array( $saved ) && array_key_exists( $k, $saved ) ? $saved[ $k ] : $f[2];
 	switch ( $f[1] ) {
 		case 'note':
+			break;
+		case 'select':
+			printf( '<select id="%s" name="%s">', esc_attr( $id ), esc_attr( $name ) );
+			foreach ( $f[4] as $ok => $ol ) {
+				printf( '<option value="%s" %s>%s</option>', esc_attr( $ok ), selected( $val, $ok, false ), esc_html( $ol ) );
+			}
+			echo '</select>';
 			break;
 		case 'image':
 			ip_image_field( $name, (int) $val );

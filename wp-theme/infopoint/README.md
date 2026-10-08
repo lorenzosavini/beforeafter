@@ -55,6 +55,33 @@ modificabili da *Infopoint → Impostazioni → Aspetto*.
 | Eventi dataLayer: `generate_lead`, `contact_click`, `lead_thank_you` | automatici |
 | Barra mobile Chiama / WhatsApp / Richiedi info | automatica |
 
+## Aggiornamenti automatici dal sito ufficiale
+
+*Infopoint → Aggiornamenti* (impostazioni in *Impostazioni → Aggiornamenti
+automatici*).
+
+- Ogni giorno (o settimana) il sito legge le sitemap di unimarconi.it e
+  rilegge **solo le pagine modificate**, 4 alla volta, in background.
+- Confronta ogni corso con la scheda ufficiale: classe, CFU, durata, costo,
+  stato iscrizioni, nota in evidenza, testo, documenti PDF, piani di studio.
+  Trova anche **corsi nuovi** e **corsi tolti** dall'offerta.
+- Controlla le pagine informative importate (tasse, immatricolazione…), la
+  pagina delle agevolazioni (segnalazione delle righe cambiate) e le sedi
+  d'esame.
+- **Con approvazione** (predefinito): ogni differenza compare con «Applica» /
+  «Ignora» e arriva un'email di riepilogo. **Automatico**: le modifiche
+  vengono applicate subito. In entrambi i casi la versione precedente resta
+  nelle *Revisioni*.
+- In ogni corso, «Aggiornamento automatico»: *Aggiorna tutto*, *Solo dati,
+  piani e documenti* (per i corsi di cui avete riscritto il testo) o *Non
+  aggiornare*. Le pagine importate hanno la stessa opzione.
+- «Verifica completa» rilegge tutte le ~225 pagine ufficiali (circa 5 minuti).
+
+WP-Cron parte quando qualcuno visita il sito. Su hosting con poco traffico
+conviene un cron di sistema: in `wp-config.php`
+`define( 'DISABLE_WP_CRON', true );` e dal pannello dell'hosting un'attività
+ogni 15 minuti su `https://tuodominio.it/wp-cron.php`.
+
 ## Shortcode
 
 ```
