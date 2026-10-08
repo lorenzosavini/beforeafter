@@ -70,17 +70,36 @@ carta intestata** che confermi la partnership: vi servirà nel ricorso.
 Senza autorizzazione, scrivete annunci descrittivi: «Lauree online
 riconosciute – Orientamento gratuito – ZDM Orientamento».
 
-## Ricorso
+## Piano per il ricorso (una volta sola, fatto bene)
 
-**Non aprite un nuovo account**: come scrive Google, verrebbe sospeso
-subito. Si presenta un nuovo ricorso sullo stesso account, *dopo* aver
-messo online le modifiche, allegando:
+Con le violazioni gravi Google riattiva solo in casi eccezionali e un
+secondo rifiuto rende tutto più difficile: niente ricorsi «di prova».
 
-- visura camerale di ZDM S.r.l.;
-- contratto di partnership / lettera dell'Ateneo;
-- link alla pagina ufficiale UniMarconi che elenca il vostro polo;
-- link alla pagina «Chi siamo» e una schermata dell'avviso in testata;
-- nuovo dominio (se cambiato).
+1. **Sistemate prima sito e dominio** (sezioni sopra). Verificate che
+   avviso in testata, P.IVA, «Chi siamo» e piè di pagina siano online sul
+   dominio definitivo.
+2. **Raccogliete le prove verificabili dall'esterno**, in ordine di forza:
+   - la pagina ufficiale UniMarconi che elenca ZDM S.r.l. tra i poli/partner
+     (se non ci siete, chiedete all'Ateneo di inserirvi: è la prova più
+     forte);
+   - lettera di autorizzazione su carta intestata dell'Ateneo che citi
+     **ZDM S.r.l., il dominio del sito e l'uso del marchio in pubblicità**
+     (se l'Ateneo è d'accordo, pubblicatela in «Chi siamo»: c'è il campo
+     apposito);
+   - autorizzazione all'uso del marchio sul vostro ID cliente, inviata
+     dall'Ateneo con il modulo di Google;
+   - contratto di partnership, visura camerale, prova di proprietà del
+     dominio (intestazione del registrar), schermate del sito corretto.
+3. **Se l'Ateneo ha un referente Google** (chi gestisce le loro campagne),
+   chiedetegli di segnalare il vostro caso: pesa più di qualunque documento.
+4. **Contattate l'assistenza Google Ads** (chat o telefono dal pannello) e
+   chiedete l'escalation al team norme per l'account 761-818-9109. Insistete
+   e richiamate, conservando i numeri di pratica, ma restate sempre
+   professionali: minacce o toni aggressivi non accelerano la revisione e
+   restano agli atti della pratica.
+5. **Presentate il ricorso dal Centro norme**, spiegando cosa avete
+   cambiato e allegando tutto. Negli annunci, da quel momento, il nome
+   attività è «ZDM S.r.l.» (o «ZDM Orientamento»), mai «UniMarconi».
 
 ### Bozza del testo (da adattare)
 

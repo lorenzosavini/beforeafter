@@ -286,7 +286,7 @@ add_shortcode( 'ip_chi_siamo', function () {
 						<div><dt><?php echo esc_html( $l ); ?></dt><dd><?php echo nl2br( esc_html( ip_opt( $k ) ) ); ?></dd></div>
 					<?php endif; ?>
 				<?php endforeach; ?>
-				<div><dt>Rapporto con l’Ateneo</dt><dd><?php echo esc_html( ucfirst( ip_opt( 'partner_role' ) ) ); ?><?php echo ip_opt( 'partner_since' ) ? ' (' . esc_html( ip_opt( 'partner_since' ) ) . ')' : ''; ?><?php if ( ip_opt( 'partner_proof' ) ) : ?>. <a href="<?php echo esc_url( ip_opt( 'partner_proof' ) ); ?>" target="_blank" rel="noopener">Elenco ufficiale dei poli UniMarconi</a><?php endif; ?></dd></div>
+				<div><dt>Rapporto con l’Ateneo</dt><dd><?php echo esc_html( ucfirst( ip_opt( 'partner_role' ) ) ); ?><?php echo ip_opt( 'partner_since' ) ? ' (' . esc_html( ip_opt( 'partner_since' ) ) . ')' : ''; ?><?php if ( ip_opt( 'partner_proof' ) ) : ?>. <a href="<?php echo esc_url( ip_opt( 'partner_proof' ) ); ?>" target="_blank" rel="noopener">Elenco ufficiale dei poli UniMarconi</a><?php endif; ?><?php if ( ip_opt( 'partner_letter' ) ) : ?> · <a href="<?php echo esc_url( ip_opt( 'partner_letter' ) ); ?>" target="_blank" rel="noopener">Lettera di autorizzazione dell’Ateneo (PDF)</a><?php endif; ?></dd></div>
 			</dl>
 			<div class="whois-cols">
 				<section>

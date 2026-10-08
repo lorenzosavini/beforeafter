@@ -29,9 +29,10 @@ function ip_settings_fields() {
 				'capital'        => array( 'Capitale sociale', 'text', '', 'Es. € 10.000 i.v.' ),
 				'partner_role'   => array( 'Ruolo rispetto all’Ateneo', 'text', 'agenzia partner dell’Università degli Studi Guglielmo Marconi per l’orientamento e l’assistenza alle iscrizioni' ),
 				'partner_since'  => array( 'Riferimento dell’accordo', 'text', '', 'Es. «accordo di collaborazione in vigore dal 2021». Mostrato nella pagina Chi siamo.' ),
+				'partner_letter' => array( 'Lettera di autorizzazione dell’Ateneo (PDF)', 'url', '', 'Facoltativo. Se l’Ateneo è d’accordo a renderla pubblica, caricala nella Libreria media e incolla qui il link: compare nella pagina Chi siamo come prova verificabile.' ),
 				'partner_proof'  => array( 'Link alla pagina ufficiale UniMarconi che vi elenca', 'url', 'https://www.unimarconi.it/sedi-esami-e-poli-di-orientamento/', 'Prova pubblica e verificabile del rapporto con l’Ateneo (es. elenco dei poli di orientamento). Google la cerca quando valuta il ricorso.' ),
 				'disclosure_bar' => array( 'Avviso di trasparenza in cima a ogni pagina', 'checkbox', '1', 'Consigliato: rende evidente fin dal primo sguardo che il sito non è quello dell’Università.' ),
-				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un servizio di {azienda}, {ruolo}. Non siamo l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.', 'Segnaposto: {brand}, {azienda}, {ruolo}.' ),
+				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un servizio di {azienda} (P.IVA {piva}), {ruolo}. Non siamo l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.', 'Segnaposto: {brand}, {azienda}, {piva}, {ruolo}. Scrivete «partner autorizzato» solo se avete un’autorizzazione scritta dell’Ateneo.' ),
 				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', 'Stai contattando {azienda}, agenzia partner. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.', 'Mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
 			),
 		),
@@ -284,6 +285,7 @@ function ip_text( $key ) {
 		'{brand}'   => ip_opt( 'brand' ),
 		'{azienda}' => ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ),
 		'{ruolo}'   => ip_opt( 'partner_role' ),
+		'{piva}'    => ip_opt( 'vat' ) ? ip_opt( 'vat' ) : '—',
 		'{citta}'   => ip_opt( 'city' ),
 	) );
 }
