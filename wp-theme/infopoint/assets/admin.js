@@ -40,6 +40,23 @@
 			});
 			frame.open();
 		}
+		if (t.matches('[data-ip-image]') && window.wp && wp.media) {
+			e.preventDefault();
+			var box = t.closest('.ip-image');
+			var f = wp.media({ title: 'Scegli un’immagine', library: { type: 'image' }, button: { text: 'Usa questa immagine' }, multiple: false });
+			f.on('select', function () {
+				var a = f.state().get('selection').first().toJSON();
+				box.querySelector('input').value = a.id;
+				var img = box.querySelector('img');
+				img.src = (a.sizes && a.sizes.medium ? a.sizes.medium.url : a.url); img.hidden = false;
+				box.querySelector('[data-ip-image-clear]').hidden = false;
+			});
+			f.open();
+		}
+		if (t.matches('[data-ip-image-clear]')) {
+			var bx = t.closest('.ip-image');
+			bx.querySelector('input').value = ''; bx.querySelector('img').hidden = true; t.hidden = true;
+		}
 		if (t.matches('[data-ip-palette]')) {
 			var pal = t.getAttribute('data-ip-palette') === 'agency'
 				? { brand: '#1f3b57', brand_dark: '#152b41', brand_deep: '#0f1f2f', accent: '#d9622b', accent_dark: '#b84f1f', soft: '#f3f4f6', dark: '#1f2933' }

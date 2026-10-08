@@ -15,3 +15,4 @@
 .ip-curr-list li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0f1; }
 .ip-check .ip-rep-row { padding: 6px 10px; align-items: center; }
 .ip-check .ip-rep-tools { flex-direction: row; }
+.ip-image img { display: block; max-width: 280px; height: auto; border-radius: 8px; margin: 0 0 8px; }

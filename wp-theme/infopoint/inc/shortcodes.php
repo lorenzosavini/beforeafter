@@ -101,8 +101,9 @@ function ip_course_list( $slugs = array(), $filter = true, $limit = 300 ) {
 	<?php
 }
 
-add_shortcode( 'ip_agevolazioni', function () {
-	return ip_buffer( 'ip_agevolazioni' );
+add_shortcode( 'ip_agevolazioni', function ( $a ) {
+	$a = shortcode_atts( array( 'stile' => 'schede' ), $a );
+	return ip_buffer( 'tabella' === $a['stile'] ? 'ip_agevolazioni_table' : 'ip_agevolazioni' );
 } );
 
 function ip_agevolazioni( $limit = -1 ) {
@@ -312,3 +313,28 @@ add_shortcode( 'ip_chi_siamo', function () {
 		<?php
 	} );
 } );
+
+/**
+ * Agevolazioni in tabella: più leggibile delle schede quando si confrontano
+ * gli importi. [ip_agevolazioni stile="tabella"]
+ */
+function ip_agevolazioni_table( $limit = -1 ) {
+	$q = get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => $limit, 'orderby' => array( 'menu_order' => 'ASC', 'title' => 'ASC' ) ) );
+	if ( ! $q ) {
+		return;
+	}
+	echo '<div class="atable-wrap"><table class="atable"><thead><tr><th>Agevolazione</th><th>A chi è rivolta</th><th class="num">Al mese</th><th class="num">All’anno</th><th><span class="sr">Azioni</span></th></tr></thead><tbody>';
+	foreach ( $q as $p ) {
+		$retta = ip_meta( 'retta', $p->ID );
+		$rata  = ip_meta( 'rata', $p->ID );
+		printf(
+			'<tr><th scope="row">%s</th><td>%s</td><td class="num">%s</td><td class="num">%s</td><td class="act"><a href="#richiedi" data-scroll-form data-interest="%s">Verifica</a></td></tr>',
+			esc_html( get_the_title( $p ) ),
+			esc_html( ip_meta( 'dest', $p->ID ) ),
+			$rata ? '<strong>€ ' . esc_html( $rata ) . '</strong>' : '—',
+			$retta ? '€ ' . esc_html( number_format( (float) $retta, 0, ',', '.' ) ) : '—',
+			esc_attr( get_the_title( $p ) )
+		);
+	}
+	echo '</tbody></table></div>';
+}

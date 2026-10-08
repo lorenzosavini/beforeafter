@@ -21,23 +21,6 @@ $wa      = ip_wa_href();
 </div>
 <?php endif; ?>
 
-<?php if ( ! $landing ) : ?>
-<div class="topbar">
-	<div class="wrap topbar-in">
-		<p><?php echo esc_html( ip_opt( 'topbar_text' ) ); ?></p>
-		<ul>
-			<?php foreach ( array( 'phone1', 'phone2' ) as $p ) : ?>
-				<?php if ( ip_opt( $p ) ) : ?>
-					<li><a href="<?php echo esc_attr( ip_tel_href( ip_opt( $p ) ) ); ?>" data-track="call"><?php echo esc_html( ip_opt( $p . '_label' ) ); ?> <strong><?php echo esc_html( ip_opt( $p ) ); ?></strong></a></li>
-				<?php endif; ?>
-			<?php endforeach; ?>
-			<?php if ( $wa ) : ?>
-				<li><a href="<?php echo esc_url( $wa ); ?>" target="_blank" rel="noopener" data-track="whatsapp">WhatsApp</a></li>
-			<?php endif; ?>
-		</ul>
-	</div>
-</div>
-<?php endif; ?>
 
 <header class="hdr">
 	<div class="wrap hdr-in">
@@ -69,6 +52,7 @@ $wa      = ip_wa_href();
 					'fallback_cb'    => 'ip_menu_fallback',
 				) );
 				?>
+				<?php echo ip_phone_link( 'phone1', 'nav-phone' ); // phpcs:ignore ?>
 				<a class="btn btn-accent nav-cta" href="#richiedi" data-scroll-form><?php echo esc_html( ip_opt( 'nav_cta' ) ); ?></a>
 			</nav>
 		<?php endif; ?>

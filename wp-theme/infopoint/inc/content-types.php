@@ -303,14 +303,22 @@ add_action( 'manage_corso_posts_custom_column', function ( $col, $id ) {
 // segue il percorso naturale (triennali → magistrali → master …).
 add_action( 'tipologia_add_form_fields', function () {
 	echo '<div class="form-field"><label for="ip-ordine">Ordine</label><input type="number" name="ip_ordine" id="ip-ordine" value="10"><p>Numero più basso = mostrata prima.</p></div>';
+	echo '<div class="form-field"><label>Immagine</label>';
+	ip_image_field( 'ip_immagine', 0 );
+	echo '<p>Usata nei riquadri dell’offerta formativa. Vuoto = copertina del primo corso.</p></div>';
 } );
 add_action( 'tipologia_edit_form_fields', function ( $term ) {
 	printf( '<tr class="form-field"><th><label for="ip-ordine">Ordine</label></th><td><input type="number" name="ip_ordine" id="ip-ordine" value="%d"></td></tr>', (int) get_term_meta( $term->term_id, 'ordine', true ) );
+	echo '<tr class="form-field"><th>Immagine</th><td>';
+	ip_image_field( 'ip_immagine', (int) get_term_meta( $term->term_id, 'immagine', true ) );
+	echo '<p class="description">Usata nei riquadri dell’offerta formativa. Vuoto = copertina del primo corso della tipologia.</p></td></tr>';
 } );
 foreach ( array( 'created_tipologia', 'edited_tipologia' ) as $hook ) {
 	add_action( $hook, function ( $term_id ) {
 		if ( isset( $_POST['ip_ordine'] ) && current_user_can( 'manage_categories' ) ) {
 			update_term_meta( $term_id, 'ordine', (int) $_POST['ip_ordine'] );
+			$img = absint( $_POST['ip_immagine'] ?? 0 );
+			$img ? update_term_meta( $term_id, 'immagine', $img ) : delete_term_meta( $term_id, 'immagine' );
 		}
 	} );
 }

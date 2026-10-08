@@ -114,12 +114,12 @@ function ip_course_row( $id = null ) {
 	$hay   = strtolower( remove_accents( get_the_title( $id ) . ' ' . ip_meta( 'short', $id ) . ' ' . ip_meta( 'code', $id ) ) );
 	?>
 	<li class="crow" data-tip="<?php echo esc_attr( $tip ? $tip->slug : '' ); ?>" data-s="<?php echo esc_attr( $hay ); ?>">
-		<span class="crow-code"><?php echo esc_html( ip_meta( 'code', $id ) ); ?></span>
+		<a class="crow-img" href="<?php echo esc_url( get_permalink( $id ) ); ?>" tabindex="-1" aria-hidden="true"><?php echo has_post_thumbnail( $id ) ? get_the_post_thumbnail( $id, 'thumbnail', array( 'loading' => 'lazy', 'alt' => '' ) ) : ''; // phpcs:ignore ?></a>
 		<div class="crow-main">
-			<a class="crow-title" href="<?php echo esc_url( get_permalink( $id ) ); ?>"><?php echo esc_html( ip_course_name( $id ) ); ?></a>
+			<a class="crow-title" href="<?php echo esc_url( get_permalink( $id ) ); ?>"><?php echo esc_html( ip_course_name( $id ) ); ?><?php if ( ip_meta( 'code', $id ) ) : ?> <span class="crow-code"><?php echo esc_html( ip_meta( 'code', $id ) ); ?></span><?php endif; ?></a>
 			<span class="crow-meta"><?php echo esc_html( implode( ' · ', $meta ) ); ?><?php if ( $stato && 'aperte' !== $stato ) : ?> · <em><?php echo esc_html( ip_status_label( $stato ) ); ?></em><?php endif; ?></span>
 		</div>
-		<a class="crow-cta" href="<?php echo esc_url( get_permalink( $id ) ); ?>#richiedi" aria-label="Richiedi informazioni su <?php echo esc_attr( ip_course_name( $id ) ); ?>">Costi e piano di studi <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
+		<a class="crow-cta" href="<?php echo esc_url( get_permalink( $id ) ); ?>">Scopri il corso</a>
 	</li>
 	<?php
 }
@@ -242,4 +242,67 @@ function ip_menu_fallback() {
 function ip_page_url( $slug ) {
 	$p = get_page_by_path( $slug );
 	return $p ? get_permalink( $p ) : '';
+}
+
+/**
+ * Immagine di una tipologia: quella scelta nel termine, altrimenti la
+ * copertina del primo corso della tipologia che ne ha una.
+ */
+function ip_term_image_id( $term ) {
+	$id = (int) get_term_meta( $term->term_id, 'immagine', true );
+	if ( $id ) {
+		return $id;
+	}
+	$q = get_posts( array(
+		'post_type'      => 'corso',
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+		'orderby'        => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
+		'meta_key'       => '_thumbnail_id',
+		'tax_query'      => array( array( 'taxonomy' => $term->taxonomy, 'terms' => $term->term_id ) ),
+	) );
+	return $q ? (int) get_post_thumbnail_id( $q[0] ) : 0;
+}
+
+/**
+ * Foto della home: quella scelta nelle impostazioni, altrimenti la
+ * copertina del primo corso in evidenza.
+ */
+function ip_hero_image_id() {
+	$id = (int) ip_opt( 'hero_image' );
+	if ( $id && wp_attachment_is_image( $id ) ) {
+		return $id;
+	}
+	$q = get_posts( array( 'post_type' => 'corso', 'posts_per_page' => 1, 'fields' => 'ids', 'meta_query' => array( array( 'key' => '_ip_featured', 'value' => '1' ), array( 'key' => '_thumbnail_id', 'compare' => 'EXISTS' ) ) ) );
+	return $q ? (int) get_post_thumbnail_id( $q[0] ) : 0;
+}
+
+/**
+ * Card corso con copertina: usata in home e nei corsi correlati.
+ */
+function ip_course_card( $id = null ) {
+	$id    = $id ? $id : get_the_ID();
+	$tip   = ip_course_tipologia( $id );
+	$code  = ip_meta( 'code', $id );
+	$stato = ip_meta( 'stato', $id ) ? ip_meta( 'stato', $id ) : 'aperte';
+	$meta  = array_filter( array( ip_meta( 'cfu', $id ) ? ip_meta( 'cfu', $id ) . ' CFU' : '', ip_meta( 'durata', $id ) ) );
+	?>
+	<article class="ccard">
+		<a class="ccard-img" href="<?php echo esc_url( get_permalink( $id ) ); ?>" tabindex="-1" aria-hidden="true">
+			<?php if ( has_post_thumbnail( $id ) ) : ?>
+				<?php echo get_the_post_thumbnail( $id, 'ip-card', array( 'loading' => 'lazy', 'alt' => '' ) ); ?>
+			<?php endif; ?>
+			<?php if ( $code ) : ?><span class="ccard-code"><?php echo esc_html( $code ); ?></span><?php endif; ?>
+		</a>
+		<div class="ccard-body">
+			<?php if ( $tip ) : ?><p class="ccard-type"><?php echo esc_html( $tip->name ); ?></p><?php endif; ?>
+			<h3><a href="<?php echo esc_url( get_permalink( $id ) ); ?>"><?php echo esc_html( ip_course_name( $id ) ); ?></a></h3>
+			<?php if ( $meta ) : ?><p class="ccard-meta"><?php echo esc_html( implode( ' · ', $meta ) ); ?></p><?php endif; ?>
+			<p class="ccard-foot">
+				<span class="dot dot-<?php echo esc_attr( $stato ); ?>"><?php echo esc_html( ip_status_label( $stato ) ); ?></span>
+				<a href="<?php echo esc_url( get_permalink( $id ) ); ?>">Scopri il corso</a>
+			</p>
+		</div>
+	</article>
+	<?php
 }

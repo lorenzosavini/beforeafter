@@ -61,21 +61,12 @@ function ip_settings_fields() {
 			'title'  => 'Home page',
 			'fields' => array(
 				'hero_eyebrow' => array( 'Occhiello sopra il titolo', 'text', '', 'Vuoto = «{vostro marchio} · Agenzia partner UniMarconi».' ),
+				'hero_image'   => array( 'Foto di copertina', 'image', '', 'Grande foto dietro al titolo. Vuoto = copertina del primo corso in evidenza.' ),
 				'hero_title'   => array( 'Titolo principale', 'text', 'Iscriviti all’Università Marconi con un orientatore al tuo fianco' ),
-				'hero_text'    => array( 'Sottotitolo', 'textarea', 'Ti aiutiamo a scegliere il corso, verifichiamo gratis i crediti che puoi farti riconoscere e seguiamo l’immatricolazione al posto tuo.' ),
-				'hero_ticks'   => array( 'Punti di forza (accanto al modulo)', 'repeater', array(
-					array( 'testo' => 'Iscrizioni aperte tutto l’anno, senza test d’ingresso' ),
-					array( 'testo' => 'Lezioni online disponibili 24 ore su 24' ),
-					array( 'testo' => 'Esami in presenza in sedi in tutta Italia' ),
-					array( 'testo' => 'Valutazione gratuita degli esami già sostenuti' ),
-				), '', array( 'testo' => array( 'Testo', 'text' ) ) ),
-				'facts'        => array( 'Striscia numeri', 'repeater', array(
-					array( 'titolo' => 'Dal 2004', 'testo' => 'prima università digitale riconosciuta dal MUR' ),
-					array( 'titolo' => 'Valore legale', 'testo' => 'titoli validi per concorsi pubblici e ordini professionali' ),
-					array( 'titolo' => '12 rate', 'testo' => 'retta mensile senza interessi' ),
-					array( 'titolo' => 'Tutor', 'testo' => 'un riferimento dall’iscrizione alla laurea' ),
-				), 'Consigliate 4 voci.', array( 'titolo' => array( 'Titolo', 'text' ), 'testo' => array( 'Testo', 'text' ) ) ),
-				'sections'     => array( 'Sezioni e ordine', 'checklist', array( 'offerta', 'featured', 'contenuto', 'agevolazioni', 'passi', 'cfu', 'recensioni', 'faq', 'news', 'cta' ), '', array(
+				'hero_text'    => array( 'Sottotitolo', 'textarea', 'Lauree triennali, magistrali e master online con esami in presenza. Ti aiutiamo a scegliere il corso, verifichiamo gratis i crediti già maturati e seguiamo con te l’immatricolazione.' ),
+				'hero_ticks'   => array( 'Punti di forza (sotto il titolo)', 'repeater', array(), 'Facoltativi. Meglio pochi e concreti.', array( 'testo' => array( 'Testo', 'text' ) ) ),
+				'facts'        => array( 'Striscia numeri', 'repeater', array(), 'Facoltativa: compare sotto la foto solo se compilata.', array( 'titolo' => array( 'Titolo', 'text' ), 'testo' => array( 'Testo', 'text' ) ) ),
+				'sections'     => array( 'Sezioni e ordine', 'checklist', array( 'featured', 'offerta', 'contenuto', 'agevolazioni', 'cfu', 'recensioni', 'faq', 'news', 'cta' ), '', array(
 					'offerta'      => 'Offerta formativa (tipologie)',
 					'featured'     => 'Corsi in evidenza',
 					'contenuto'    => 'Contenuto della pagina Home (editor)',
@@ -93,6 +84,7 @@ function ip_settings_fields() {
 				'agev_text'    => array( 'Testo «Agevolazioni»', 'textarea', 'Le agevolazioni si applicano al momento dell’immatricolazione e non sono retroattive: verifichiamo con te quale ti spetta prima dell’iscrizione.' ),
 				'agev_count'   => array( 'Quante agevolazioni mostrare in home', 'text', '4' ),
 				't_passi'      => array( 'Titolo «Come funziona»', 'text', 'Come funziona l’iscrizione con noi' ),
+				'cfu_image'    => array( 'Box CFU: immagine', 'image', '', 'Vuoto = copertina di un corso.' ),
 				'cfu_title'    => array( 'Box CFU: titolo', 'text', 'Hai già sostenuto esami all’università?' ),
 				'cfu_text'     => array( 'Box CFU: testo', 'textarea', 'Esami di un percorso interrotto, una prima laurea, certificazioni o esperienza professionale possono valere crediti formativi. Con 30 CFU riconosciuti puoi iscriverti direttamente al secondo anno.' ),
 				'cfu_button'   => array( 'Box CFU: pulsante', 'text', 'Richiedi la prevalutazione gratuita' ),
@@ -340,6 +332,8 @@ function ip_sanitize_field( $f, $v ) {
 	switch ( $f[1] ) {
 		case 'checkbox':
 			return $v ? '1' : '';
+		case 'image':
+			return $v ? (string) absint( $v ) : '';
 		case 'url':
 			return esc_url_raw( trim( (string) $v ) );
 		case 'page':
@@ -406,6 +400,21 @@ function ip_settings_page() {
 	<?php
 }
 
+/**
+ * Selettore immagine dalla Libreria media (salva l'ID dell'allegato).
+ */
+function ip_image_field( $name, $id ) {
+	$src = $id ? wp_get_attachment_image_url( $id, 'medium' ) : '';
+	printf(
+		'<div class="ip-image"><img src="%1$s" alt="" %2$s><input type="hidden" name="%3$s" value="%4$s"><button type="button" class="button" data-ip-image>Scegli immagine</button> <button type="button" class="button-link" data-ip-image-clear %5$s>Rimuovi</button></div>',
+		esc_url( $src ),
+		$src ? '' : 'hidden',
+		esc_attr( $name ),
+		$id ? (int) $id : '',
+		$id ? '' : 'hidden'
+	);
+}
+
 function ip_settings_field( $k, $f ) {
 	$name  = 'ip_settings[' . $k . ']';
 	$id    = 'ip-' . $k;
@@ -413,6 +422,9 @@ function ip_settings_field( $k, $f ) {
 	$val   = is_array( $saved ) && array_key_exists( $k, $saved ) ? $saved[ $k ] : $f[2];
 	switch ( $f[1] ) {
 		case 'note':
+			break;
+		case 'image':
+			ip_image_field( $name, (int) $val );
 			break;
 		case 'checkbox':
 			printf( '<label><input type="checkbox" id="%2$s" name="%1$s" value="1" %3$s> Attivo</label>', esc_attr( $name ), esc_attr( $id ), checked( $val, '1', false ) );
@@ -492,7 +504,7 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	wp_enqueue_style( 'ip-admin', IP_URI . '/assets/admin.css', array(), IP_VERSION );
 	wp_enqueue_script( 'ip-admin', IP_URI . '/assets/admin.js', array(), IP_VERSION, true );
 	$screen = get_current_screen();
-	if ( $screen && in_array( $screen->post_type, array( 'corso', 'curriculum', 'agevolazione' ), true ) ) {
+	if ( ( $screen && in_array( $screen->post_type, array( 'corso', 'curriculum', 'agevolazione' ), true ) ) || ( $screen && in_array( $screen->base, array( 'toplevel_page_ip-settings', 'term', 'edit-tags' ), true ) ) ) {
 		wp_enqueue_media();
 	}
 } );

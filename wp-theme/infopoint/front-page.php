@@ -11,28 +11,31 @@ $price   = ip_price_from();
 $agev    = ip_page_url( 'convenzioni-e-agevolazioni' );
 $cfu     = ip_page_url( 'riconoscimento-cfu' );
 $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand' ) . ' · Agenzia partner UniMarconi' . ( ip_opt( 'city' ) ? ' a ' . ip_opt( 'city' ) : '' );
-$arrow   = ip_icon( 'arrow', 16 );
 ?>
 
-<section class="hero">
+<?php $hero_img = ip_hero_image_id(); ?>
+<section class="hero hero-photo">
+	<?php if ( $hero_img ) : ?>
+		<?php echo wp_get_attachment_image( $hero_img, 'full', false, array( 'class' => 'hero-bg', 'alt' => '', 'loading' => 'eager', 'fetchpriority' => 'high', 'sizes' => '100vw' ) ); ?>
+	<?php endif; ?>
 	<div class="wrap hero-in">
 		<div class="hero-text">
-			<p class="eyebrow"><?php echo esc_html( $eyebrow ); ?></p>
+			<p class="hero-kicker"><?php echo esc_html( $eyebrow ); ?></p>
 			<h1><?php echo esc_html( ip_opt( 'hero_title' ) ); ?></h1>
 			<p class="hero-lead"><?php echo esc_html( ip_opt( 'hero_text' ) ); ?></p>
 			<?php if ( ip_rows( 'hero_ticks' ) ) : ?>
-				<ul class="ticks">
+				<ul class="hero-points">
 					<?php foreach ( ip_rows( 'hero_ticks' ) as $t ) : ?>
-						<li><?php echo ip_icon( 'check', 18 ); // phpcs:ignore ?><?php echo esc_html( $t['testo'] ); ?></li>
+						<li><?php echo esc_html( $t['testo'] ); ?></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
 			<div class="hero-actions">
-				<?php echo ip_phone_link( 'phone1', 'btn btn-primary' ); // phpcs:ignore ?>
-				<a class="btn btn-line" href="<?php echo esc_url( ip_courses_url() ); ?>">Vedi tutti i corsi</a>
+				<a class="btn btn-white" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
+				<?php echo ip_phone_link( 'phone1', 'btn btn-line-light' ); // phpcs:ignore ?>
 			</div>
 			<?php if ( $price ) : ?>
-				<p class="hero-price">Retta da <strong><?php echo esc_html( $price ); ?> al mese</strong> con le agevolazioni<?php if ( $agev ) : ?> · <a href="<?php echo esc_url( $agev ); ?>">vedi tutte</a><?php endif; ?></p>
+				<p class="hero-price">Retta da <strong><?php echo esc_html( $price ); ?> al mese</strong> con le agevolazioni dell’Ateneo<?php if ( $agev ) : ?> · <a href="<?php echo esc_url( $agev ); ?>">vedi tutte</a><?php endif; ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="hero-form">
@@ -61,19 +64,19 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 				break;
 			}
 			?>
-			<section class="sec">
+			<section class="sec sec-alt">
 				<div class="wrap">
 					<header class="sec-head">
 						<h2><?php echo esc_html( ip_opt( 't_offerta' ) ); ?></h2>
-						<a href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi <?php echo $arrow; // phpcs:ignore ?></a>
+						<a class="more-link" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
 					</header>
-					<ul class="tiplist">
+					<ul class="tiles">
 						<?php foreach ( $tips as $t ) : ?>
+							<?php $img = ip_term_image_id( $t ); ?>
 							<li>
 								<a href="<?php echo esc_url( get_term_link( $t ) ); ?>">
-									<span class="tip-name"><?php echo esc_html( $t->name ); ?></span>
-									<span class="tip-count"><?php echo (int) $t->count; ?> <?php echo 1 === (int) $t->count ? 'corso' : 'corsi'; ?></span>
-									<?php echo ip_icon( 'arrow', 18 ); // phpcs:ignore ?>
+									<?php echo $img ? wp_get_attachment_image( $img, 'ip-card', false, array( 'loading' => 'lazy', 'alt' => '' ) ) : ''; ?>
+									<span class="tile-label"><strong><?php echo esc_html( $t->name ); ?></strong><span><?php echo (int) $t->count; ?> <?php echo 1 === (int) $t->count ? 'corso' : 'corsi'; ?></span></span>
 								</a>
 							</li>
 						<?php endforeach; ?>
@@ -96,21 +99,21 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 				break;
 			}
 			?>
-			<section class="sec sec-alt">
+			<section class="sec">
 				<div class="wrap">
 					<header class="sec-head">
 						<h2><?php echo esc_html( ip_opt( 't_featured' ) ); ?></h2>
-						<a href="<?php echo esc_url( ip_courses_url() ); ?>">Cerca tra tutti i corsi <?php echo $arrow; // phpcs:ignore ?></a>
+						<a class="more-link" href="<?php echo esc_url( ip_courses_url() ); ?>">Cerca tra tutti i corsi</a>
 					</header>
-					<ul class="crows">
+					<div class="cards">
 						<?php
 						while ( $featured->have_posts() ) {
 							$featured->the_post();
-							ip_course_row();
+							ip_course_card();
 						}
 						wp_reset_postdata();
 						?>
-					</ul>
+					</div>
 				</div>
 			</section>
 			<?php
@@ -136,10 +139,10 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 				<div class="wrap">
 					<header class="sec-head">
 						<h2><?php echo esc_html( ip_opt( 't_agev' ) ); ?></h2>
-						<?php if ( $agev ) : ?><a href="<?php echo esc_url( $agev ); ?>">Tutte le agevolazioni <?php echo $arrow; // phpcs:ignore ?></a><?php endif; ?>
+						<?php if ( $agev ) : ?><a class="more-link" href="<?php echo esc_url( $agev ); ?>">Tutte le agevolazioni</a><?php endif; ?>
 					</header>
 					<?php if ( ip_opt( 'agev_text' ) ) : ?><p class="sec-lead"><?php echo esc_html( ip_opt( 'agev_text' ) ); ?></p><?php endif; ?>
-					<?php ip_agevolazioni( max( 1, (int) ip_opt( 'agev_count' ) ) ); ?>
+					<?php ip_agevolazioni_table( max( 1, (int) ip_opt( 'agev_count' ) ) ); ?>
 				</div>
 			</section>
 			<?php
@@ -158,16 +161,23 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 
 		case 'cfu':
 			?>
-			<section class="sec">
-				<div class="wrap split">
-					<div>
+			<section class="sec sec-alt">
+				<div class="wrap promo">
+					<div class="promo-text">
 						<h2><?php echo esc_html( ip_opt( 'cfu_title' ) ); ?></h2>
 						<p><?php echo esc_html( ip_opt( 'cfu_text' ) ); ?></p>
-					</div>
-					<div class="split-cta">
-						<a class="btn btn-primary" href="<?php echo esc_url( $cfu ? $cfu : '#richiedi' ); ?>"><?php echo esc_html( ip_opt( 'cfu_button' ) ); ?></a>
+						<p><a class="btn btn-primary" href="<?php echo esc_url( $cfu ? $cfu : '#richiedi' ); ?>"><?php echo esc_html( ip_opt( 'cfu_button' ) ); ?></a></p>
 						<p class="muted">Risposta via email, nessun impegno.</p>
 					</div>
+					<?php
+					$promo = get_posts( array( 'post_type' => 'corso', 'posts_per_page' => 1, 'fields' => 'ids', 'meta_key' => '_thumbnail_id', 'tax_query' => array( array( 'taxonomy' => 'tipologia', 'field' => 'slug', 'terms' => 'laurea-magistrale' ) ), 'orderby' => 'title', 'order' => 'DESC' ) );
+					$promo = $promo ? (int) get_post_thumbnail_id( $promo[0] ) : 0;
+					if ( ! (int) ip_opt( 'cfu_image' ) && $promo ) :
+						echo wp_get_attachment_image( $promo, 'medium_large', false, array( 'class' => 'promo-img', 'loading' => 'lazy', 'alt' => '' ) );
+					elseif ( (int) ip_opt( 'cfu_image' ) ) :
+						echo wp_get_attachment_image( (int) ip_opt( 'cfu_image' ), 'medium_large', false, array( 'class' => 'promo-img', 'loading' => 'lazy', 'alt' => '' ) );
+					endif;
+					?>
 				</div>
 			</section>
 			<?php
@@ -202,7 +212,7 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 				break;
 			}
 			?>
-			<section class="sec sec-alt">
+			<section class="sec">
 				<div class="wrap narrow">
 					<header class="sec-head"><h2><?php echo esc_html( ip_opt( 't_faq' ) ); ?></h2></header>
 					<?php ip_faq_list( ip_rows( 'faq' ) ); ?>
@@ -222,20 +232,23 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 				<div class="wrap">
 					<header class="sec-head">
 						<h2><?php echo esc_html( ip_opt( 't_news' ) ); ?></h2>
-						<?php if ( $blog ) : ?><a href="<?php echo esc_url( get_permalink( $blog ) ); ?>">Tutte le news <?php echo $arrow; // phpcs:ignore ?></a><?php endif; ?>
+						<?php if ( $blog ) : ?><a class="more-link" href="<?php echo esc_url( get_permalink( $blog ) ); ?>">Tutte le news</a><?php endif; ?>
 					</header>
-					<ul class="newslist">
+					<div class="ncards">
 						<?php
 						while ( $news->have_posts() ) :
 							$news->the_post();
 							?>
-							<li>
-								<time datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>"><?php echo esc_html( get_the_date( 'j M Y' ) ); ?></time>
-								<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-							</li>
+							<article class="ncard">
+								<?php if ( has_post_thumbnail() ) : ?>
+									<a class="ncard-img" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true"><?php the_post_thumbnail( 'ip-card', array( 'loading' => 'lazy', 'alt' => '' ) ); ?></a>
+								<?php endif; ?>
+								<time datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>"><?php echo esc_html( get_the_date() ); ?></time>
+								<h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+							</article>
 						<?php endwhile; ?>
 						<?php wp_reset_postdata(); ?>
-					</ul>
+					</div>
 				</div>
 			</section>
 			<?php

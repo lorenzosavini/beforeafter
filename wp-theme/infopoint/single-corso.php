@@ -18,8 +18,9 @@ while ( have_posts() ) :
 	) );
 	?>
 	<article class="course">
-		<header class="phead phead-course">
-			<div class="wrap">
+		<header class="phead phead-course<?php echo has_post_thumbnail() ? ' has-img' : ''; ?>">
+			<div class="wrap phead-grid">
+				<div class="phead-main">
 				<?php ip_breadcrumbs(); ?>
 				<p class="eyebrow">
 					<?php echo esc_html( $tip ? $tip->name : 'Corso' ); ?>
@@ -47,6 +48,10 @@ while ( have_posts() ) :
 					<?php endforeach; ?>
 				</dl>
 				<a class="btn btn-accent jump" href="#richiedi" data-scroll-form>Ricevi costi e piano di studi</a>
+				</div>
+				<?php if ( has_post_thumbnail() ) : ?>
+					<figure class="phead-img"><?php the_post_thumbnail( 'medium_large', array( 'loading' => 'eager', 'fetchpriority' => 'high', 'alt' => '' ) ); ?></figure>
+				<?php endif; ?>
 			</div>
 		</header>
 
@@ -133,7 +138,7 @@ while ( have_posts() ) :
 		if ( $tip ) :
 			$rel = new WP_Query( array(
 				'post_type'      => 'corso',
-				'posts_per_page' => 6,
+				'posts_per_page' => 4,
 				'no_found_rows'  => true,
 				'post__not_in'   => array( $id ),
 				'orderby'        => 'rand',
@@ -145,17 +150,17 @@ while ( have_posts() ) :
 					<div class="wrap">
 						<header class="sec-head">
 							<h2>Altri corsi: <?php echo esc_html( strtolower( $tip->name ) ); ?></h2>
-							<a href="<?php echo esc_url( get_term_link( $tip ) ); ?>">Vedi tutti <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
+							<a class="more-link" href="<?php echo esc_url( get_term_link( $tip ) ); ?>">Vedi tutti</a>
 						</header>
-						<ul class="crows">
+						<div class="cards">
 							<?php
 							while ( $rel->have_posts() ) {
 								$rel->the_post();
-								ip_course_row();
+								ip_course_card();
 							}
 							wp_reset_postdata();
 							?>
-						</ul>
+						</div>
 					</div>
 				</section>
 				<?php
