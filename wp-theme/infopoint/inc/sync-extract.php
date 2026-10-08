@@ -277,11 +277,12 @@ function ip_src_blocks( $x ) {
 			continue;
 		}
 		// Etichette di pulsanti rimaste senza pulsante (moduli dell'Ateneo).
-		if ( in_array( $tag, array( 'p', 'h2', 'h3', 'h4' ), true ) && preg_match( '/^(?:\s*(?:compila il modulo|richiedi informazioni|scopri di più|clicca qui)\s*)+$/iu', ip_src_text( $inner ) ) ) {
+		if ( in_array( $tag, array( 'p', 'h2', 'h3', 'h4' ), true ) && preg_match( '/^(?:form|guarda una demo)?(?:\s*(?:compila il modulo|richiedi informazioni|scopri di più|clicca qui)\s*)+$/iu', ip_src_text( $inner ) ) ) {
 			continue;
 		}
 		if ( 'p' === $tag ) {
 			$inner = trim( preg_replace( '#</?(?:p|h[2-4]|ul|ol|li|table|tr|td|th|thead|tbody|tfoot)>#', ' ', $inner ) );
+			$inner = preg_replace( '/\s+(?:compila il modulo|richiedi informazioni)$/iu', '', $inner );
 			$out[] = "<!-- wp:paragraph -->\n<p>" . $inner . "</p>\n<!-- /wp:paragraph -->";
 		} elseif ( in_array( $tag, array( 'h2', 'h3', 'h4' ), true ) ) {
 			$lv    = (int) $tag[1];
