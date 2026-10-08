@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.5.0
+Version: 2.5.1
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -622,51 +622,3 @@ a.contact:hover { color: var(--brand); }
 .band { background: var(--brand); }
 .facts { background: var(--brand-dark); }
 
-/* Landing di conversione -------------------------------------------- */
-.lp-hdr .hdr-in { min-height: 68px; }
-.lp-hdr-act { display: flex; align-items: center; gap: 14px; }
-.lp-wa { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--brand-tint); color: var(--brand); }
-.lp-link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
-.disclosure .lp-link { color: var(--brand-dark); font-weight: 600; }
-.lp-hero .hero-in { align-items: start; }
-.lp-hero h1 { font-size: clamp(1.75rem, 3.4vw, 2.6rem); }
-.lp-points { list-style: none; margin: 1.3em 0 0; padding: 0; display: grid; gap: 10px; }
-.lp-points li { display: flex; gap: 10px; align-items: flex-start; color: #fff; font-weight: 500; }
-.lp-points .i { flex: none; margin-top: 3px; color: #8fd3b5; }
-.lp-deadline { display: inline-flex; align-items: center; gap: 8px; margin: 1.2em 0 0; padding: 8px 14px; border-radius: var(--r-btn); background: #fff4d6; color: #5c3b00; font-weight: 600; font-size: .92rem; }
-.lp-hero .hero-form { position: relative; }
-.lp-facts .facts-in p strong { font-size: 1.1rem; }
-.lp-narrow { max-width: 860px; }
-.lp-clip { max-height: 560px; overflow: hidden; position: relative; }
-.lp-clip::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; background: linear-gradient(rgba(255,255,255,0), #fff); }
-.lp-expand-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
-.lp-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
-.lp-course { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--white); }
-.lp-course-img { position: relative; aspect-ratio: 16 / 9; background: var(--brand-tint); }
-.lp-course-img img { width: 100%; height: 100%; object-fit: cover; }
-.lp-course-body { display: flex; flex-direction: column; flex: 1; padding: 14px 16px 16px; }
-.lp-course-body h3 { font-size: 1.02rem; margin-bottom: 6px; }
-.lp-course-body .btn { margin-top: auto; }
-.lp-tips { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
-.lp-tip { display: flex; flex-direction: column; gap: 4px; padding: 18px; border: 1px solid var(--line); border-radius: var(--r-lg); color: var(--ink); text-decoration: none; }
-.lp-tip span { font-size: .88rem; color: var(--brand); font-weight: 600; }
-.lp-tip:hover { border-color: var(--brand); color: var(--ink); }
-.lp-cond { margin: 0 0 1em; padding-left: 1.2em; }
-.lp-cond li { margin-bottom: .35em; }
-.lp-det { color: var(--ink-2); font-size: .95rem; }
-.lp-cost { font-size: 1.5rem; margin-bottom: .3em; }
-.lead-done { border-top: 4px solid var(--ok); }
-.lp-dialog { width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 0; border: 0; border-radius: var(--r-lg); box-shadow: 0 24px 60px rgba(0,0,0,.28); }
-.lp-dialog::backdrop { background: rgba(14, 38, 29, .55); }
-.lp-dialog-in { position: relative; padding: 28px 28px 24px; }
-.lp-dialog h2 { padding-right: 40px; }
-.lp-x { position: absolute; right: 12px; top: 12px; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--soft); color: var(--ink); cursor: pointer; }
-.lp-exit { width: min(480px, calc(100vw - 32px)); }
-.lp-exit .lp-dialog-in { padding: 0; }
-.lp-exit .lead { border: 0; margin: 0; }
-.lp-exit .lp-x { z-index: 2; }
-.lp-ftr .ftr-bottom { border-top: 0; }
-@media (max-width: 900px) {
-	.lp-hdr-act .hdr-phone span { display: none; }
-	.lp-points li { font-size: .97rem; }
-}

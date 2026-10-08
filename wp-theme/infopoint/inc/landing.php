@@ -593,3 +593,100 @@ add_action( 'manage_ip_landing_posts_custom_column', function ( $col, $id ) {
 		echo (int) get_post_meta( $id, '_lp_leads', true );
 	}
 }, 10, 2 );
+
+/* ---------------------------------------------------------------------
+ * Impaginazione
+ * ------------------------------------------------------------------- */
+
+/**
+ * Titolo diviso per l'impaginazione: «Laurea triennale in» sopra, il nome
+ * grande, la classe in evidenza.
+ *
+ * @return array pre, main, code.
+ */
+function ip_lp_title_parts( $d ) {
+	$t    = trim( $d['title'] );
+	$code = '';
+	$pre  = '';
+	if ( preg_match( '/^(.*\S)\s*\(([A-Z0-9][A-Z0-9\/ -]{0,14})\)$/u', $t, $m ) ) {
+		$t    = $m[1];
+		$code = $m[2];
+	}
+	if ( 'corso' === $d['type'] && '' === trim( (string) $d['o']['titolo'] ) && preg_match( '/^(.{6,60}?\s(?:in|di))\s(.+)$/u', $t, $m ) ) {
+		$pre = $m[1];
+		$t   = $m[2];
+	}
+	return array( $pre, $t, $code );
+}
+
+/**
+ * Scheda tecnica sotto il titolo: pochi dati veri, ben leggibili.
+ *
+ * @return array label => valore.
+ */
+function ip_lp_spec( $d ) {
+	$f = $d['facts'];
+	if ( 'corso' === $d['type'] ) {
+		$out = array_filter( array(
+			'Classe' => $f['Classe'] ?? '',
+			'CFU'    => $f['CFU'] ?? '',
+			'Durata' => $f['Durata'] ?? '',
+		) );
+		if ( ! empty( $f['Costo'] ) && mb_strlen( $f['Costo'] ) < 18 ) {
+			$out['Costo'] = $f['Costo'];
+		} elseif ( count( ip_rows( 'exam_sites' ) ) ) {
+			$out['Sedi d’esame'] = count( ip_rows( 'exam_sites' ) );
+		}
+		return $out;
+	}
+	if ( 'agevolazione' === $d['type'] ) {
+		return array_filter( array(
+			'Retta annua' => $f['Retta annua'] ?? '',
+			'Al mese'     => $f['Rata mensile'] ?? '',
+		) );
+	}
+	if ( 'tipologia' === $d['type'] ) {
+		$fees = ip_fees();
+		return array_filter( array(
+			'Corsi'        => count( $d['courses'] ),
+			'Sedi d’esame' => count( ip_rows( 'exam_sites' ) ),
+			'Da'           => $d['price'] && $fees['min_rata'] ? ip_eur( $fees['min_rata'] ) . '/mese' : '',
+		) );
+	}
+	return array();
+}
+
+/**
+ * Cifre dell'offerta, tutte lette dai dati del sito.
+ */
+function ip_lp_figures() {
+	$fees = ip_fees();
+	return array_filter( array(
+		array( (int) wp_count_posts( 'corso' )->publish, 'corsi online tra lauree, master e formazione' ),
+		array( count( ip_rows( 'exam_sites' ) ), 'sedi d’esame in tutta Italia, scegli la più vicina' ),
+		array( (int) wp_count_posts( 'agevolazione' )->publish, 'agevolazioni e convenzioni sulla retta' ),
+		$fees['min_rata'] ? array( ip_eur( $fees['min_rata'] ), 'al mese con le agevolazioni, senza interessi' ) : null,
+	), function ( $x ) {
+		return $x && $x[0];
+	} );
+}
+
+// Stile della landing: solo su queste pagine, incorporato come il resto.
+add_action( 'wp_head', function () {
+	if ( ! is_singular( 'ip_landing' ) ) {
+		return;
+	}
+	if ( ! ip_opt( 'inline_css' ) ) {
+		printf( '<link rel="stylesheet" href="%s">', esc_url( IP_URI . '/assets/landing.css?ver=' . IP_VERSION ) );
+		return;
+	}
+	$css = get_transient( 'ip_lpcss_' . IP_VERSION );
+	if ( false === $css || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+		$css = (string) file_get_contents( IP_DIR . '/assets/landing.css' );
+		$css = preg_replace( '#/\*.*?\*/#s', '', $css );
+		$css = preg_replace( '/\s+/', ' ', $css );
+		$css = str_replace( array( ' {', '{ ', ' }', '; ', ': ', ', ' ), array( '{', '{', '}', ';', ':', ',' ), $css );
+		set_transient( 'ip_lpcss_' . IP_VERSION, $css, WEEK_IN_SECONDS );
+	}
+	echo '<style id="ip-lp-css">' . $css . '</style>' . "\n"; // phpcs:ignore
+}, 8 );
