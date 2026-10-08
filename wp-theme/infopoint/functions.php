@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'IP_VERSION', '2.1.1' );
+define( 'IP_VERSION', '2.1.2' );
 define( 'IP_DIR', get_template_directory() );
 define( 'IP_URI', get_template_directory_uri() );
 

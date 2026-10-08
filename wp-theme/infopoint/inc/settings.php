@@ -281,7 +281,11 @@ add_action( 'update_option_ip_settings', function () {
  * Testo di un'impostazione con i segnaposto {brand}, {azienda}, {ruolo}, {citta}.
  */
 function ip_text( $key ) {
-	return strtr( (string) ip_opt( $key ), array(
+	$t = (string) ip_opt( $key );
+	if ( ! ip_opt( 'vat' ) ) {
+		$t = preg_replace( '/\s*\(P\.?\s?IVA \{piva\}\)/i', '', $t );
+	}
+	return strtr( $t, array(
 		'{brand}'   => ip_opt( 'brand' ),
 		'{azienda}' => ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ),
 		'{ruolo}'   => ip_opt( 'partner_role' ),

@@ -200,3 +200,13 @@ add_filter( 'body_class', function ( $c ) {
 	}
 	return $c;
 } );
+
+// I link interni scritti come «/pagina/» seguono l'indirizzo del sito,
+// anche quando WordPress è in una sottocartella (es. localhost/infopoint-site).
+add_filter( 'the_content', function ( $html ) {
+	$base = untrailingslashit( (string) wp_parse_url( home_url(), PHP_URL_PATH ) );
+	if ( '' === $base ) {
+		return $html;
+	}
+	return preg_replace( '#href="/(?!/)(?!' . preg_quote( ltrim( $base, '/' ), '#' ) . '/)#', 'href="' . $base . '/', $html );
+}, 20 );
