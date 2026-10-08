@@ -92,6 +92,17 @@ conviene un cron di sistema: in `wp-config.php`
 `define( 'DISABLE_WP_CRON', true );` e dal pannello dell'hosting un'attività
 ogni 15 minuti su `https://tuodominio.it/wp-cron.php`.
 
+## Landing per le campagne
+
+*Landing → Crea landing*: una landing da un **corso**, una **tipologia**, un'**agevolazione** o generica; oppure in blocco (una per ogni corso di una tipologia, per ogni agevolazione, per ogni tipologia). Dall'elenco dei corsi e delle agevolazioni c'è anche il link «Crea landing». Indirizzo: `/lp/nome/`.
+
+- Titolo, punti di forza, dati, costi, scheda e piani di studio si leggono dal corso o dall'agevolazione: si aggiornano con il sito ufficiale. Ogni testo si può riscrivere (campi vuoti = automatici).
+- Pagina **chiusa**: nessun menu, logo non cliccabile, nessun collegamento verso altre pagine o siti. Chi siamo, privacy e cookie si aprono in finestre sulla pagina. Restano telefono, WhatsApp e moduli.
+- Modulo sopra la piega, modulo finale «ti richiamiamo», barra fissa su mobile, ringraziamento **sulla pagina** (eventi `generate_lead` e `lead_thank_you` per Google Ads/GTM).
+- Su computer, un solo invito «Prima di andare, ti richiamiamo noi?» quando il mouse esce dalla finestra. Il tasto Indietro **non** viene bloccato: Google Ads lo considera una pratica scorretta.
+- Ogni richiesta registra la landing di provenienza; nell'elenco landing c'è il conteggio delle richieste.
+- Non indicizzate di default (servono alle campagne).
+
 ## Shortcode
 
 ```

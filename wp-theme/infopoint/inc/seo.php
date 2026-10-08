@@ -59,6 +59,10 @@ function ip_seo_title_for( $id, $custom = true ) {
 	if ( $t ) {
 		return $t;
 	}
+	if ( 'ip_landing' === get_post_type( $id ) ) {
+		$d = ip_lp_data( $id );
+		return $d['title'] . ' | ' . ip_city_suffix();
+	}
 	if ( 'corso' === get_post_type( $id ) ) {
 		$tip  = ip_course_tipologia( $id );
 		$code = ip_meta( 'code', $id );
@@ -76,6 +80,10 @@ function ip_seo_desc_for( $id, $custom = true ) {
 		return $d;
 	}
 	$p = get_post( $id );
+	if ( 'ip_landing' === $p->post_type ) {
+		$d = ip_lp_data( $id );
+		return wp_strip_all_tags( $d['sub'] );
+	}
 	if ( 'corso' === $p->post_type && ! $p->post_excerpt ) {
 		$tip   = ip_course_tipologia( $id );
 		$facts = array_filter( array( ip_meta( 'code', $id ) ? 'classe ' . ip_meta( 'code', $id ) : '', ip_meta( 'cfu', $id ) ? ip_meta( 'cfu', $id ) . ' CFU' : '', ip_meta( 'durata', $id ) ) );

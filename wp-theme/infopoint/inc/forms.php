@@ -27,8 +27,12 @@ function ip_form( $a = array() ) {
 		'type'   => 'info',
 		'course' => 0,
 		'title'  => '',
-		'text'   => '',
-		'button' => '',
+		'text'     => '',
+		'button'   => '',
+		'interest' => '',    // Interesse già noto (landing): niente menu a tendina.
+		'landing'  => 0,     // Landing di provenienza, registrata nella richiesta.
+		'inline'   => false, // Ringraziamento sul posto, senza cambiare pagina.
+		'id'       => '',
 	) );
 	$GLOBALS['ip_has_form'] = true;
 
@@ -45,14 +49,14 @@ function ip_form( $a = array() ) {
 	$button = $a['button'] ? $a['button'] : $titles[ $type ][2];
 	$priv   = ip_privacy_url();
 
-	$attrs = 1 === $count ? ' id="richiedi"' : '';
+	$attrs = $a['id'] ? ' id="' . esc_attr( $a['id'] ) . '"' : ( 1 === $count ? ' id="richiedi"' : '' );
 	?>
 	<div class="lead lead-<?php echo esc_attr( $type ); ?>"<?php echo $attrs; // phpcs:ignore ?>>
 		<p class="lead-title"><?php echo esc_html( $title ); ?></p>
 		<?php if ( $text ) : ?>
 			<p class="lead-text"><?php echo esc_html( $text ); ?></p>
 		<?php endif; ?>
-		<form class="form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" <?php echo 'cfu' === $type ? 'enctype="multipart/form-data"' : ''; ?> data-ip-form novalidate>
+		<form class="form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" <?php echo 'cfu' === $type ? 'enctype="multipart/form-data"' : ''; ?> data-ip-form<?php echo $a['inline'] ? ' data-inline' : ''; ?> novalidate>
 			<input type="hidden" name="action" value="ip_lead">
 			<input type="hidden" name="ip_type" value="<?php echo esc_attr( $type ); ?>">
 			<input type="hidden" name="ip_tk" value="<?php echo esc_attr( ip_form_token() ); ?>">
@@ -61,9 +65,15 @@ function ip_form( $a = array() ) {
 			<?php if ( $course ) : ?>
 				<input type="hidden" name="ip_course" value="<?php echo (int) $course->ID; ?>">
 			<?php endif; ?>
+			<?php if ( $a['landing'] ) : ?>
+				<input type="hidden" name="ip_landing" value="<?php echo (int) $a['landing']; ?>">
+			<?php endif; ?>
 			<div class="hp" aria-hidden="true"><label>Lascia vuoto <input type="text" name="ip_website" tabindex="-1" autocomplete="off"></label></div>
 
 			<?php if ( 'callback' === $type ) : ?>
+				<?php if ( $a['interest'] && ! $course ) : ?>
+					<input type="hidden" name="ip_interesse" value="<?php echo esc_attr( $a['interest'] ); ?>" data-interest-field>
+				<?php endif; ?>
 				<?php ip_field( $uid, 'nome', 'Nome', 'text', true, array( 'autocomplete' => 'given-name' ) ); ?>
 				<?php ip_field( $uid, 'telefono', 'Telefono', 'tel', true, array( 'autocomplete' => 'tel', 'inputmode' => 'tel' ) ); ?>
 				<?php ip_select( $uid, 'fascia', 'Quando preferisci essere chiamato?', array( 'Mattina (9–13)', 'Pomeriggio (14–18)', 'Sera (18–20)', 'Indifferente' ), false ); ?>
@@ -91,6 +101,9 @@ function ip_form( $a = array() ) {
 				<?php else : ?>
 					<?php if ( $course ) : ?>
 						<p class="lead-course"><?php echo ip_icon( 'doc', 16 ); // phpcs:ignore ?> <span><?php echo esc_html( ip_course_name( $course->ID ) ); ?></span></p>
+					<?php elseif ( $a['interest'] ) : ?>
+						<input type="hidden" name="ip_interesse" value="<?php echo esc_attr( $a['interest'] ); ?>" data-interest-field>
+						<p class="lead-course"><?php echo ip_icon( 'doc', 16 ); // phpcs:ignore ?> <span data-interest-label><?php echo esc_html( $a['interest'] ); ?></span></p>
 					<?php else : ?>
 						<?php ip_select( $uid, 'interesse', 'Ti interessa', wp_list_pluck( ip_rows( 'form_courses' ), 'voce' ), true ); ?>
 					<?php endif; ?>
@@ -245,7 +258,13 @@ function ip_handle_lead() {
 		'marketing' => $get( 'marketing' ) ? 'sì' : 'no',
 		'pagina'    => esc_url_raw( $get( 'page' ) ),
 		'origine'   => $get( 'attr' ),
+		'landing'   => '',
 	);
+	$landing_id = absint( $get( 'landing' ) );
+	if ( $landing_id && 'ip_landing' === get_post_type( $landing_id ) ) {
+		$data['landing'] = get_the_title( $landing_id );
+		update_post_meta( $landing_id, '_lp_leads', (int) get_post_meta( $landing_id, '_lp_leads', true ) + 1 );
+	}
 	$course_id = absint( $get( 'course' ) );
 	if ( $course_id && 'corso' === get_post_type( $course_id ) ) {
 		$data['corso'] = ip_course_name( $course_id );

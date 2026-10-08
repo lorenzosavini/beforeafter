@@ -16,6 +16,7 @@ function ip_upgrade() {
 	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
+		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.
 	}
 }
 

@@ -28,8 +28,13 @@
 		e.preventDefault();
 		var nav = d.getElementById('nav');
 		if (nav) { nav.classList.remove('open'); if (toggle) toggle.setAttribute('aria-expanded', 'false'); }
+		var setI = a.getAttribute('data-set-interest');
 		var interest = a.getAttribute('data-interest');
-		if (interest) {
+		if (setI) {
+			/* Landing: il corso scelto diventa l'interesse del modulo */
+			box.querySelectorAll('[data-interest-field]').forEach(function (f) { f.value = setI; });
+			box.querySelectorAll('[data-interest-label]').forEach(function (f) { f.textContent = setI; });
+		} else if (interest) {
 			var more = box.querySelector('details.more');
 			var msg = box.querySelector('textarea[name="ip_messaggio"]');
 			if (more) more.open = true;
@@ -111,12 +116,16 @@
 			btn.disabled = true;
 			var label = btn.textContent;
 			btn.textContent = 'Invio in corso…';
-			fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'X-IP-Ajax': '1' }, credentials: 'same-origin' })
+			fetch(form.getAttribute('action'), { method: 'POST', body: new FormData(form), headers: { 'X-IP-Ajax': '1' }, credentials: 'same-origin' })
 				.then(function (r) { return r.json(); })
 				.then(function (res) {
 					if (res.ok) {
 						dl.push({ event: 'generate_lead', lead_type: form.ip_type.value });
-						location.href = res.redirect;
+						if (form.hasAttribute('data-inline')) {
+							thanks(form);
+						} else {
+							location.href = res.redirect;
+						}
 					} else {
 						show(res.message);
 						btn.disabled = false;
@@ -126,6 +135,60 @@
 				.catch(function () { form.submit(); });
 		});
 	});
+
+	/* Ringraziamento sul posto (landing): chi ha scritto resta sulla pagina */
+	function thanks(form) {
+		var tpl = d.getElementById('ip-thanks');
+		var box = form.closest('.lead');
+		var name = form.ip_nome ? form.ip_nome.value.trim().split(' ')[0] : '';
+		if (!tpl || !box) return;
+		box.innerHTML = tpl.innerHTML.replace('{nome}', name ? ', ' + name.replace(/[<>&"]/g, '') : '');
+		box.classList.add('lead-done');
+		box.scrollIntoView({ block: 'center' });
+		store.set('ip_lead_sent', '1');
+		d.querySelectorAll('dialog[open]').forEach(function (x) { x.close(); });
+		dl.push({ event: 'lead_thank_you', lead_type: form.ip_type.value });
+	}
+
+	/* Finestre della landing: chi siamo, privacy, cookie restano nella pagina */
+	d.addEventListener('click', function (e) {
+		var o = e.target.closest('[data-lp-open]');
+		var c = e.target.closest('[data-lp-close]');
+		var link = e.target.closest('a[href]');
+		var dlg = null;
+		if (o) dlg = d.getElementById(o.getAttribute('data-lp-open'));
+		if (!o && link && d.body.classList.contains('lp')) {
+			d.querySelectorAll('dialog[data-url]').forEach(function (x) { if (x.getAttribute('data-url') === link.href.split('#')[0]) dlg = x; });
+		}
+		if (dlg && dlg.showModal) { e.preventDefault(); dlg.showModal(); }
+		if (c) { e.preventDefault(); c.closest('dialog').close(); }
+	});
+	d.querySelectorAll('dialog.lp-dialog').forEach(function (x) {
+		x.addEventListener('click', function (e) { if (e.target === x) x.close(); });
+	});
+
+	/* Landing: «Leggi tutta la scheda» apre il testo sul posto */
+	d.addEventListener('click', function (e) {
+		var b = e.target.closest('[data-lp-expand]');
+		if (!b) return;
+		var t = d.getElementById(b.getAttribute('data-lp-expand'));
+		if (t) t.classList.remove('lp-clip');
+		b.hidden = true;
+	});
+
+	/* Landing: un solo invito prima di uscire (solo con il mouse, mai sul tasto Indietro) */
+	var exitDlg = d.querySelector('dialog[data-lp-exit]');
+	if (exitDlg && exitDlg.showModal && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+		var ss = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return '1'; } }, set: function (k) { try { sessionStorage.setItem(k, '1'); } catch (e) {} } };
+		var armed = false;
+		setTimeout(function () { armed = true; }, 8000);
+		d.addEventListener('mouseout', function (e) {
+			if (!armed || e.relatedTarget || e.clientY > 0 || ss.get('ip_exit') || store.get('ip_lead_sent') || d.querySelector('dialog[open]')) return;
+			ss.set('ip_exit');
+			exitDlg.showModal();
+			dl.push({ event: 'exit_intent_shown' });
+		});
+	}
 
 	/* Misurazione dei contatti diretti */
 	d.addEventListener('click', function (e) {

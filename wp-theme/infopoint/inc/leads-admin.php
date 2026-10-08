@@ -110,6 +110,9 @@ add_action( 'manage_ip_lead_posts_custom_column', function ( $col, $id ) {
 		case 'ip_origin':
 			$p = $m( 'pagina' );
 			echo $p ? '<a href="' . esc_url( $p ) . '" target="_blank">' . esc_html( wp_parse_url( $p, PHP_URL_PATH ) ) . '</a>' : '';
+			if ( $m( 'landing' ) ) {
+				echo '<br><small>Landing: ' . esc_html( $m( 'landing' ) ) . '</small>';
+			}
 			if ( $m( 'origine' ) ) {
 				echo '<br><small>' . esc_html( $m( 'origine' ) ) . '</small>';
 			}
@@ -152,7 +155,7 @@ add_action( 'add_meta_boxes_ip_lead', function () {
 } );
 
 function ip_lead_box( $post ) {
-	$keys = array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'fascia', 'messaggio', 'marketing', 'consenso', 'pagina', 'origine' );
+	$keys = array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'fascia', 'messaggio', 'marketing', 'consenso', 'landing', 'pagina', 'origine' );
 	echo '<table class="widefat striped"><tbody>';
 	foreach ( $keys as $k ) {
 		$v = (string) get_post_meta( $post->ID, '_lead_' . $k, true );
@@ -243,7 +246,7 @@ add_action( 'admin_post_ip_export_leads', function () {
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_die( 'Non autorizzato.' );
 	}
-	$keys = array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'fascia', 'messaggio', 'marketing', 'tipo', 'stato', 'note', 'pagina', 'origine' );
+	$keys = array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'fascia', 'messaggio', 'marketing', 'tipo', 'stato', 'note', 'landing', 'pagina', 'origine' );
 	nocache_headers();
 	header( 'Content-Type: text/csv; charset=UTF-8' );
 	header( 'Content-Disposition: attachment; filename="richieste-' . gmdate( 'Y-m-d' ) . '.csv"' );
