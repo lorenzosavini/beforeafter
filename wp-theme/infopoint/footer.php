@@ -25,6 +25,9 @@ endif;
 		<div class="wrap ftr-grid">
 			<div class="ftr-brand">
 				<p class="ftr-name"><?php echo esc_html( ip_opt( 'brand' ) ); ?></p>
+				<?php if ( ip_opt( 'company_name' ) ) : ?>
+					<p><?php echo esc_html( ip_text( 'disclosure' ) ? ip_opt( 'company_name' ) . ' – ' . ip_opt( 'partner_role' ) : ip_opt( 'company_name' ) ); ?></p>
+				<?php endif; ?>
 				<?php if ( ip_opt( 'address' ) ) : ?>
 					<p><?php echo nl2br( esc_html( ip_opt( 'address' ) ) ); ?></p>
 				<?php endif; ?>
@@ -75,9 +78,9 @@ endif;
 		</div>
 	<?php endif; ?>
 	<div class="wrap ftr-bottom">
-		<p>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ) ); ?><?php echo ip_opt( 'vat' ) ? ' · P.IVA ' . esc_html( ip_opt( 'vat' ) ) : ''; ?><?php if ( ip_privacy_url() ) : ?> · <a href="<?php echo esc_url( ip_privacy_url() ); ?>">Privacy</a><?php endif; ?><?php if ( (int) ip_opt( 'cookie_page' ) ) : ?> · <a href="<?php echo esc_url( get_permalink( (int) ip_opt( 'cookie_page' ) ) ); ?>">Cookie</a><?php endif; ?></p>
+		<p>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( ip_legal_line() ); ?><?php if ( ip_page_url( 'chi-siamo' ) ) : ?> · <a href="<?php echo esc_url( ip_page_url( 'chi-siamo' ) ); ?>">Chi siamo</a><?php endif; ?><?php if ( ip_privacy_url() ) : ?> · <a href="<?php echo esc_url( ip_privacy_url() ); ?>">Privacy</a><?php endif; ?><?php if ( (int) ip_opt( 'cookie_page' ) ) : ?> · <a href="<?php echo esc_url( get_permalink( (int) ip_opt( 'cookie_page' ) ) ); ?>">Cookie</a><?php endif; ?></p>
 		<?php if ( ip_opt( 'disclaimer' ) ) : ?>
-			<p class="ftr-disc"><?php echo esc_html( ip_opt( 'disclaimer' ) ); ?></p>
+			<p class="ftr-disc"><?php echo esc_html( ip_text( 'disclaimer' ) ); ?></p>
 		<?php endif; ?>
 	</div>
 </footer>

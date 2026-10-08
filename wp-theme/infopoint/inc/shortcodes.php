@@ -266,3 +266,49 @@ add_shortcode( 'ip_cta', function ( $a ) {
 		ip_cta_band( $a['titolo'] );
 	} );
 } );
+
+/**
+ * [ip_chi_siamo] — scheda di trasparenza: chi siete, che rapporto avete con
+ * l'Ateneo, cosa fate e cosa no. È la pagina che Google e gli utenti cercano
+ * per capire che il sito non è quello dell'Università.
+ */
+add_shortcode( 'ip_chi_siamo', function () {
+	return ip_buffer( function () {
+		$azienda = ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' );
+		?>
+		<div class="whois">
+			<p class="whois-lead"><?php echo esc_html( ip_text( 'disclosure' ) ); ?></p>
+			<dl class="whois-dl">
+				<div><dt>Marchio</dt><dd><?php echo esc_html( ip_opt( 'brand' ) ); ?></dd></div>
+				<div><dt>Ragione sociale</dt><dd><?php echo esc_html( $azienda ); ?></dd></div>
+				<?php foreach ( array( 'legal_address' => 'Sede legale', 'address' => 'Sede operativa', 'vat' => 'Partita IVA', 'rea' => 'REA', 'capital' => 'Capitale sociale', 'pec' => 'PEC', 'email' => 'Email', 'phone1' => 'Telefono' ) as $k => $l ) : ?>
+					<?php if ( ip_opt( $k ) ) : ?>
+						<div><dt><?php echo esc_html( $l ); ?></dt><dd><?php echo nl2br( esc_html( ip_opt( $k ) ) ); ?></dd></div>
+					<?php endif; ?>
+				<?php endforeach; ?>
+				<div><dt>Rapporto con l’Ateneo</dt><dd><?php echo esc_html( ucfirst( ip_opt( 'partner_role' ) ) ); ?><?php echo ip_opt( 'partner_since' ) ? ' (' . esc_html( ip_opt( 'partner_since' ) ) . ')' : ''; ?><?php if ( ip_opt( 'partner_proof' ) ) : ?>. <a href="<?php echo esc_url( ip_opt( 'partner_proof' ) ); ?>" target="_blank" rel="noopener">Elenco ufficiale dei poli UniMarconi</a><?php endif; ?></dd></div>
+			</dl>
+			<div class="whois-cols">
+				<section>
+					<h2>Cosa facciamo</h2>
+					<ul>
+						<li>Orientamento gratuito sulla scelta del corso</li>
+						<li>Richiesta della prevalutazione dei crediti (CFU)</li>
+						<li>Assistenza nella procedura di immatricolazione</li>
+						<li>Supporto durante il percorso: piano di studi, esami, scadenze</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Cosa non facciamo</h2>
+					<ul>
+						<li>Non siamo l’Università e non rilasciamo titoli: i titoli sono rilasciati dall’Università degli Studi Guglielmo Marconi</li>
+						<li>Non incassiamo rette o tasse universitarie: si pagano direttamente all’Ateneo (PagoPA o addebito SEPA)</li>
+						<li>Non decidiamo ammissioni, convalide o agevolazioni: le stabilisce l’Ateneo</li>
+					</ul>
+				</section>
+			</div>
+			<p class="whois-note">Sito ufficiale dell’Università degli Studi Guglielmo Marconi: <a href="https://www.unimarconi.it" target="_blank" rel="noopener">www.unimarconi.it</a>. Marchi e denominazioni dell’Ateneo appartengono ai rispettivi titolari e sono citati per indicare il servizio offerto.</p>
+		</div>
+		<?php
+	} );
+} );

@@ -15,6 +15,12 @@ $wa      = ip_wa_href();
 <?php wp_body_open(); ?>
 <a class="skip" href="#main">Vai al contenuto</a>
 
+<?php if ( ip_opt( 'disclosure_bar' ) && ip_text( 'disclosure' ) ) : ?>
+<div class="disclosure" role="note">
+	<div class="wrap"><p><?php echo esc_html( ip_text( 'disclosure' ) ); ?><?php if ( ip_page_url( 'chi-siamo' ) ) : ?> <a href="<?php echo esc_url( ip_page_url( 'chi-siamo' ) ); ?>">Chi siamo</a><?php endif; ?></p></div>
+</div>
+<?php endif; ?>
+
 <?php if ( ! $landing ) : ?>
 <div class="topbar">
 	<div class="wrap topbar-in">
@@ -39,10 +45,10 @@ $wa      = ip_wa_href();
 			<?php if ( has_custom_logo() ) : ?>
 				<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'brand-logo', 'alt' => esc_attr( ip_opt( 'brand' ) ), 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?>
 			<?php else : ?>
-				<span class="brand-mark" aria-hidden="true">M</span>
+				<span class="brand-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></span>
 				<span class="brand-text">
 					<strong><?php echo esc_html( ip_opt( 'brand' ) ); ?></strong>
-					<small>Infopoint Università Marconi<?php echo ip_opt( 'city' ) ? ' · ' . esc_html( ip_opt( 'city' ) ) : ''; ?></small>
+					<small>Agenzia partner UniMarconi<?php echo ip_opt( 'city' ) ? ' · ' . esc_html( ip_opt( 'city' ) ) : ''; ?></small>
 				</span>
 			<?php endif; ?>
 		</a>

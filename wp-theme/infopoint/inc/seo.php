@@ -51,8 +51,7 @@ add_action( 'save_post', function ( $id ) {
 } );
 
 function ip_city_suffix() {
-	$c = ip_opt( 'city' );
-	return $c ? 'Infopoint UniMarconi ' . $c : ip_opt( 'brand' );
+	return ip_opt( 'brand' );
 }
 
 function ip_seo_title_for( $id, $custom = true ) {
@@ -66,7 +65,7 @@ function ip_seo_title_for( $id, $custom = true ) {
 		return sprintf( '%s%s online%s | %s', $tip ? $tip->name . ' in ' : '', ip_course_name( $id ), $code ? ' (' . $code . ')' : '', ip_city_suffix() );
 	}
 	if ( (int) get_option( 'page_on_front' ) === (int) $id ) {
-		return ip_opt( 'brand' ) . ' | Iscrizioni Università Marconi';
+		return ip_opt( 'brand' ) . ' | Orientamento e iscrizioni all’Università Marconi' . ( ip_opt( 'city' ) ? ' a ' . ip_opt( 'city' ) : '' );
 	}
 	return get_the_title( $id ) . ' | ' . ip_city_suffix();
 }
@@ -168,11 +167,14 @@ add_action( 'wp_footer', function () {
 		'@type'     => 'LocalBusiness',
 		'@id'       => $home . '#infopoint',
 		'name'      => ip_opt( 'brand' ),
+		'legalName' => ip_opt( 'company_name' ),
+		'vatID'     => ip_opt( 'vat' ),
+		'description' => ip_text( 'disclosure' ),
 		'url'       => $home,
 		'telephone' => ip_opt( 'phone1' ),
 		'email'     => ip_opt( 'email' ),
 		'address'   => ip_opt( 'address' ) ? array( '@type' => 'PostalAddress', 'streetAddress' => preg_replace( '/\s+/', ' ', ip_opt( 'address' ) ), 'addressCountry' => 'IT' ) : null,
-		'sameAs'    => array_values( array_filter( array( ip_opt( 'facebook' ), ip_opt( 'instagram' ) ) ) ),
+		'sameAs'    => array_values( array_filter( array( ip_opt( 'facebook' ), ip_opt( 'instagram' ), ip_opt( 'linkedin' ), ip_opt( 'youtube' ), ip_opt( 'tiktok' ) ) ) ),
 	);
 	if ( has_custom_logo() ) {
 		$org['logo'] = wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' );

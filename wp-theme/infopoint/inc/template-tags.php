@@ -200,6 +200,22 @@ function ip_cta_band( $title = '' ) {
 	<?php
 }
 
+/**
+ * Ragione sociale con i dati di legge, su una riga.
+ */
+function ip_legal_line() {
+	$parts = array( ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ) );
+	if ( ip_opt( 'legal_address' ) ) {
+		$parts[] = 'Sede legale ' . preg_replace( '/\s*\n\s*/', ', ', trim( ip_opt( 'legal_address' ) ) );
+	}
+	foreach ( array( 'vat' => 'P.IVA ', 'rea' => 'REA ', 'capital' => 'Cap. soc. ', 'pec' => 'PEC ' ) as $k => $l ) {
+		if ( ip_opt( $k ) ) {
+			$parts[] = $l . ip_opt( $k );
+		}
+	}
+	return implode( ' · ', $parts );
+}
+
 function ip_price_from() {
 	$p = trim( (string) ip_opt( 'price_from' ) );
 	return $p ? '€ ' . $p : '';

@@ -416,7 +416,7 @@ function ip_import_menus( $pages, $tip_ids ) {
 				array( $page( 'altri-corsi', 'Altri corsi' ), array( $tip( 'corsi-di-formazione' ), $tip( 'microcredenziali' ), $tip( 'dottorato-di-ricerca' ) ) ),
 				array( $page( 'convenzioni-e-agevolazioni', 'Costi e agevolazioni' ), array( $page( 'tasse-di-iscrizione' ), $page( 'convenzioni-e-agevolazioni', 'Agevolazioni e convenzioni' ), $page( 'modalita-di-pagamento' ), $page( 'pa-110-e-lode' ) ) ),
 				array( $page( 'iscriversi', 'Iscriversi' ), array( $page( 'immatricolazione' ), $page( 'riconoscimento-cfu' ), $page( 'trasferimento-da-altro-ateneo' ), $page( 'area-studenti', 'Requisiti di accesso' ), $page( 'sedi-esame' ), $page( 'studenti-stranieri' ) ) ),
-				array( $page( 'contatti' ), array() ),
+				array( $page( 'contatti' ), array( $page( 'chi-siamo' ) ) ),
 			);
 			foreach ( $tree as $node ) {
 				if ( ! $node[0] ) {
@@ -445,7 +445,7 @@ function ip_import_menus( $pages, $tip_ids ) {
 	if ( empty( $locations['legal'] ) ) {
 		$menu = wp_create_nav_menu( 'Link utili' );
 		if ( ! is_wp_error( $menu ) ) {
-			foreach ( array( 'iscriversi', 'tasse-di-iscrizione', 'sedi-esame', 'contatti' ) as $s ) {
+			foreach ( array( 'chi-siamo', 'iscriversi', 'tasse-di-iscrizione', 'sedi-esame', 'contatti' ) as $s ) {
 				if ( $page( $s ) ) {
 					$add( $menu, $page( $s ) );
 				}
@@ -663,6 +663,12 @@ function ip_import_pages() {
 				. $faq( 'La consulenza è a pagamento?', 'No. Orientamento, prevalutazione dei CFU e assistenza all’iscrizione sono gratuiti.' )
 				. $faq( 'Posso venire in sede?', 'Sì, su appuntamento. Chiamaci o scrivici per fissare un orario.' )
 				. $faq( 'Quanto tempo serve per iscriversi?', 'Se hai già scelto il corso e hai i documenti pronti, l’immatricolazione si completa in pochi giorni.' ),
+		),
+
+		'chi-siamo' => array(
+			'title'   => 'Chi siamo',
+			'excerpt' => 'Chi gestisce questo sito, che rapporto ha con l’Università Marconi e cosa fa (e non fa) per chi vuole iscriversi.',
+			'content' => $sc( '[ip_chi_siamo]' ),
 		),
 
 		'grazie' => array(

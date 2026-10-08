@@ -87,6 +87,10 @@ while ( have_posts() ) :
 					</ul>
 				<?php endif; ?>
 
+				<?php if ( ip_meta( 'fonte' ) && false !== strpos( ip_meta( 'fonte' ), 'unimarconi.it' ) ) : ?>
+					<p class="source">Informazioni tratte dalla <a href="<?php echo esc_url( ip_meta( 'fonte' ) ); ?>" target="_blank" rel="noopener">scheda ufficiale del corso su unimarconi.it</a>, che fa fede in caso di differenze.</p>
+				<?php endif; ?>
+
 				<?php $faq = ip_meta_rows( 'faq', $id ); ?>
 				<?php if ( $faq ) : ?>
 					<h2>Domande frequenti</h2>
@@ -110,7 +114,7 @@ while ( have_posts() ) :
 								<p><span>Costo</span><strong><?php echo esc_html( $cost ); ?></strong></p>
 							<?php else : ?>
 								<p><span>Retta</span><strong>da <?php echo esc_html( ip_price_from() ); ?>/mese</strong></p>
-								<p class="muted">con le agevolazioni, rateizzabile senza interessi.<?php echo ip_opt( 'retta_std' ) ? ' Retta standard ' . esc_html( ip_opt( 'retta_std' ) ) . '.' : ''; ?></p>
+								<p class="muted">importi stabiliti dall’Ateneo e pagati direttamente all’Università, con le agevolazioni e rateizzabili senza interessi.<?php echo ip_opt( 'retta_std' ) ? ' Retta standard ' . esc_html( ip_opt( 'retta_std' ) ) . '.' : ''; ?></p>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>

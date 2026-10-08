@@ -13,11 +13,26 @@ function ip_settings_fields() {
 		'identita'    => array(
 			'title'  => 'Identità',
 			'fields' => array(
-				'brand'        => array( 'Nome del sito/infopoint', 'text', '', 'Se vuoto viene usato il titolo del sito. Il logo si carica da Aspetto → Personalizza → Identità del sito.' ),
-				'city'         => array( 'Città dell’infopoint', 'text', '', 'Usata nei titoli: «Infopoint UniMarconi …».' ),
-				'company_name' => array( 'Ragione sociale', 'text', '' ),
-				'vat'          => array( 'Partita IVA', 'text', '' ),
-				'disclaimer'   => array( 'Nota a piè di pagina', 'textarea', 'Infopoint autorizzato per l’orientamento e le iscrizioni all’Università degli Studi Guglielmo Marconi. Questo non è il sito ufficiale dell’Ateneo.' ),
+				'brand'        => array( 'Nome del vostro marchio', 'text', '', 'Il <strong>vostro</strong> nome commerciale (es. «ZDM Orientamento»), lo stesso da usare come nome dell’attività in Google Ads. Non usare «UniMarconi» o «Università Marconi»: Google lo considera uso del marchio altrui. Se vuoto viene usato il titolo del sito.' ),
+				'city'         => array( 'Città', 'text', '', 'Usata nei testi (es. «… a Pescara»).' ),
+				'disclaimer'   => array( 'Nota a piè di pagina', 'textarea', '{brand} è un servizio di {azienda}, agenzia partner dell’Università degli Studi Guglielmo Marconi per l’orientamento e l’assistenza alle iscrizioni. Questo non è il sito ufficiale dell’Ateneo: il sito ufficiale è www.unimarconi.it.', 'Segnaposto: {brand}, {azienda}.' ),
+			),
+		),
+		'trasparenza' => array(
+			'title'  => 'Trasparenza (Google Ads)',
+			'fields' => array(
+				'company_name'   => array( 'Ragione sociale', 'text', '', 'Es. ZDM S.r.l. Deve coincidere con il nome verificato nell’account Google Ads.' ),
+				'vat'            => array( 'Partita IVA', 'text', '' ),
+				'legal_address'  => array( 'Sede legale', 'textarea', '' ),
+				'rea'            => array( 'Numero REA', 'text', '' ),
+				'pec'            => array( 'PEC', 'text', '' ),
+				'capital'        => array( 'Capitale sociale', 'text', '', 'Es. € 10.000 i.v.' ),
+				'partner_role'   => array( 'Ruolo rispetto all’Ateneo', 'text', 'agenzia partner dell’Università degli Studi Guglielmo Marconi per l’orientamento e l’assistenza alle iscrizioni' ),
+				'partner_since'  => array( 'Riferimento dell’accordo', 'text', '', 'Es. «accordo di collaborazione in vigore dal 2021». Mostrato nella pagina Chi siamo.' ),
+				'partner_proof'  => array( 'Link alla pagina ufficiale UniMarconi che vi elenca', 'url', 'https://www.unimarconi.it/sedi-esami-e-poli-di-orientamento/', 'Prova pubblica e verificabile del rapporto con l’Ateneo (es. elenco dei poli di orientamento). Google la cerca quando valuta il ricorso.' ),
+				'disclosure_bar' => array( 'Avviso di trasparenza in cima a ogni pagina', 'checkbox', '1', 'Consigliato: rende evidente fin dal primo sguardo che il sito non è quello dell’Università.' ),
+				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un servizio di {azienda}, {ruolo}. Non siamo l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.', 'Segnaposto: {brand}, {azienda}, {ruolo}.' ),
+				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', 'Stai contattando {azienda}, agenzia partner. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.', 'Mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
 			),
 		),
 		'contatti'    => array(
@@ -44,7 +59,7 @@ function ip_settings_fields() {
 		'home'        => array(
 			'title'  => 'Home page',
 			'fields' => array(
-				'hero_eyebrow' => array( 'Occhiello sopra il titolo', 'text', '', 'Vuoto = «Infopoint UniMarconi · città».' ),
+				'hero_eyebrow' => array( 'Occhiello sopra il titolo', 'text', '', 'Vuoto = «{vostro marchio} · Agenzia partner UniMarconi».' ),
 				'hero_title'   => array( 'Titolo principale', 'text', 'Iscriviti all’Università Marconi con un orientatore al tuo fianco' ),
 				'hero_text'    => array( 'Sottotitolo', 'textarea', 'Ti aiutiamo a scegliere il corso, verifichiamo gratis i crediti che puoi farti riconoscere e seguiamo l’immatricolazione al posto tuo.' ),
 				'hero_ticks'   => array( 'Punti di forza (accanto al modulo)', 'repeater', array(
@@ -121,7 +136,7 @@ function ip_settings_fields() {
 				'form_title'   => array( 'Titolo modulo informazioni', 'text', 'Ricevi costi e piano di studi' ),
 				'form_text'    => array( 'Testo modulo informazioni', 'text', 'Ti rispondiamo entro un giorno lavorativo, anche su WhatsApp se preferisci.' ),
 				'form_button'  => array( 'Pulsante modulo informazioni', 'text', 'Invia la richiesta' ),
-				'privacy_text' => array( 'Testo consenso privacy', 'textarea', 'Ho letto l’informativa privacy e acconsento al trattamento dei dati per ricevere le informazioni richieste.', 'Le parole «informativa privacy» diventano il link alla pagina scelta sopra.' ),
+				'privacy_text' => array( 'Testo consenso privacy', 'textarea', 'Ho letto l’informativa privacy e acconsento al trattamento dei miei dati da parte di {azienda} per ricevere le informazioni richieste.', 'Le parole «informativa privacy» diventano il link alla pagina scelta sopra. Segnaposto: {azienda}.' ),
 				'mkt_text'     => array( 'Testo consenso marketing', 'textarea', 'Voglio ricevere aggiornamenti su corsi, agevolazioni e scadenze (facoltativo).' ),
 			),
 		),
@@ -134,6 +149,7 @@ function ip_settings_fields() {
 		'aspetto'     => array(
 			'title'  => 'Aspetto',
 			'fields' => array(
+				'palette_note'      => array( 'Nota', 'note', '', 'La palette predefinita è quella ufficiale UniMarconi. Per le campagne Google Ads conviene usare colori vostri: un sito identico nei colori a quello dell’Ateneo può essere giudicato come imitazione. <button type="button" class="button" data-ip-palette="agency">Applica palette agenzia</button> <button type="button" class="button" data-ip-palette="official">Ripristina palette UniMarconi</button> (poi salva).' ),
 				'color_brand'       => array( 'Colore principale', 'color', '#225e48', 'Verde UniMarconi.' ),
 				'color_brand_dark'  => array( 'Colore principale (hover)', 'color', '#174f3a' ),
 				'color_brand_deep'  => array( 'Colore principale scuro (barra in alto)', 'color', '#0e261d' ),
@@ -260,6 +276,18 @@ add_action( 'update_option_ip_settings', function () {
 /**
  * Righe di un campo elenco, senza righe vuote.
  */
+/**
+ * Testo di un'impostazione con i segnaposto {brand}, {azienda}, {ruolo}, {citta}.
+ */
+function ip_text( $key ) {
+	return strtr( (string) ip_opt( $key ), array(
+		'{brand}'   => ip_opt( 'brand' ),
+		'{azienda}' => ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ),
+		'{ruolo}'   => ip_opt( 'partner_role' ),
+		'{citta}'   => ip_opt( 'city' ),
+	) );
+}
+
 function ip_rows( $key ) {
 	$v = ip_opt( $key );
 	if ( ! is_array( $v ) ) {
@@ -378,6 +406,8 @@ function ip_settings_field( $k, $f ) {
 	$saved = get_option( 'ip_settings', array() );
 	$val   = is_array( $saved ) && array_key_exists( $k, $saved ) ? $saved[ $k ] : $f[2];
 	switch ( $f[1] ) {
+		case 'note':
+			break;
 		case 'checkbox':
 			printf( '<label><input type="checkbox" id="%2$s" name="%1$s" value="1" %3$s> Attivo</label>', esc_attr( $name ), esc_attr( $id ), checked( $val, '1', false ) );
 			break;

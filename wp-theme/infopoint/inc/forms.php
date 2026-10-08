@@ -103,12 +103,15 @@ function ip_form( $a = array() ) {
 
 			<div class="check">
 				<input type="checkbox" id="<?php echo esc_attr( $uid ); ?>-privacy" name="ip_privacy" value="1" required>
-				<label for="<?php echo esc_attr( $uid ); ?>-privacy"><?php echo $priv ? str_replace( 'informativa privacy', '<a href="' . esc_url( $priv ) . '" target="_blank" rel="noopener">informativa privacy</a>', esc_html( ip_opt( 'privacy_text' ) ) ) : esc_html( ip_opt( 'privacy_text' ) ); // phpcs:ignore ?></label>
+				<label for="<?php echo esc_attr( $uid ); ?>-privacy"><?php echo $priv ? str_replace( 'informativa privacy', '<a href="' . esc_url( $priv ) . '" target="_blank" rel="noopener">informativa privacy</a>', esc_html( ip_text( 'privacy_text' ) ) ) : esc_html( ip_text( 'privacy_text' ) ); // phpcs:ignore ?></label>
 			</div>
 			<div class="check">
 				<input type="checkbox" id="<?php echo esc_attr( $uid ); ?>-mkt" name="ip_marketing" value="1">
 				<label for="<?php echo esc_attr( $uid ); ?>-mkt"><?php echo esc_html( ip_opt( 'mkt_text' ) ); ?></label>
 			</div>
+			<?php if ( ip_text( 'form_notice' ) ) : ?>
+				<p class="form-notice"><?php echo esc_html( ip_text( 'form_notice' ) ); ?></p>
+			<?php endif; ?>
 			<?php $err = 1 === $count && isset( $_GET['ip_err'] ) ? sanitize_text_field( wp_unslash( $_GET['ip_err'] ) ) : ''; ?>
 			<div class="form-msg" role="alert"<?php echo $err ? '' : ' hidden'; ?>><?php echo esc_html( $err ); ?></div>
 			<button type="submit" class="btn btn-accent btn-block"><?php echo esc_html( $button ); ?></button>

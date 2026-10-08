@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.0.0
+Version: 2.1.0
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -81,6 +81,24 @@ p { margin: 0 0 1em; }
 .btn-block { width: 100%; }
 .btnrow { display: flex; flex-wrap: wrap; gap: 12px; }
 
+/* Trasparenza ------------------------------------------------------ */
+.disclosure { background: var(--brand-tint); border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: .8rem; line-height: 1.45; }
+.disclosure p { margin: 0; padding: 7px 0; }
+@media (max-width: 600px) { .disclosure { font-size: .72rem; } .disclosure p { padding: 5px 0; } .hdr-phone { font-size: .95rem; } }
+.disclosure a { color: var(--brand-dark); font-weight: 600; }
+.form-notice { margin: 0; padding: 8px 10px; font-size: .8rem; line-height: 1.45; color: var(--ink-2); background: var(--soft); border-radius: var(--r); }
+.hero-who { font-size: .88rem; color: var(--ink-2); border-left: 3px solid var(--brand); padding-left: 10px; }
+.source { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+.whois-lead { font-size: 1.1rem; }
+.whois-dl { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0; margin: 1.5em 0; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.whois-dl div { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.whois-dl dt { font-size: .72rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.whois-dl dd { margin: 2px 0 0; font-weight: 600; }
+.whois-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.whois-cols h2 { font-size: 1.2rem; }
+.whois-note { font-size: .88rem; color: var(--muted); margin-top: 1.5em; }
+@media (max-width: 700px) { .whois-cols { grid-template-columns: 1fr; gap: 0; } }
+
 /* Testata ----------------------------------------------------------- */
 .topbar { background: var(--brand-deep); color: #d5e2dc; font-size: .85rem; }
 .topbar-in { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 38px; }
@@ -98,7 +116,7 @@ p { margin: 0 0 1em; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-text strong { font-size: 1rem; white-space: nowrap; }
 .brand-text small { font-size: .76rem; color: var(--muted); white-space: nowrap; }
-.hdr-phone { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1rem; text-decoration: none; }
+.hdr-phone { white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1rem; text-decoration: none; }
 .nav { display: flex; align-items: center; gap: 14px; }
 .menu { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; }
 .menu li { position: relative; }

@@ -10,7 +10,7 @@ get_header();
 $price   = ip_price_from();
 $agev    = ip_page_url( 'convenzioni-e-agevolazioni' );
 $cfu     = ip_page_url( 'riconoscimento-cfu' );
-$eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_opt( 'hero_eyebrow' ) : ( ip_opt( 'city' ) ? 'Infopoint UniMarconi · ' . ip_opt( 'city' ) : 'Infopoint Università Marconi' );
+$eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand' ) . ' · Agenzia partner UniMarconi' . ( ip_opt( 'city' ) ? ' a ' . ip_opt( 'city' ) : '' );
 $arrow   = ip_icon( 'arrow', 16 );
 ?>
 

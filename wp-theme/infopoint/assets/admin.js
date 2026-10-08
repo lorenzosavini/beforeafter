@@ -40,6 +40,15 @@
 			});
 			frame.open();
 		}
+		if (t.matches('[data-ip-palette]')) {
+			var pal = t.getAttribute('data-ip-palette') === 'agency'
+				? { brand: '#1f3b57', brand_dark: '#152b41', brand_deep: '#0f1f2f', accent: '#d9622b', accent_dark: '#b84f1f', soft: '#f3f4f6', dark: '#1f2933' }
+				: { brand: '#225e48', brand_dark: '#174f3a', brand_deep: '#0e261d', accent: '#a0300e', accent_dark: '#ca451d', soft: '#f0f0f0', dark: '#373737' };
+			Object.keys(pal).forEach(function (k) {
+				var el = document.getElementById('ip-color_' + k);
+				if (el) { el.value = pal[k]; var c = el.parentNode.querySelector('code'); if (c) c.textContent = pal[k]; }
+			});
+		}
 		if (t.matches('[data-ip-reset-color]')) {
 			var c = t.parentNode.querySelector('input[type=color]');
 			c.value = t.getAttribute('data-ip-reset-color');
