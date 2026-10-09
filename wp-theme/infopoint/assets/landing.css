@@ -366,3 +366,53 @@
 	.lp-team-lead { font-size: 1.15rem; }
 	.lp-hero h1 { font-size: clamp(2rem, 8.4vw, 2.6rem); }
 }
+
+/* Apertura più compatta: titolo e testi proporzionati, modulo più corto -- */
+.lp-hero-in { padding-top: 40px; padding-bottom: 44px; gap: 48px; }
+.lp-hero h1 { font-size: clamp(1.85rem, 2.7vw, 2.35rem); line-height: 1.08; margin-bottom: 14px; }
+.lp-h1-pre { font-size: max(.95rem, .4em); margin-bottom: 8px; }
+.lp-h1-code { font-size: max(.72rem, .3em); }
+.lp-k { margin-bottom: 12px; font-size: .84rem; }
+.lp-lead { font-size: 1rem; line-height: 1.55; }
+.lp-spec { margin-top: 22px; }
+.lp-spec div { padding-top: 10px; padding-bottom: 10px; }
+.lp-spec dd { font-size: 1.2rem; }
+.lp-pts { margin-top: 18px; gap: 8px 28px; }
+.lp-pts li { font-size: .92rem; }
+.lp-due, .lp-price { margin-top: 18px; }
+.lp-price strong { font-size: 1.3rem; }
+.lp .lead > .lead-title { padding: 18px 22px 4px; font-size: 1.2rem; }
+.lp .lead > .lead-text { padding: 0 22px 16px; font-size: .84rem; }
+.lp .lead > .form { padding: 16px 22px 2px; gap: 10px; }
+.lp .lead-alt { padding: 2px 22px 12px; font-size: .84rem; }
+.lp .field { gap: 4px; }
+.lp .field label { font-size: .76rem; }
+.lp .field input, .lp .field select, .lp .field textarea { min-height: 42px; padding: 9px 12px; font-size: .95rem; }
+.lp .lead-course { padding: 8px 12px; font-size: .86rem; }
+.lp .check { font-size: .74rem; line-height: 1.4; }
+.lp .check input { width: 16px; height: 16px; }
+.lp .form-notice { padding: 8px 10px; font-size: .72rem; }
+.lp .lead button[type=submit] { min-height: 48px; font-size: .98rem; }
+.lp-assure { padding: 10px 22px; font-size: .74rem; }
+@media (max-width: 900px) {
+	.lp-disc .lp-w { padding-top: 6px; padding-bottom: 6px; }
+	.lp-disc p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding: 0; font-size: .72rem; }
+	.lp-hero-in { padding-top: 22px; padding-bottom: 28px; gap: 22px; }
+	.lp-hero h1 { font-size: clamp(1.5rem, 6.2vw, 1.8rem); }
+	.lp-h1-pre { font-size: .88rem; margin-bottom: 6px; }
+	.lp-k { font-size: .8rem; margin-bottom: 10px; }
+	.lp-k::before { width: 20px; }
+	.lp-lead { font-size: .95rem; }
+	.lp-spec { margin-top: 18px; }
+	.lp-spec div { padding-top: 8px; padding-bottom: 8px; }
+	.lp-spec dd { font-size: 1.08rem; }
+	.lp-pts { margin-top: 14px; }
+	.lp-pts li { font-size: .9rem; }
+}
+.lp-hero-f .lead-alt, .lp-hero-f details.more { display: none; }
+.lp-hero-f .lead > .lead-text { display: none; }
+.lp-hero-f .lead > .lead-title { padding-bottom: 16px; }
+@media (max-width: 900px) {
+	/* Su telefono il modulo arriva prima: punti e prezzo restano nelle sezioni sotto. */
+	.lp-hero .lp-pts, .lp-hero .lp-price { display: none; }
+}

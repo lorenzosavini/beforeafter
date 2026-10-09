@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.6.0
+Version: 2.6.1
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -622,3 +622,26 @@ a.contact:hover { color: var(--brand); }
 .band { background: var(--brand); }
 .facts { background: var(--brand-dark); }
 
+
+/* Apertura della home più compatta */
+.hero h1 { font-size: clamp(1.7rem, 2.6vw, 2.2rem); line-height: 1.12; margin-bottom: .4em; }
+.hero-lead { font-size: 1rem; line-height: 1.55; }
+.hero-kicker { font-size: .86rem; margin-bottom: .6em; }
+.hero-photo .hero-in { padding-top: 40px; padding-bottom: 44px; }
+.hero-actions { margin-top: 1.2em; }
+.hero-price { font-size: .9rem; }
+@media (max-width: 900px) {
+	.hero h1 { font-size: clamp(1.4rem, 5.8vw, 1.7rem); }
+	.hero-lead { font-size: .95rem; }
+	.hero-photo .hero-in { padding-top: 22px; padding-bottom: 26px; }
+	.disclosure .wrap { padding-top: 5px; padding-bottom: 5px; }
+	.disclosure p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding: 0; }
+}
+.hero .lead { padding: 20px 22px; }
+.hero .lead-title { font-size: 1.15rem; }
+.hero .lead-text { font-size: .86rem; margin-bottom: .8em; }
+.hero .form { gap: 10px; }
+.hero .field input, .hero .field select { padding: 9px 12px; font-size: .95rem; }
+.hero .check { font-size: .76rem; }
+.hero .form-notice { font-size: .72rem; }
+.hero .lead-alt, .hero details.more { display: none; }
