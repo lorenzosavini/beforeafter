@@ -183,7 +183,7 @@
 		if (dlg && dlg.showModal) { e.preventDefault(); dlg.showModal(); }
 		if (c) { e.preventDefault(); c.closest('dialog').close(); }
 	});
-	d.querySelectorAll('dialog.lp-dialog').forEach(function (x) {
+	d.querySelectorAll('dialog.lp-dialog, dialog.exit-dlg').forEach(function (x) {
 		x.addEventListener('click', function (e) { if (e.target === x) x.close(); });
 	});
 
@@ -238,17 +238,34 @@
 	});
 
 	/* Landing: un solo invito prima di uscire (solo con il mouse, mai sul tasto Indietro) */
+	/* Banner d'uscita: una volta per visita, mai dopo una richiesta inviata.
+	   Da computer: il mouse esce dal bordo alto. Da telefono: dopo aver letto, si torna su di scatto. */
 	var exitDlg = d.querySelector('dialog[data-lp-exit]');
-	if (exitDlg && exitDlg.showModal && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+	if (exitDlg && exitDlg.showModal) {
 		var ss = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return '1'; } }, set: function (k) { try { sessionStorage.setItem(k, '1'); } catch (e) {} } };
 		var armed = false;
-		setTimeout(function () { armed = true; }, 8000);
-		d.addEventListener('mouseout', function (e) {
-			if (!armed || e.relatedTarget || e.clientY > 0 || ss.get('ip_exit') || store.get('ip_lead_sent') || d.querySelector('dialog[open]')) return;
-			ss.set('ip_exit');
-			exitDlg.showModal();
-			dl.push({ event: 'exit_intent_shown' });
-		});
+		var showExit = function (how) {
+			if (!armed || ss.get('ip_exit') || store.get('ip_lead_sent') || d.querySelector('dialog[open]')) return;
+			var f = d.activeElement;
+			if (f && f.closest && f.closest('form') && /INPUT|SELECT|TEXTAREA/.test(f.tagName)) return;
+			ss.set('ip_exit'); exitDlg.showModal(); dl.push({ event: 'exit_intent_shown', exit_trigger: how });
+		};
+		if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+			setTimeout(function () { armed = true; }, 8000);
+			d.addEventListener('mouseout', function (e) {
+				if (!e.relatedTarget && e.clientY <= 0) showExit('mouse');
+			});
+		} else if (exitDlg.hasAttribute('data-mobile') || d.body.classList.contains('lp')) {
+			setTimeout(function () { armed = true; }, 20000);
+			var lastY = window.scrollY, upY = lastY, upT = Date.now(), maxDepth = 0;
+			window.addEventListener('scroll', function () {
+				var y = window.scrollY, t = Date.now(), h = d.documentElement.scrollHeight - window.innerHeight;
+				if (h > 0) maxDepth = Math.max(maxDepth, y / h);
+				if (y >= lastY || t - upT > 700) { upY = y; upT = t; }
+				if (y < lastY && maxDepth > 0.4 && upY - y > 350 && t - upT < 700) showExit('scroll_up');
+				lastY = y;
+			}, { passive: true });
+		}
 	}
 
 	/* Misurazione dei contatti diretti */

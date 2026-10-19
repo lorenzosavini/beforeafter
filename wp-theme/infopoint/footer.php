@@ -103,6 +103,8 @@ endif;
 	<a class="mbar-main" href="#richiedi" data-scroll-form><?php echo ip_icon( 'doc', 20 ); // phpcs:ignore ?><span>Richiedi info</span></a>
 </nav>
 
+<?php ip_exit_banner(); ?>
+
 <?php wp_footer(); ?>
 </body>
 </html>

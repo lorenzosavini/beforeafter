@@ -53,8 +53,9 @@ modificabili da *Infopoint → Impostazioni → Aspetto*.
 | Sitemap XML | nativa: `/wp-sitemap.xml` |
 | GTM con Consent Mode v2 + banner cookie leggero, riapribile da «Preferenze cookie» | *Impostazioni → Privacy, cookie e tracciamento* |
 | Informativa privacy e cookie policy generate dai dati della società (`[ip_privacy]`, `[ip_cookie]`): si aggiornano da sole se cambiano ragione sociale, recapiti o strumenti attivi | Pagine «Informativa privacy» e «Cookie policy»; tempi di conservazione, fornitori e DPO in *Privacy, cookie e tracciamento* |
-| Eventi dataLayer: `generate_lead`, `contact_click`, `lead_thank_you` | automatici |
+| Eventi dataLayer: `generate_lead`, `contact_click`, `lead_thank_you`, `exit_intent_shown` | automatici |
 | Barra mobile Chiama / WhatsApp / Richiedi info | automatica |
+| Banner d'uscita con richiesta di richiamata: da computer quando il mouse va verso la chiusura, da telefono quando si torna su di scatto dopo aver letto. Una volta per visita, mai dopo una richiesta inviata né nella pagina di ringraziamento. Evento `exit_intent_shown` | *Impostazioni → Moduli e richieste* (attiva, solo computer, titolo, testo, punti) |
 
 ## Aggiornamenti automatici dal sito ufficiale
 

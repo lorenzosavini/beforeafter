@@ -661,3 +661,43 @@ add_filter( 'walker_nav_menu_start_el', function ( $out, $item, $depth, $args ) 
 	return $out;
 }, 10, 4 );
 
+
+/**
+ * Banner d'uscita: una richiesta di richiamata mostrata a chi sta lasciando il sito.
+ * Le landing hanno il loro; la pagina di ringraziamento non lo mostra mai.
+ */
+function ip_exit_banner() {
+	if ( ! ip_opt( 'exit_on' ) || is_404() || is_singular( 'ip_landing' ) || is_page_template( 'page-templates/landing.php' ) ) {
+		return;
+	}
+	$thanks = (int) ip_opt( 'thanks_page' );
+	if ( $thanks && is_page( $thanks ) ) {
+		return;
+	}
+	$points = array_slice( array_filter( array_map( 'trim', explode( "\n", (string) ip_opt( 'exit_points' ) ) ) ), 0, 3 );
+	$course = is_singular( 'corso' ) ? get_the_ID() : 0;
+	?>
+	<dialog class="exit-dlg" data-lp-exit<?php echo ip_opt( 'exit_mobile' ) ? ' data-mobile' : ''; ?> aria-labelledby="exit-t">
+		<div class="exit-in">
+			<button type="button" class="exit-x" data-lp-close aria-label="Chiudi"><?php echo ip_icon( 'close', 20 ); // phpcs:ignore ?></button>
+			<div class="exit-side">
+				<p class="exit-t" id="exit-t"><?php echo ip_hl( ip_opt( 'exit_title' ) ); // phpcs:ignore ?></p>
+				<?php if ( ip_opt( 'exit_text' ) ) : ?>
+					<p class="exit-p"><?php echo esc_html( ip_text( 'exit_text' ) ); ?></p>
+				<?php endif; ?>
+				<?php if ( $points ) : ?>
+					<ul class="exit-pts">
+						<?php foreach ( $points as $pt ) : ?>
+							<li><?php echo ip_icon( 'check', 16 ); // phpcs:ignore ?><?php echo esc_html( $pt ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+				<?php if ( ip_opt( 'phone1' ) ) : ?>
+					<p class="exit-call">Preferisci chiamare tu? <a href="<?php echo esc_attr( ip_tel_href( ip_opt( 'phone1' ) ) ); ?>" data-track="call"><?php echo esc_html( ip_opt( 'phone1' ) ); ?></a></p>
+				<?php endif; ?>
+			</div>
+			<?php ip_form( array( 'type' => 'callback', 'course' => $course, 'inline' => true, 'id' => 'exit-form', 'title' => 'Ti richiamiamo noi', 'text' => 'Gratis, quando preferisci.' ) ); ?>
+		</div>
+	</dialog>
+	<?php
+}
