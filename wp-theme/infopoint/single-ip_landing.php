@@ -90,7 +90,8 @@ $head = function ( $title, $sub = '' ) {
 		<?php endif; ?>
 		<div class="lp-w lp-hero-in">
 			<div class="lp-hero-t">
-				<?php if ( $d['kicker'] ) : ?><p class="lp-k"><?php echo esc_html( $d['kicker'] ); ?></p><?php endif; ?>
+				<?php $k_txt = false !== strpos( $d['kicker'], ip_opt( 'brand' ) ) ? ip_role_label() : $d['kicker']; ?>
+				<p class="lp-badge-row"><span class="hero-badge"><?php echo esc_html( ip_opt( 'brand' ) ); ?></span> <?php echo esc_html( $k_txt ); ?></p>
 				<h1>
 					<?php if ( $t_pre ) : ?><span class="lp-h1-pre"><?php echo esc_html( $t_pre ); ?></span><?php endif; ?>
 					<?php $h1 = ip_hl( $t_main, true ); echo false === strpos( $h1, 'class="hl"' ) ? '<span class="hl">' . $h1 . '</span>' : $h1; // phpcs:ignore ?>
@@ -99,25 +100,30 @@ $head = function ( $title, $sub = '' ) {
 				<?php if ( $d['sub'] ) : ?><p class="lp-lead"><?php echo ip_hl( $d['sub'] ); // phpcs:ignore ?></p><?php endif; ?>
 
 				<?php if ( $spec ) : ?>
-					<dl class="lp-spec">
+					<ul class="lp-chips">
 						<?php foreach ( $spec as $label => $value ) : ?>
-							<div><dt><?php echo esc_html( $label ); ?></dt><dd><?php echo esc_html( $value ); ?></dd></div>
+							<li><span><?php echo esc_html( $label ); ?></span> <?php echo esc_html( $value ); ?></li>
 						<?php endforeach; ?>
-					</dl>
+					</ul>
 				<?php endif; ?>
 
 				<?php if ( $d['points'] ) : ?>
 					<ul class="lp-pts">
-						<?php foreach ( $d['points'] as $p ) : ?><li><?php echo esc_html( $p ); ?></li><?php endforeach; ?>
+						<?php foreach ( array_slice( $d['points'], 0, 3 ) as $p ) : ?><li><?php echo ip_icon( 'check', 18 ); // phpcs:ignore ?><span><?php echo esc_html( $p ); ?></span></li><?php endforeach; ?>
 					</ul>
 				<?php endif; ?>
 
-				<?php if ( $d['deadline'] ) : ?>
-					<p class="lp-due"><span>Scadenza</span> richieste entro il <?php echo esc_html( $d['deadline'] ); ?></p>
-				<?php endif; ?>
+				<div class="lp-acts">
+					<?php echo ip_phone_link( 'phone1', 'btn btn-white' ); // phpcs:ignore ?>
+					<?php if ( ip_opt( 'whatsapp' ) ) : ?>
+						<a class="btn btn-line-light" href="<?php echo esc_url( ip_wa_href( 'Ciao, vorrei informazioni su ' . wp_strip_all_tags( $d['title'] ) . '.' ) ); ?>" target="_blank" rel="noopener" data-track="whatsapp"><?php echo ip_icon( 'whatsapp', 18 ); // phpcs:ignore ?><span>Scrivici su WhatsApp</span></a>
+					<?php endif; ?>
+				</div>
+
 				<?php if ( $d['price'] && 'agevolazione' !== $d['type'] ) : ?>
-					<p class="lp-price"><?php echo wp_kses( $d['price'], array( 'strong' => array() ) ); ?></p>
-					<?php if ( false !== strpos( $d['price'], 'agevolazioni' ) ) : ?><?php echo ip_agev_deadline_note( 'lp-due-note' ); // phpcs:ignore ?><?php endif; ?>
+					<p class="lp-price"><?php echo wp_kses( $d['price'], array( 'strong' => array() ) ); ?><?php if ( ip_agev_deadline_text() && false !== strpos( $d['price'], 'agevolazioni' ) ) : ?><br><small><?php echo esc_html( ip_agev_deadline_text() ); ?></small><?php endif; ?></p>
+				<?php elseif ( $d['deadline'] ) : ?>
+					<p class="lp-price"><small>Richieste entro il <?php echo esc_html( $d['deadline'] ); ?></small></p>
 				<?php endif; ?>
 			</div>
 
