@@ -31,7 +31,7 @@ function ip_settings_fields() {
 				'partner_since'  => array( 'Riferimento dell’accordo', 'text', '', 'Es. «accordo di collaborazione in vigore dal 2021». Mostrato nella pagina Chi siamo.' ),
 				'partner_letter' => array( 'Lettera di autorizzazione dell’Ateneo (PDF)', 'url', '', 'Facoltativo. Se l’Ateneo è d’accordo a renderla pubblica, caricala nella Libreria media e incolla qui il link: compare nella pagina Chi siamo come prova verificabile.' ),
 				'partner_proof'  => array( 'Link alla pagina ufficiale UniMarconi che vi elenca', 'url', 'https://www.unimarconi.it/sedi-esami-e-poli-di-orientamento/', 'Prova pubblica e verificabile del rapporto con l’Ateneo (es. elenco dei poli di orientamento). Google la cerca quando valuta il ricorso.' ),
-				'disclosure_bar' => array( 'Avviso di trasparenza in cima a ogni pagina', 'checkbox', '1', 'Consigliato: rende evidente fin dal primo sguardo che il sito non è quello dell’Università.' ),
+				'disclosure_bar' => array( 'Avviso di trasparenza in cima a ogni pagina', 'checkbox', '', 'Consigliato: rende evidente fin dal primo sguardo che il sito non è quello dell’Università.' ),
 				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un {ruolo}, gestito da {azienda} (P.IVA {piva}).', 'Segnaposto: {brand}, {azienda}, {piva}, {ruolo}. Usate la dicitura prevista dal contratto con l’Ateneo («centro di orientamento accreditato»).' ),
 				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', '', 'Facoltativo: mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
 			),

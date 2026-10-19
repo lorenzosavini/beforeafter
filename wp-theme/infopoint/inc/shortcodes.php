@@ -109,14 +109,31 @@ add_shortcode( 'ip_agevolazioni', function ( $a ) {
 	return ip_buffer( 'tabella' === $a['stile'] ? 'ip_agevolazioni_table' : 'ip_agevolazioni' );
 } );
 
-function ip_agevolazioni( $limit = -1 ) {
-	$q = get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => $limit, 'orderby' => array( 'menu_order' => 'ASC', 'title' => 'ASC' ) ) );
+/**
+ * Schede delle agevolazioni.
+ *
+ * @param int   $limit Numero massimo (-1 = tutte).
+ * @param array $args  no_std: senza la retta standard; priced: solo con importo; note: nota sulle scadenze in fondo.
+ */
+function ip_agevolazioni( $limit = -1, $args = array() ) {
+	$args = wp_parse_args( $args, array( 'no_std' => false, 'priced' => false, 'note' => true ) );
+	$q    = get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => -1, 'orderby' => array( 'menu_order' => 'ASC', 'title' => 'ASC' ) ) );
+	$num  = function ( $v ) {
+		return (float) str_replace( ',', '.', str_replace( '.', '', (string) $v ) );
+	};
+	$q = array_values( array_filter( $q, function ( $p ) use ( $args ) {
+		$key = get_post_meta( $p->ID, '_ip_fonte', true ) ? get_post_meta( $p->ID, '_ip_fonte', true ) : $p->post_name;
+		if ( $args['no_std'] && 'retta-standard' === $key ) {
+			return false;
+		}
+		return ! $args['priced'] || ip_meta( 'rata', $p->ID ) || ip_meta( 'retta', $p->ID );
+	} ) );
+	if ( $limit > 0 ) {
+		$q = array_slice( $q, 0, $limit );
+	}
 	if ( ! $q ) {
 		return;
 	}
-	$num = function ( $v ) {
-		return (float) str_replace( ',', '.', str_replace( '.', '', (string) $v ) );
-	};
 	$fees = ip_fees();
 	$std  = $num( $fees['std_retta'] );
 	$best = $num( $fees['min_rata'] );
@@ -130,45 +147,60 @@ function ip_agevolazioni( $limit = -1 ) {
 		$save  = $std && $num( $retta ) > 0 && $num( $retta ) < $std ? $std - $num( $retta ) : 0;
 		$full  = $std && $num( $retta ) === $std;
 		?>
-		<?php $is_best = $best && $num( $rata ) === $best; ?>
+		<?php
+		$is_best = $best && $num( $rata ) === $best;
+		$top     = array_slice( $cond, 0, 3 );
+		$cut     = function ( $t ) {
+			return mb_strlen( $t ) > 110 ? rtrim( mb_substr( $t, 0, 108 ), ' ,;.' ) . '…' : $t;
+		};
+		?>
 		<article class="agev-item<?php echo $is_best ? ' agev-best' : ''; ?>">
-			<?php if ( $is_best ) : ?><p class="agev-flag">La più conveniente</p><?php endif; ?>
-			<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="agev-badge"><?php echo ip_icon( 'calendar', 14 ); // phpcs:ignore ?> Richieste entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
-			<div class="agev-head">
-				<span class="agev-ico"><?php echo ip_icon( ip_agev_icon( $title ), 20 ); // phpcs:ignore ?></span>
-				<h3><?php echo esc_html( $title ); ?></h3>
-			</div>
-			<p class="agev-dest"><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
-			<div class="agev-price<?php echo $rata || $retta ? '' : ' agev-price-none'; ?>">
-				<?php if ( $rata ) : ?>
-					<p><strong>€ <?php echo esc_html( $rata ); ?></strong><span>/mese</span></p>
-					<?php if ( $retta ) : ?><small>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?> l’anno</small><?php endif; ?>
-				<?php elseif ( $retta ) : ?>
-					<p><strong>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?></strong><span>/anno</span></p>
-				<?php else : ?>
-					<p class="agev-ask">Importo su misura</p><small>Ti diciamo noi quanto paghi</small>
+			<header class="agev-hd">
+				<?php if ( $is_best ) : ?><p class="agev-flag">La più conveniente</p><?php endif; ?>
+				<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="agev-badge"><?php echo ip_icon( 'calendar', 14 ); // phpcs:ignore ?> Richieste entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
+				<div class="agev-head">
+					<span class="agev-ico"><?php echo ip_icon( ip_agev_icon( $title ), 20 ); // phpcs:ignore ?></span>
+					<h3><?php echo esc_html( $title ); ?></h3>
+				</div>
+				<p class="agev-dest"><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
+			</header>
+			<div class="agev-body">
+				<div class="agev-price<?php echo $rata || $retta ? '' : ' agev-price-none'; ?>">
+					<?php if ( $rata ) : ?>
+						<p><strong>€ <?php echo esc_html( $rata ); ?></strong><span>/mese</span></p>
+						<?php if ( $retta ) : ?><small>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?> l’anno</small><?php endif; ?>
+					<?php elseif ( $retta ) : ?>
+						<p><strong>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?></strong><span>/anno</span></p>
+					<?php else : ?>
+						<p class="agev-ask">Importo su misura</p><small>Ti diciamo noi quanto paghi</small>
+					<?php endif; ?>
+					<?php if ( $save ) : ?>
+						<span class="agev-save">Risparmi € <?php echo esc_html( number_format( $save, 0, ',', '.' ) ); ?> l’anno</span>
+					<?php elseif ( $full ) : ?>
+						<span class="agev-save agev-full">Retta piena</span>
+					<?php endif; ?>
+				</div>
+				<?php if ( $top ) : ?>
+					<ul class="agev-checks">
+						<?php foreach ( $top as $c ) : ?><li><?php echo ip_icon( 'check', 16 ); // phpcs:ignore ?><span><?php echo esc_html( $cut( $c ) ); ?></span></li><?php endforeach; ?>
+					</ul>
 				<?php endif; ?>
-				<?php if ( $save ) : ?>
-					<span class="agev-save">Risparmi € <?php echo esc_html( number_format( $save, 0, ',', '.' ) ); ?> l’anno</span>
-				<?php elseif ( $full ) : ?>
-					<span class="agev-save agev-full">Retta piena</span>
+				<?php if ( count( $cond ) > 3 || $det || array_filter( $top, function ( $c ) { return mb_strlen( $c ) > 110; } ) ) : ?>
+					<details>
+						<summary>Tutte le condizioni</summary>
+						<?php if ( $cond ) : ?><ul><?php foreach ( $cond as $c ) : ?><li><?php echo esc_html( $c ); ?></li><?php endforeach; ?></ul><?php endif; ?>
+						<?php if ( $det ) : ?><p class="agev-det"><?php echo nl2br( esc_html( $det ) ); ?></p><?php endif; ?>
+					</details>
 				<?php endif; ?>
+				<a class="agev-cta" href="#richiedi" data-scroll-form data-interest="<?php echo esc_attr( $title ); ?>">Verifica se ne hai diritto <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
 			</div>
-			<?php if ( $cond ) : ?>
-				<details>
-					<summary>Condizioni</summary>
-					<ul><?php foreach ( $cond as $c ) : ?><li><?php echo esc_html( $c ); ?></li><?php endforeach; ?></ul>
-					<?php if ( $det ) : ?><p class="agev-det"><?php echo nl2br( esc_html( $det ) ); ?></p><?php endif; ?>
-				</details>
-			<?php elseif ( $det ) : ?>
-				<details><summary>Dettagli</summary><p class="agev-det"><?php echo nl2br( esc_html( $det ) ); ?></p></details>
-			<?php endif; ?>
-			<a class="agev-cta" href="#richiedi" data-scroll-form data-interest="<?php echo esc_attr( $title ); ?>">Verifica se ne hai diritto <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
 		</article>
 		<?php
 	}
 	echo '</div>';
-	echo ip_agev_deadline_note(); // phpcs:ignore
+	if ( $args['note'] ) {
+		echo ip_agev_deadline_note(); // phpcs:ignore
+	}
 }
 
 add_shortcode( 'ip_sedi', function () {

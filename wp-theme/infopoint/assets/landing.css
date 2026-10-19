@@ -2,7 +2,6 @@
    Impaginazione da prospetto: filetti al posto dei riquadri, cifre vere in
    evidenza, una sola azione per sezione. Colori: palette ufficiale. */
 
-@font-face { font-family: "Source Serif"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("fonts/sourceserif4-latin-var.woff2") format("woff2"); }
 .lp { --serif: "Source Serif", Georgia, "Times New Roman", serif; --deep: #0e261d; --paper: #f5f6f4; --hair: #dfe3e1; --tab: tabular-nums; background: #fff; color: var(--ink); }
 .lp-w { max-width: 1240px; margin: 0 auto; padding: 0 32px; }
 .lp h1, .lp h2, .lp h3 { color: var(--deep); }
@@ -421,3 +420,81 @@
 .lp-due-note { margin: 12px 0 0; padding: 9px 12px; border-left: 3px solid var(--accent); background: #fbf3ef; font-size: .86rem; line-height: 1.45; color: #5c2009; }
 .lp-sec .lp-due-note { margin: 0 0 22px; }
 .lp-hero .hl { color: var(--accent); font-style: italic; }
+
+/* =====================================================================
+   Stile del sito: stessa banda verde, stessa fascia arancione sul titolo,
+   stesso carattere (Montserrat) e stesse schede del resto del sito.
+   ===================================================================== */
+.lp { --serif: var(--font); }
+.lp-hero h1, .lp-sh h2, .lp-end h2, .lp-dialog h2 { font-weight: 700; letter-spacing: -.012em; }
+.lp-figs strong, .lp-std strong, .lp-cost-n, .lp-price strong, .lp-spec dd, .lp-team-tel { font-weight: 800; letter-spacing: -.02em; }
+.lp-quotes blockquote { font-style: normal; font-size: 1.08rem; font-weight: 500; }
+.lp-team-lead { font-size: 1.12rem; font-weight: 500; }
+.lp-team-mark { font-weight: 800; }
+
+/* Apertura a banda verde con foto velata, come la home */
+.lp-hero { overflow: hidden; border-bottom: 0; background: var(--deep); color: #fff; }
+.lp-hero-img { inset: 0; width: 100%; background: none; }
+.lp-hero-img::before { left: 0; right: 0; width: auto; background: linear-gradient(90deg, rgba(9, 28, 21, .97) 0%, rgba(9, 28, 21, .92) 45%, rgba(9, 28, 21, .72) 100%); }
+.lp-k { color: #cfe0d8; }
+.lp-k::before { background: var(--accent); }
+.lp-hero h1 { color: #fff; line-height: 1.22; }
+.lp-hero .hl { padding: 0 .2em; border-radius: 4px; background: var(--accent); color: #fff; font-style: normal; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.lp-h1-pre { color: #cfe0d8; }
+.lp-h1-code { border-color: rgba(255, 255, 255, .5); color: #fff; }
+.lp-lead { color: #e6eee9; }
+.lp-spec { border-top-color: rgba(255, 255, 255, .35); border-bottom-color: rgba(255, 255, 255, .15); }
+.lp-spec div { border-left-color: rgba(255, 255, 255, .15); }
+.lp-spec dt { color: #b9cfc5; }
+.lp-spec dd { color: #fff; }
+.lp-pts li { color: #fff; }
+.lp-pts li::before { background: var(--accent); }
+.lp-due, .lp-hero .lp-due-note { border: 1px solid rgba(255, 255, 255, .18); border-left: 3px solid var(--accent); background: rgba(255, 255, 255, .07); color: #fff; }
+.lp-due span { border-right-color: rgba(255, 255, 255, .25); color: #ffb08f; }
+.lp-price { color: #e6eee9; }
+.lp-price strong { color: #fff; }
+
+/* Modulo: scheda bianca come nel sito */
+.lp-hero-f, .lp-end-f { border-radius: 16px; box-shadow: 0 24px 50px rgba(0, 0, 0, .3); }
+.lp .lead > .lead-title, .lp-end-f .lead > .lead-title { padding-top: 22px; background: #fff; color: var(--deep); }
+.lp .lead > .lead-text, .lp-end-f .lead > .lead-text { background: #fff; color: var(--muted); }
+.lp .field input, .lp .field select, .lp .field textarea { border-radius: var(--r); }
+.lp .lead button[type=submit] { border-radius: var(--r-btn); }
+.lp-assure { background: var(--soft); }
+
+/* Cifre su fondo chiaro: la banda verde resta una sola */
+.lp-figs { background: var(--paper); color: var(--ink); border-bottom: 1px solid var(--hair); }
+.lp-figs p { border-left-color: var(--hair); }
+.lp-figs strong { color: var(--deep); }
+.lp-figs span { color: var(--muted); }
+@media (max-width: 900px) { .lp-figs p:nth-child(n+3) { border-top-color: var(--hair); } }
+
+/* Titoli di sezione, pulsanti e schede come nel sito */
+.lp-sh h2 { font-size: clamp(1.55rem, 2.4vw, 2.1rem); }
+.lp-btn { border-radius: var(--r-btn); font-weight: 700; }
+.lp-card { border-radius: 14px; transition: border-color .15s, box-shadow .15s; }
+.lp-card:hover { border-color: var(--brand-soft); box-shadow: 0 12px 28px rgba(14, 38, 29, .1); }
+.lp-tabs-cta { border-radius: 16px; }
+.lp-tabs-cta p { font-weight: 700; font-size: 1.12rem; }
+.lp-team-call, .lp-team-img, .lp-det, .lp-dialog { border-radius: 16px; }
+
+/* Condizioni dell'agevolazione con la spunta */
+.lp-rules li { padding-left: 32px; }
+.lp-rules li::before { top: 1.05em; width: 18px; height: 18px; background: var(--brand-mid); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+/* Agevolazioni con le schede del sito */
+.lp .agev { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); margin: 0 0 4px; }
+.lp-split .agev { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+@media (max-width: 900px) {
+	.lp-hero-img { display: block; }
+	.lp-hero-img::before { background: rgba(9, 28, 21, .93); }
+}
+
+.lp .agev-item h3 { color: #fff; }
+.lp .agev-item details { margin: 0 0 16px; border-top: 1px solid var(--hair); }
+.lp .agev-item details summary { position: relative; padding: 12px 28px 12px 0; list-style: none; font-size: .9rem; font-weight: 600; color: var(--brand); cursor: pointer; }
+.lp .agev-item details summary::-webkit-details-marker { display: none; }
+.lp .agev-item details summary::after { content: "+"; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; font-weight: 400; color: var(--brand); }
+.lp .agev-item details[open] summary::after { content: "−"; }
+.lp .agev-checks { margin: 0 0 14px; padding: 0; list-style: none; }
+.lp .agev-checks li { display: flex; align-items: flex-start; gap: 9px; }

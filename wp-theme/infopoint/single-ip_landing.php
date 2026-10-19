@@ -93,7 +93,7 @@ $head = function ( $title, $sub = '' ) {
 				<?php if ( $d['kicker'] ) : ?><p class="lp-k"><?php echo esc_html( $d['kicker'] ); ?></p><?php endif; ?>
 				<h1>
 					<?php if ( $t_pre ) : ?><span class="lp-h1-pre"><?php echo esc_html( $t_pre ); ?></span><?php endif; ?>
-					<?php echo ip_hl( $t_main, true ); // phpcs:ignore ?>
+					<?php $h1 = ip_hl( $t_main, true ); echo false === strpos( $h1, 'class="hl"' ) ? '<span class="hl">' . $h1 . '</span>' : $h1; // phpcs:ignore ?>
 					<?php if ( $t_code ) : ?><span class="lp-h1-code"><?php echo esc_html( $t_code ); ?></span><?php endif; ?>
 				</h1>
 				<?php if ( $d['sub'] ) : ?><p class="lp-lead"><?php echo ip_hl( $d['sub'] ); // phpcs:ignore ?></p><?php endif; ?>
@@ -283,31 +283,7 @@ $head = function ( $title, $sub = '' ) {
 						<?php echo ip_agev_deadline_note( 'lp-due-note' ); // phpcs:ignore ?>
 					</div>
 					<div>
-						<?php
-						$agevs = get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => -1, 'orderby' => array( 'menu_order' => 'ASC', 'title' => 'ASC' ) ) );
-						$shown = 0;
-						?>
-						<table class="lp-tab">
-							<thead><tr><th>Agevolazione</th><th class="n">Al mese</th><th class="n">All’anno</th></tr></thead>
-							<tbody>
-							<?php foreach ( $agevs as $ag ) : ?>
-								<?php
-								$rata  = ip_meta( 'rata', $ag->ID );
-								$retta = ip_meta( 'retta', $ag->ID );
-								$std   = 'retta-standard' === ( get_post_meta( $ag->ID, '_ip_fonte', true ) ? get_post_meta( $ag->ID, '_ip_fonte', true ) : $ag->post_name );
-								if ( $std || ( ! $rata && ! $retta ) || $shown >= 7 ) {
-									continue;
-								}
-								$shown++;
-								?>
-								<tr>
-									<th scope="row"><strong><?php echo esc_html( html_entity_decode( $ag->post_title, ENT_QUOTES, 'UTF-8' ) ); ?></strong><?php if ( ip_agev_deadline( $ag->ID ) ) : ?><em class="lp-tab-due">Richieste entro il <?php echo esc_html( ip_agev_deadline( $ag->ID ) ); ?></em><?php endif; ?><span><?php echo esc_html( ip_meta( 'dest', $ag->ID ) ); ?></span></th>
-									<td class="n"><?php echo $rata ? '<strong>' . esc_html( ip_eur( $rata ) ) . '</strong>' : '—'; ?></td>
-									<td class="n"><?php echo $retta ? esc_html( ip_eur( $retta ) ) : '—'; ?></td>
-								</tr>
-							<?php endforeach; ?>
-							</tbody>
-						</table>
+						<?php ip_agevolazioni( 6, array( 'no_std' => true, 'priced' => true, 'note' => false ) ); ?>
 						<p class="lp-tab-foot">Altre agevolazioni e convenzioni con enti e aziende: <a href="#richiedi" data-scroll-form>chiedici quale ti spetta</a>.</p>
 					</div>
 				</div>

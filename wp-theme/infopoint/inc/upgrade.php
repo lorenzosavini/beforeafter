@@ -52,6 +52,13 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '2.8.7', '<' ) ) {
+		// Barra di trasparenza in cima tolta su richiesta: l'identità resta in testata, piè di pagina e Chi siamo.
+		$o = get_option( 'ip_settings', array() );
+		$o = is_array( $o ) ? $o : array();
+		$o['disclosure_bar'] = '';
+		update_option( 'ip_settings', $o );
+	}
 	if ( version_compare( $v, '2.7.9', '<' ) ) {
 		ip_upgrade_279();
 		// Avviso in testata: tolta la frase «Non è l’Università: l’iscrizione si completa…».
