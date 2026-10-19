@@ -255,7 +255,8 @@ function ip_src_drop_phrases() {
 function ip_src_dropped( $html ) {
 	$t = mb_strtolower( preg_replace( '/\s+/u', ' ', ip_src_text( $html ) ) );
 	foreach ( ip_src_drop_phrases() as $ph ) {
-		if ( '' !== $ph && false !== mb_strpos( $t, $ph ) ) {
+		// «=testo» scarta solo i paragrafi che contengono esattamente quel testo.
+		if ( 0 === strpos( $ph, '=' ) ? trim( $t, " \t.:!" ) === trim( substr( $ph, 1 ), " \t.:!" ) : ( '' !== $ph && false !== mb_strpos( $t, $ph ) ) ) {
 			return true;
 		}
 	}
@@ -298,6 +299,15 @@ function ip_src_filter( $blocks, $keep = array(), $exclude = array() ) {
 		}
 		if ( preg_match( '#^<!-- wp:(paragraph|list-item)#', $b ) && ip_src_dropped( $b ) ) {
 			continue;
+		}
+		if ( preg_match( '#^<!-- wp:list\b#', $b ) ) {
+			// Voci di elenco scartate una per una; se non ne resta nessuna, via l'elenco.
+			$b = preg_replace_callback( '#<!-- wp:list-item[^>]*-->\s*<li[^>]*>.*?</li>\s*<!-- /wp:list-item -->\s*#su', function ( $m ) {
+				return ip_src_dropped( $m[0] ) ? '' : $m[0];
+			}, $b );
+			if ( false === strpos( $b, '<li' ) ) {
+				continue;
+			}
 		}
 		$out[] = $b;
 	}

@@ -52,6 +52,9 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '2.9.9', '<' ) ) {
+		ip_upgrade_299();
+	}
 	if ( version_compare( $v, '2.8.7', '<' ) ) {
 		// Barra di trasparenza in cima tolta su richiesta: l'identità resta in testata, piè di pagina e Chi siamo.
 		$o = get_option( 'ip_settings', array() );
@@ -401,6 +404,39 @@ function ip_upgrade_279() {
 		$e = strtr( $p->post_excerpt, $swap );
 		if ( $c !== $p->post_content || $e !== $p->post_excerpt ) {
 			wp_update_post( wp_slash( array( 'ID' => $p->ID, 'post_content' => $c, 'post_excerpt' => $e ) ) );
+		}
+	}
+}
+
+/**
+ * 2.9.9: niente coordinate bancarie dell'Ateneo (IBAN, intestazione,
+ * causale). Le frasi entrano tra quelle da non importare e i testi già
+ * presenti vengono ripuliti.
+ */
+function ip_upgrade_299() {
+	$o = get_option( 'ip_settings', array() );
+	$o = is_array( $o ) ? $o : array();
+	$cur  = isset( $o['sync_drop'] ) ? (string) $o['sync_drop'] : 'Vuoi iscriverti a due corsi';
+	$have = array_map( 'mb_strtolower', array_map( 'trim', explode( "\n", $cur ) ) );
+	foreach ( array( 'IBAN:', 'effettuato tramite bonifico bancario', 'bonifico bancario in favore di', 'causale di versamento', 'Per chi deve immatricolarsi: nome e cognome', 'matricola (obbligatoria)', '=ATTENZIONE', 'Hai bisogno di chiarimenti o supporto' ) as $ph ) {
+		if ( ! in_array( mb_strtolower( $ph ), $have, true ) ) {
+			$cur .= "\n" . $ph;
+		}
+	}
+	$o['sync_drop'] = trim( $cur );
+	update_option( 'ip_settings', $o );
+	ip_opt( 'ip_flush' );
+	if ( ! function_exists( 'ip_src_filter' ) ) {
+		return;
+	}
+	global $wpdb;
+	$ids = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_type IN ('page','corso','curriculum') AND post_status <> 'auto-draft' AND ( post_content LIKE '%IBAN:%' OR post_content LIKE '%ausale%' OR post_content LIKE '%bonifico bancario%' OR post_content LIKE '%ATTENZIONE%' OR post_content LIKE '%chiarimenti o supporto%' )" );
+	foreach ( $ids as $id ) {
+		$old = get_post_field( 'post_content', $id );
+		$new = ip_src_filter( $old );
+		if ( $new !== trim( $old ) && '' !== trim( $new ) ) {
+			$wpdb->update( $wpdb->posts, array( 'post_content' => $new ), array( 'ID' => $id ) );
+			clean_post_cache( $id );
 		}
 	}
 }

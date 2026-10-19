@@ -35,7 +35,7 @@ $from  = ip_price_from();
 	</div>
 </header>
 
-<div class="sec">
+<div class="sec sec-search">
 	<div class="wrap">
 		<?php
 		if ( $term && 'tipologia' === $term->taxonomy ) {

@@ -272,7 +272,18 @@
 			var kids = Array.prototype.slice.call(box.children), cur = null, intro = [];
 			kids.forEach(function (el) {
 				if (el.matches(widgets) || el.querySelector(widgets)) {
-					cur = null; /* Moduli, elenchi corsi, agevolazioni, contatti: sempre in vista, al loro posto. */
+					/* Moduli, elenchi corsi, passi, agevolazioni, contatti: sempre in vista, al loro posto.
+					   Se il titolo sopra era già diventato una tendina vuota, torna un titolo normale. */
+					if (cur && cur.children.length === 1) {
+						var h = d.createElement('h2');
+						if (cur.id) { h.id = cur.id; }
+						h.innerHTML = cur.firstChild.innerHTML;
+						var oi = h.querySelector('.acc-i'); if (oi) oi.remove();
+						box.insertBefore(h, cur);
+						box.removeChild(cur);
+						if (cur.open) { first = true; }
+					}
+					cur = null;
 					intro.stop = true;
 				} else if (el.tagName === 'H2') {
 					cur = d.createElement('details');

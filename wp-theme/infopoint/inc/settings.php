@@ -159,7 +159,7 @@ function ip_settings_fields() {
 				'sync_new'     => array( 'Corsi nuovi in modalità automatica', 'select', 'bozza', '', array( 'bozza' => 'Crea in bozza, li pubblico io', 'pubblica' => 'Pubblica subito' ) ),
 				'sync_retire'  => array( 'Corsi tolti dall’offerta', 'checkbox', '', 'In modalità automatica mette in bozza i corsi che non compaiono più nell’offerta ufficiale.' ),
 				'sync_email'   => array( 'Email per le notifiche', 'text', '', 'Vuoto = email dell’amministratore.' ),
-				'sync_drop'    => array( 'Frasi da non importare mai', 'textarea', 'Vuoi iscriverti a due corsi', 'Una per riga. Ogni paragrafo o voce di elenco che contiene una di queste frasi viene scartato da pagine, corsi e piani di studio, anche quando l’Ateneo aggiorna i testi.' ),
+				'sync_drop'    => array( 'Frasi da non importare mai', 'textarea', "Vuoi iscriverti a due corsi\nIBAN:\neffettuato tramite bonifico bancario\nbonifico bancario in favore di\ncausale di versamento\nPer chi deve immatricolarsi: nome e cognome\nmatricola (obbligatoria)\n=ATTENZIONE\nHai bisogno di chiarimenti o supporto", 'Una per riga (con «=» davanti: solo i paragrafi fatti esattamente di quel testo). Ogni paragrafo o voce di elenco che contiene una di queste frasi viene scartato da pagine, corsi e piani di studio, anche quando l’Ateneo aggiorna i testi.' ),
 				'sync_blocked' => array( 'Pagine e corsi ufficiali da non importare', 'textarea', '', 'Un indirizzo di unimarconi.it per riga. Si compila da solo quando eliminate una pagina o un corso preso dal sito ufficiale: non verrà più ricreato né riproposto. Togliete una riga per farlo tornare.' ),
 			),
 		),
