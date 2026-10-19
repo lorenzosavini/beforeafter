@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.9.1
+Version: 2.9.2
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -848,3 +848,30 @@ summary.has-i::after { top: 50% !important; transform: translateY(-50%); }
 }
 
 @media (min-width: 1341px) { .menu > li > a { padding-left: 6px; padding-right: 6px; font-size: .88rem; } .menu .menu-item-has-children > a::after { margin-left: 4px; } .brand-text small { max-width: 15em; } }
+
+/* Animazioni leggere ----------------------------------------------------- */
+@keyframes ip-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ip-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ip-zoom { from { transform: scale(1.06); } to { transform: scale(1); } }
+.rv { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1); }
+.rv.in { opacity: 1; transform: none; }
+.hero-text > *, .lp-hero-t > *, .phead-band .wrap > *, .phead-course .phead-main > * { animation: ip-up .7s cubic-bezier(.2, .7, .2, 1) both; }
+.hero-text > :nth-child(2), .lp-hero-t > :nth-child(2), .phead-band .wrap > :nth-child(2), .phead-course .phead-main > :nth-child(2) { animation-delay: .06s; }
+.hero-text > :nth-child(3), .lp-hero-t > :nth-child(3), .phead-band .wrap > :nth-child(3), .phead-course .phead-main > :nth-child(3) { animation-delay: .12s; }
+.hero-text > :nth-child(4), .lp-hero-t > :nth-child(4), .phead-band .wrap > :nth-child(4), .phead-course .phead-main > :nth-child(4) { animation-delay: .18s; }
+.hero-text > :nth-child(n+5), .lp-hero-t > :nth-child(n+5), .phead-band .wrap > :nth-child(n+5), .phead-course .phead-main > :nth-child(n+5) { animation-delay: .24s; }
+.hero-form, .lp-hero-f, .phead-img { animation: ip-up .8s .15s cubic-bezier(.2, .7, .2, 1) both; }
+.hero-photo .hero-bg, .lp-hero-img img { animation: ip-zoom 1.6s cubic-bezier(.2, .7, .2, 1) both; }
+.btn, .agev-cta, .lp-btn, .chip { transition: background-color .15s, border-color .15s, color .15s, transform .15s, box-shadow .15s; }
+.btn:hover, .agev-cta:hover, .lp-btn:hover { transform: translateY(-1px); }
+.btn:active, .agev-cta:active, .lp-btn:active { transform: translateY(0); }
+.agev-item, .lp-card, .card, .crows > li { transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1), box-shadow .2s, border-color .2s; }
+.agev-item.in:hover, .agev-item:not(.rv):hover, .lp-card:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(14, 38, 29, .12); }
+details > summary .acc-i { transition: background-color .2s, color .2s; }
+details[open] > :not(summary) { animation: ip-fade .35s ease both; }
+.menu .sub-menu a .mi, .sub-toggle::before { transition: background-color .15s, color .15s, transform .2s, margin .2s; }
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after { animation: none !important; transition: none !important; }
+	.rv { opacity: 1; transform: none; }
+}
+
