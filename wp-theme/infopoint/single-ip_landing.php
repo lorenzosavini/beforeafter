@@ -91,7 +91,7 @@ $head = function ( $title, $sub = '' ) {
 		<div class="lp-w lp-hero-in">
 			<div class="lp-hero-t">
 				<?php $k_txt = false !== strpos( $d['kicker'], ip_opt( 'brand' ) ) ? ip_role_label() : $d['kicker']; ?>
-				<p class="lp-badge-row"><span class="hero-badge"><?php echo esc_html( ip_opt( 'brand' ) ); ?></span> <?php echo esc_html( $k_txt ); ?></p>
+				<p class="lp-badge-row"><span class="hero-badge"><?php echo esc_html( ip_opt( 'brand' ) ); ?></span> <span class="lp-badge-t"><?php echo esc_html( $k_txt ); ?></span></p>
 				<h1>
 					<?php if ( $t_pre ) : ?><span class="lp-h1-pre"><?php echo esc_html( $t_pre ); ?></span><?php endif; ?>
 					<?php $h1 = ip_hl( $t_main, true ); echo false === strpos( $h1, 'class="hl"' ) ? '<span class="hl">' . $h1 . '</span>' : $h1; // phpcs:ignore ?>

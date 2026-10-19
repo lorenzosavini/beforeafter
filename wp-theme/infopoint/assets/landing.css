@@ -550,3 +550,10 @@
 .lp-logo { display: block; height: 50px; max-height: none; width: auto; max-width: 250px; object-fit: contain; }
 @media (max-width: 900px) { .lp-logo { height: 38px; max-width: 170px; } .lp .field input, .lp .field select, .lp .field textarea { font-size: 16px !important; } }
 @media (max-width: 760px) { .lp .row2 { grid-template-columns: 1fr; gap: 12px; } }
+
+/* Testi della hero centrati rispetto al modulo; etichetta e frase affiancate */
+@media (min-width: 901px) {
+	.lp-hero-in { align-items: center; }
+}
+.lp-badge-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; line-height: 1.4; }
+.lp-badge-row .lp-badge-t { flex: 1 1 260px; }
