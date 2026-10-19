@@ -35,8 +35,8 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 				</ul>
 			<?php endif; ?>
 			<div class="hero-actions">
-				<a class="btn btn-accent" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
-				<?php echo ip_phone_link( 'phone1', 'btn btn-line-light' ); // phpcs:ignore ?>
+				<?php echo ip_phone_link( 'phone1', 'btn btn-white' ); // phpcs:ignore ?>
+				<a class="btn btn-line-light" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
 			</div>
 			<?php if ( $price ) : ?>
 				<p class="hero-price">Retta da <strong><?php echo esc_html( $price ); ?> al mese</strong> con le agevolazioni dell’Ateneo<?php if ( $agev ) : ?> · <a href="<?php echo esc_url( $agev ); ?>">vedi tutte</a><?php endif; ?><?php echo ip_agev_deadline_text() ? '<br><small>' . esc_html( ip_agev_deadline_text() ) . '</small>' : ''; // phpcs:ignore ?></p>
