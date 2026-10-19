@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.8.1
+Version: 2.8.2
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -740,4 +740,38 @@ a.contact:hover { color: var(--brand); }
 	.phead-acts .btn { width: 100%; }
 	.phead-course .facts-dl div:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: 0; }
 }
+
+/* Agevolazioni: schede ricche su griglia larga (fino a quattro colonne). */
+.agev { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.prose .agev { width: min(1240px, calc(100vw - 40px)); margin: 28px 0; position: relative; left: 50%; transform: translateX(-50%); }
+.agev-item { position: relative; padding: 22px 22px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: 0 1px 2px rgba(14, 38, 29, .04); transition: transform .18s, box-shadow .18s, border-color .18s; }
+.agev-item:hover { transform: translateY(-3px); border-color: var(--brand-soft); box-shadow: 0 16px 34px rgba(14, 38, 29, .12); }
+.agev-item::before { content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--brand); }
+.agev-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.agev-ico { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; background: var(--brand-tint); color: var(--brand); flex: none; }
+.agev-top .agev-badge { display: inline-flex; align-items: center; gap: 5px; margin: 6px 0 0; font-size: .74rem; white-space: nowrap; }
+.prose .agev-item h3, .agev-item h3 { margin: 0 0 .35em; font-size: 1.12rem; line-height: 1.3; }
+.agev-dest { margin: 0 0 16px; font-size: .9rem; line-height: 1.5; color: var(--ink-2); }
+.agev-price { display: block; margin: auto 0 14px; padding: 14px 16px; border-radius: 12px; background: var(--soft); }
+.agev-price p { display: flex; align-items: baseline; gap: 4px; margin: 0; }
+.agev-price strong { font-size: 1.9rem; line-height: 1.1; color: var(--brand-dark); }
+.agev-price span { font-size: .92rem; color: var(--muted); }
+.agev-price small { display: block; margin-top: 2px; font-size: .84rem; color: var(--muted); }
+.agev-price .agev-ask { font-size: 1.1rem; font-weight: 700; color: var(--brand-dark); }
+.agev-save { display: inline-block; margin-top: 10px; padding: 3px 10px; border-radius: 999px; background: #fbf1ec; color: var(--accent); font-size: .8rem !important; font-weight: 700; }
+.agev-save.agev-full { background: var(--white); color: var(--muted); border: 1px solid var(--line); font-weight: 600; }
+.prose .agev-item details { margin: 0 0 14px; border: 0; border-top: 1px solid var(--line); }
+.prose .agev-item details summary { padding: 12px 30px 12px 0; font-size: .92rem; }
+.prose .agev-item details summary::after { top: 8px; font-size: 1.3rem; }
+.agev-cta { justify-content: center; margin-top: 0; padding: 11px 14px; border: 2px solid var(--accent); border-radius: var(--r-btn); color: var(--accent); }
+.agev-cta:hover { background: var(--accent); color: #fff; }
+@media (max-width: 760px) { .prose .agev { width: auto; left: 0; transform: none; } }
+
+/* Icone delle tendine. */
+summary.has-i { display: flex; align-items: center; gap: 12px; }
+.acc-i { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; border-radius: 9px; background: var(--brand-tint); color: var(--brand); }
+details[open] > summary .acc-i { background: var(--brand); color: #fff; }
+.agev-item summary .acc-i { width: 26px; height: 26px; border-radius: 7px; }
+.agev-item summary .acc-i svg { width: 15px; height: 15px; }
+summary.has-i::after { top: 50% !important; transform: translateY(-50%); }
 

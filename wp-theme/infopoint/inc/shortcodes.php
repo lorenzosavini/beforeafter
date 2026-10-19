@@ -112,27 +112,43 @@ function ip_agevolazioni( $limit = -1 ) {
 	if ( ! $q ) {
 		return;
 	}
+	$num = function ( $v ) {
+		return (float) str_replace( ',', '.', str_replace( '.', '', (string) $v ) );
+	};
+	$fees = ip_fees();
+	$std  = $num( $fees['std_retta'] );
 	echo '<div class="agev">';
 	foreach ( $q as $p ) {
+		$title = get_the_title( $p );
 		$retta = ip_meta( 'retta', $p->ID );
 		$rata  = ip_meta( 'rata', $p->ID );
 		$cond  = array_filter( array_map( 'trim', explode( "\n", ip_meta( 'cond', $p->ID ) ) ) );
 		$det   = ip_meta( 'det', $p->ID );
+		$save  = $std && $num( $retta ) > 0 && $num( $retta ) < $std ? $std - $num( $retta ) : 0;
+		$full  = $std && $num( $retta ) === $std;
 		?>
 		<article class="agev-item">
-			<header>
-				<h3><?php echo esc_html( get_the_title( $p ) ); ?></h3>
-				<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="agev-badge">Richieste entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
-				<p class="agev-dest"><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
-			</header>
-			<p class="agev-price">
+			<div class="agev-top">
+				<span class="agev-ico"><?php echo ip_icon( ip_agev_icon( $title ), 22 ); // phpcs:ignore ?></span>
+				<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="agev-badge"><?php echo ip_icon( 'calendar', 14 ); // phpcs:ignore ?> Entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
+			</div>
+			<h3><?php echo esc_html( $title ); ?></h3>
+			<p class="agev-dest"><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
+			<div class="agev-price<?php echo $rata || $retta ? '' : ' agev-price-none'; ?>">
 				<?php if ( $rata ) : ?>
-					<strong>€ <?php echo esc_html( $rata ); ?></strong><span>/mese</span>
-					<?php if ( $retta ) : ?><small>€ <?php echo esc_html( number_format( (float) $retta, 0, ',', '.' ) ); ?> l’anno</small><?php endif; ?>
+					<p><strong>€ <?php echo esc_html( $rata ); ?></strong><span>/mese</span></p>
+					<?php if ( $retta ) : ?><small>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?> l’anno</small><?php endif; ?>
 				<?php elseif ( $retta ) : ?>
-					<strong>€ <?php echo esc_html( number_format( (float) $retta, 0, ',', '.' ) ); ?></strong><span>/anno</span>
+					<p><strong>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?></strong><span>/anno</span></p>
+				<?php else : ?>
+					<p class="agev-ask">Importo su misura</p><small>Ti diciamo noi quanto paghi</small>
 				<?php endif; ?>
-			</p>
+				<?php if ( $save ) : ?>
+					<span class="agev-save">Risparmi € <?php echo esc_html( number_format( $save, 0, ',', '.' ) ); ?> l’anno</span>
+				<?php elseif ( $full ) : ?>
+					<span class="agev-save agev-full">Retta piena</span>
+				<?php endif; ?>
+			</div>
 			<?php if ( $cond ) : ?>
 				<details>
 					<summary>Condizioni</summary>
@@ -142,7 +158,7 @@ function ip_agevolazioni( $limit = -1 ) {
 			<?php elseif ( $det ) : ?>
 				<details><summary>Dettagli</summary><p class="agev-det"><?php echo nl2br( esc_html( $det ) ); ?></p></details>
 			<?php endif; ?>
-			<a class="agev-cta" href="#richiedi" data-scroll-form data-interest="<?php echo esc_attr( get_the_title( $p ) ); ?>">Verifica se ne hai diritto <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
+			<a class="agev-cta" href="#richiedi" data-scroll-form data-interest="<?php echo esc_attr( $title ); ?>">Verifica se ne hai diritto <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
 		</article>
 		<?php
 	}

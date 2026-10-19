@@ -21,6 +21,25 @@ function ip_icon( $name, $size = 20 ) {
 		'close'    => '<path d="M6 6l12 12M18 6 6 18"/>',
 		'search'   => '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
 		'doc'      => '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',
+		'user'     => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+		'users'    => '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6.5 6.5 0 0 1 3.5 6"/>',
+		'shield'   => '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+		'building' => '<path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6M8 11h.01M12 11h.01M16 11h.01"/>',
+		'cap'      => '<path d="m2 9 10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5M22 9v6"/>',
+		'trophy'   => '<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6"/>',
+		'heart'    => '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+		'gear'     => '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',
+		'euro'     => '<path d="M17 5.5a7 7 0 1 0 0 13M4 10h10M4 14h10"/>',
+		'star'     => '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+		'briefcase' => '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
+		'book'     => '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5M8 7h7"/>',
+		'percent'  => '<path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
+		'target'   => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+		'key'      => '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M14 9l2 2"/>',
+		'list'     => '<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
+		'question' => '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/>',
+		'info'     => '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
+		'calendar' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
 	);
 	if ( ! isset( $paths[ $name ] ) ) {
 		return '';
@@ -495,4 +514,44 @@ function ip_local_links( $html ) {
 	}, $html );
 }
 add_filter( 'the_content', 'ip_local_links', 99 );
+
+/**
+ * Icone delle tendine: stampate una volta in fondo alla pagina, lo script le
+ * mette a sinistra di ogni titolo secondo l'argomento (obiettivi, sbocchi,
+ * piani di studio, costi, domande…).
+ */
+add_action( 'wp_footer', function () {
+	echo '<template id="ip-acc-icons">';
+	foreach ( array( 'target', 'briefcase', 'book', 'doc', 'key', 'euro', 'check', 'list', 'pin', 'clock', 'calendar', 'question', 'info', 'cap', 'users', 'percent' ) as $n ) {
+		echo '<span data-i="' . esc_attr( $n ) . '">' . ip_icon( $n, 18 ) . '</span>'; // phpcs:ignore
+	}
+	echo '</template>';
+}, 5 );
+
+/** Icona di un'agevolazione, dal nome. */
+function ip_agev_icon( $title ) {
+	$map = array(
+		'/standard/i'                  => 'euro',
+		'/110 e lode/i'                => 'star',
+		'/continuit/i'                 => 'cap',
+		'/divisa|forze/i'              => 'shield',
+		'/pubblica amministrazione/i'  => 'building',
+		'/giovani/i'                   => 'user',
+		'/sport/i'                     => 'trophy',
+		'/docente|ata\b/i'            => 'book',
+		'/laureati/i'                  => 'cap',
+		'/famiglia/i'                  => 'users',
+		'/ingegner/i'                  => 'gear',
+		'/borse|disco/i'               => 'star',
+		'/disabilit/i'                 => 'heart',
+		'/prestito/i'                  => 'percent',
+		'/convenzion|enti\b/i'        => 'briefcase',
+	);
+	foreach ( $map as $re => $icon ) {
+		if ( preg_match( $re, $title ) ) {
+			return $icon;
+		}
+	}
+	return 'percent';
+}
 

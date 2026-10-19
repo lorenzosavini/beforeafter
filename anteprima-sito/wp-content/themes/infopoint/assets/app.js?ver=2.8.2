@@ -301,6 +301,37 @@
 		openHash();
 	})();
 
+	/* Icone a sinistra di ogni tendina del sito, scelte dall'argomento del titolo. */
+	var accIcons = d.getElementById('ip-acc-icons');
+	if (accIcons) {
+		var rules = [
+			[/obiettiv|finalit/, 'target'], [/sbocch|lavor|occupaz|profession/, 'briefcase'],
+			[/piano|piani|insegnament|curricul|programm/, 'book'], [/document|bando|bandi|regolament|modulist/, 'doc'],
+			[/accesso|requisit|ammission|titolo/, 'key'], [/cost|tass|rett|pagament|agevol|bonus|prezz|import|€/, 'euro'],
+			[/iscri|immatricol/, 'check'], [/condizion|dettagl/, 'list'], [/esam|sede|sedi/, 'pin'],
+			[/durata|tempo|orari/, 'clock'], [/scadenz|calendar|date/, 'calendar'], [/famigl|student/, 'users'],
+			[/riconosciment|cfu|credit/, 'percent'], [/laurea|master|corso|corsi/, 'cap']
+		];
+		var pickIcon = function (s) {
+			var t = s.textContent.toLowerCase().trim();
+			if (/\?$/.test(t)) return 'question';
+			for (var i = 0; i < rules.length; i++) { if (rules[i][0].test(t)) return rules[i][1]; }
+			return 'info';
+		};
+		d.querySelectorAll('details > summary').forEach(function (s) {
+			var det = s.parentNode;
+			if (det.classList.contains('more') || det.hasAttribute('data-region') || s.querySelector('.acc-i')) return;
+			var src = accIcons.content.querySelector('[data-i="' + pickIcon(s) + '"]');
+			if (!src) return;
+			var ic = d.createElement('span');
+			ic.className = 'acc-i';
+			ic.setAttribute('aria-hidden', 'true');
+			ic.innerHTML = src.innerHTML;
+			s.insertBefore(ic, s.firstChild);
+			s.classList.add('has-i');
+		});
+	}
+
 	/* Banner cookie */
 	var banner = d.querySelector('[data-consent]');
 	if (banner) {
