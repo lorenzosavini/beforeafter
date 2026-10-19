@@ -127,7 +127,7 @@ function ip_settings_fields() {
 				'form_button'  => array( 'Pulsante modulo informazioni', 'text', 'Invia la richiesta' ),
 				'privacy_text' => array( 'Testo consenso privacy', 'textarea', 'Ho letto l’informativa privacy.', 'Le parole «informativa privacy» diventano il link alla pagina scelta sopra. Segnaposto: {azienda}.' ),
 				'mkt_text'     => array( 'Testo consenso marketing', 'textarea', 'Voglio ricevere aggiornamenti su corsi, agevolazioni e scadenze (facoltativo).' ),
-				'exit_on'      => array( 'Banner quando il visitatore sta per uscire', 'checkbox', '1', 'Da computer compare quando il mouse va verso la chiusura della scheda; da telefono quando, dopo aver letto, si torna su di scatto. Una volta per visita, mai dopo una richiesta inviata.' ),
+				'exit_on'      => array( 'Banner quando il visitatore sta per uscire', 'checkbox', '1', 'Da computer compare quando il mouse va verso la chiusura della scheda (dopo 8 secondi sulla pagina); da telefono quando, dopo aver letto, si torna su di scatto. Una volta per visita e non per 30 giorni dopo una richiesta inviata. Per provarlo aggiungi <code>?prova-banner</code> all’indirizzo di una pagina e porta il mouse fuori dalla finestra, verso l’alto.' ),
 				'exit_mobile'  => array( 'Banner d’uscita anche da telefono', 'checkbox', '1' ),
 				'exit_title'   => array( 'Banner d’uscita: titolo', 'text', 'Prima di andare: *ti richiamiamo noi?*', 'Il testo tra asterischi viene evidenziato.' ),
 				'exit_text'    => array( 'Banner d’uscita: testo', 'textarea', 'Lascia nome e numero: un orientatore ti spiega costi, agevolazioni e tempi del percorso che ti interessa.' ),

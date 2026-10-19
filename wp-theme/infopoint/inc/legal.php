@@ -193,7 +193,7 @@ add_shortcode( 'ip_cookie', function () {
 				<?php if ( $gtm && ip_opt( 'consent_banner' ) ) : ?>
 					<tr><td><code>ip_consent</code> (localStorage)</td><td>Ricorda se hai accettato o rifiutato i cookie di statistica e pubblicità, per non chiedertelo a ogni pagina.</td><td>Finché non lo cancelli dal browser o non cambi scelta</td></tr>
 				<?php endif; ?>
-				<tr><td><code>ip_lead_sent</code> (localStorage)</td><td>Ricorda che hai già inviato una richiesta, per non mostrarti di nuovo l’invito a contattarci.</td><td>Finché non lo cancelli dal browser</td></tr>
+				<tr><td><code>ip_lead_sent</code> (localStorage)</td><td>Ricorda che hai già inviato una richiesta, per non mostrarti di nuovo l’invito a contattarci.</td><td>30 giorni dall’ultima richiesta</td></tr>
 				<tr><td><code>ip_exit</code> (sessionStorage)</td><td>Evita di mostrarti più di una volta l’invito a contattarci quando stai per lasciare la pagina.</td><td>Fino alla chiusura della scheda</td></tr>
 				<tr><td><code>wordpress_*</code>, <code>wp-settings-*</code></td><td>Solo per chi accede all’area riservata del sito (personale di <?php echo esc_html( $name ); ?>): mantengono l’accesso e le preferenze del pannello.</td><td>Sessione o fino a 1 anno</td></tr>
 			</tbody>

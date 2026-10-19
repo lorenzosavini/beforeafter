@@ -165,7 +165,7 @@
 		box.innerHTML = tpl.innerHTML.replace('{nome}', name ? ', ' + name.replace(/[<>&"]/g, '') : '');
 		box.classList.add('lead-done');
 		box.scrollIntoView({ block: 'center' });
-		store.set('ip_lead_sent', '1');
+		store.set('ip_lead_sent', String(Date.now()));
 		d.querySelectorAll('dialog[open]').forEach(function (x) { x.close(); });
 		dl.push({ event: 'lead_thank_you', lead_type: form.ip_type.value });
 	}
@@ -243,20 +243,24 @@
 	var exitDlg = d.querySelector('dialog[data-lp-exit]');
 	if (exitDlg && exitDlg.showModal) {
 		var ss = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return '1'; } }, set: function (k) { try { sessionStorage.setItem(k, '1'); } catch (e) {} } };
-		var armed = false;
+		// ?prova-banner nell'indirizzo: compare subito al primo segnale, anche se già visto o dopo una richiesta.
+		var test = /[?&]prova-banner/.test(location.search);
+		var armed = test;
+		var leadAge = Date.now() - (parseInt(store.get('ip_lead_sent'), 10) || 0);
 		var showExit = function (how) {
-			if (!armed || ss.get('ip_exit') || store.get('ip_lead_sent') || d.querySelector('dialog[open]')) return;
+			if (!armed || d.querySelector('dialog[open]')) return;
+			if (!test && (ss.get('ip_exit') || leadAge < 30 * 864e5)) return;
 			var f = d.activeElement;
 			if (f && f.closest && f.closest('form') && /INPUT|SELECT|TEXTAREA/.test(f.tagName)) return;
 			ss.set('ip_exit'); exitDlg.showModal(); dl.push({ event: 'exit_intent_shown', exit_trigger: how });
 		};
 		if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-			setTimeout(function () { armed = true; }, 8000);
+			if (!test) setTimeout(function () { armed = true; }, 8000);
 			d.addEventListener('mouseout', function (e) {
 				if (!e.relatedTarget && e.clientY <= 0) showExit('mouse');
 			});
 		} else if (exitDlg.hasAttribute('data-mobile') || d.body.classList.contains('lp')) {
-			setTimeout(function () { armed = true; }, 20000);
+			if (!test) setTimeout(function () { armed = true; }, 20000);
 			var lastY = window.scrollY, upY = lastY, upT = Date.now(), maxDepth = 0;
 			window.addEventListener('scroll', function () {
 				var y = window.scrollY, t = Date.now(), h = d.documentElement.scrollHeight - window.innerHeight;
