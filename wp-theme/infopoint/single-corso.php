@@ -92,9 +92,6 @@ while ( have_posts() ) :
 					</ul>
 				<?php endif; ?>
 
-				<?php if ( ip_meta( 'fonte' ) && false !== strpos( ip_meta( 'fonte' ), 'unimarconi.it' ) ) : ?>
-					<p class="source">Informazioni tratte dalla <a href="<?php echo esc_url( ip_meta( 'fonte' ) ); ?>" target="_blank" rel="noopener">scheda ufficiale del corso su unimarconi.it</a>, che fa fede in caso di differenze.</p>
-				<?php endif; ?>
 
 				<?php $faq = ip_meta_rows( 'faq', $id ); ?>
 				<?php if ( $faq ) : ?>

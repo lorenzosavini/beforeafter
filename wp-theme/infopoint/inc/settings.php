@@ -15,7 +15,7 @@ function ip_settings_fields() {
 			'fields' => array(
 				'brand'        => array( 'Nome del vostro marchio', 'text', '', 'Il nome del polo, con la sua presenza territoriale come da contratto (es. «Infopoint Lanciano»). La società che lo gestisce va in «Trasparenza» e non sostituisce questo nome. Non usare «UniMarconi» o «Università Marconi»: Google lo considera uso del marchio altrui. Se vuoto viene usato il titolo del sito.' ),
 				'city'         => array( 'Città', 'text', '', 'Usata nei testi (es. «… a Lanciano»).' ),
-				'disclaimer'   => array( 'Nota a piè di pagina', 'textarea', '{brand} è un {ruolo}, gestito da {azienda}. Questo non è il sito ufficiale dell’Ateneo: il sito ufficiale è www.unimarconi.it.', 'Segnaposto: {brand}, {azienda}, {ruolo}.' ),
+				'disclaimer'   => array( 'Nota a piè di pagina', 'textarea', '{brand} è un {ruolo}, gestito da {azienda}. Marchi e denominazioni dell’Università appartengono ai rispettivi titolari.', 'Segnaposto: {brand}, {azienda}, {ruolo}.' ),
 			),
 		),
 		'trasparenza' => array(
@@ -32,7 +32,7 @@ function ip_settings_fields() {
 				'partner_letter' => array( 'Lettera di autorizzazione dell’Ateneo (PDF)', 'url', '', 'Facoltativo. Se l’Ateneo è d’accordo a renderla pubblica, caricala nella Libreria media e incolla qui il link: compare nella pagina Chi siamo come prova verificabile.' ),
 				'partner_proof'  => array( 'Link alla pagina ufficiale UniMarconi che vi elenca', 'url', 'https://www.unimarconi.it/sedi-esami-e-poli-di-orientamento/', 'Prova pubblica e verificabile del rapporto con l’Ateneo (es. elenco dei poli di orientamento). Google la cerca quando valuta il ricorso.' ),
 				'disclosure_bar' => array( 'Avviso di trasparenza in cima a ogni pagina', 'checkbox', '1', 'Consigliato: rende evidente fin dal primo sguardo che il sito non è quello dell’Università.' ),
-				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un {ruolo}, gestito da {azienda} (P.IVA {piva}). Non è l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.', 'Segnaposto: {brand}, {azienda}, {piva}, {ruolo}. Usate la dicitura prevista dal contratto con l’Ateneo («centro di orientamento accreditato»).' ),
+				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un {ruolo}, gestito da {azienda} (P.IVA {piva}).', 'Segnaposto: {brand}, {azienda}, {piva}, {ruolo}. Usate la dicitura prevista dal contratto con l’Ateneo («centro di orientamento accreditato»).' ),
 				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', '', 'Facoltativo: mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
 			),
 		),

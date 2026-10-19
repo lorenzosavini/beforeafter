@@ -24,8 +24,8 @@ del nome dell'attività.
 
 - Avviso di trasparenza in cima a **ogni** pagina, landing comprese:
   «{nome del polo} è un centro di orientamento accreditato dall'Università
-  degli Studi Guglielmo Marconi, gestito da {ragione sociale}… Non è
-  l'Università…» con link a «Chi siamo».
+  degli Studi Guglielmo Marconi, gestito da {ragione sociale} (P.IVA …)»
+  con link a «Chi siamo».
 - Pagina **Chi siamo** generata con i dati di legge (ragione sociale, sede
   legale, P.IVA, REA, PEC, capitale), il rapporto con l'Ateneo, cosa fate e
   cosa *non* fate, link all'elenco ufficiale dei poli UniMarconi.
@@ -117,9 +117,8 @@ secondo rifiuto rende tutto più difficile: niente ricorsi «di prova».
 > utenti di trovarsi sul sito dell'Università. Lo abbiamo modificato:
 > - il sito è ora intestato al nostro marchio «…» e alla nostra società,
 >   con dati di legge completi in ogni pagina;
-> - in cima a ogni pagina e sopra ogni modulo un avviso spiega che non
->   siamo l'Università, che l'iscrizione si completa sui canali ufficiali
->   dell'Ateneo e che le tasse si pagano direttamente all'Università;
+> - in cima a ogni pagina un avviso indica chi gestisce il sito: il nome
+>   del polo, il rapporto con l'Ateneo, la società e la P.IVA;
 > - una pagina «Chi siamo» (<link>) descrive il nostro rapporto con
 >   l'Ateneo e cosa facciamo e non facciamo;
 > - non usiamo più logo e colori dell'Ateneo; le schede corso citano la

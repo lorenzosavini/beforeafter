@@ -601,7 +601,7 @@ function ip_import_pages() {
 			'excerpt' => 'Master online di I e II livello in management, marketing, diritto, sanità, comunicazione e tecnologie.',
 			'content' => $sc( '[ip_corsi tipologia="master-di-i-livello,master-di-ii-livello"]' )
 				. $h( 'I o II livello: quale scegliere' )
-				. $p( 'Il master di I livello è aperto a chi ha una laurea triennale; quello di II livello richiede una laurea magistrale, a ciclo unico o del vecchio ordinamento. Durata, crediti e costo di ciascun master sono nella sua scheda, aggiornata dal sito ufficiale.' )
+				. $p( 'Il master di I livello è aperto a chi ha una laurea triennale; quello di II livello richiede una laurea magistrale, a ciclo unico o del vecchio ordinamento. Durata, crediti e costo di ciascun master sono nella sua scheda.' )
 				. $p( 'Per alcune categorie di iscritti l’Ateneo prevede condizioni agevolate anche sui master: <a href="/convenzioni-e-agevolazioni/">vedi le agevolazioni</a>.' ),
 		),
 
@@ -618,7 +618,7 @@ function ip_import_pages() {
 			'template' => 'page-templates/sidebar-form.php',
 			'excerpt'  => 'I percorsi di formazione iniziale per ottenere l’abilitazione all’insegnamento nella scuola secondaria di primo e secondo grado (DPCM 4 agosto 2023).',
 			'content'  => $sc( '[ip_corsi tipologia="percorsi-abilitanti,specializzazione-sostegno" filtro="no"]' ) . "<!-- wp:group {\"className\":\"box\"} -->\n<div class=\"wp-block-group box\"><!-- wp:paragraph -->\n<p>Le iscrizioni seguono i bandi dell’Ateneo e restano aperte poche settimane. Lasciaci il tuo contatto: ti avvisiamo all’uscita del prossimo bando e verifichiamo con te quale percorso ti spetta.</p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:group -->\n\n"
-				. $p( 'Requisiti di accesso, posti disponibili, costi e calendario sono fissati da ciascun bando: li trovi aggiornati nella scheda di ogni percorso, presa dal sito ufficiale dell’Ateneo.' ),
+				. $p( 'Requisiti di accesso, posti disponibili, costi e calendario sono fissati da ciascun bando: li trovi aggiornati nella scheda di ogni percorso.' ),
 		),
 
 		'altri-corsi' => array(
@@ -649,7 +649,7 @@ function ip_import_pages() {
 
 		'convenzioni-e-agevolazioni' => array(
 			'title'   => 'Agevolazioni e convenzioni',
-			'excerpt' => 'Retta standard {retta_std}; con le agevolazioni dell’Ateneo si parte da {rata_min} al mese. Ecco a chi spettano e a quali condizioni, aggiornate dal sito ufficiale.',
+			'excerpt' => 'Retta standard {retta_std}; con le agevolazioni dell’Ateneo si parte da {rata_min} al mese. Ecco a chi spettano e a quali condizioni.',
 			'content' => $p( 'Tutte le agevolazioni economiche si applicano al momento dell’immatricolazione e non hanno effetto retroattivo. Ti confermiamo sempre l’importo esatto prima dell’iscrizione.' )
 				. $sc( '[ip_agevolazioni]' ),
 		),

@@ -456,3 +456,43 @@ function ip_hl_plain( $text ) {
 	return str_replace( '*', '', (string) $text );
 }
 
+/**
+ * Nessun rimando al sito dell'Ateneo: i link a unimarconi.it nei testi
+ * importati puntano alla pagina corrispondente di questo sito (se esiste)
+ * oppure diventano testo semplice. I documenti (PDF, Word…) restano e si
+ * aprono in un'altra finestra.
+ */
+function ip_local_url( $url ) {
+	static $map = null;
+	if ( null === $map ) {
+		global $wpdb;
+		$map  = array();
+		$rows = $wpdb->get_results( "SELECT m.post_id, m.meta_value FROM {$wpdb->postmeta} m JOIN {$wpdb->posts} p ON p.ID = m.post_id WHERE m.meta_key = '_ip_fonte' AND p.post_status = 'publish' AND p.post_type IN ('page','corso')" );
+		foreach ( $rows as $r ) {
+			$map[ ip_url_key( $r->meta_value ) ] = (int) $r->post_id;
+		}
+	}
+	$k = ip_url_key( $url );
+	return isset( $map[ $k ] ) ? get_permalink( $map[ $k ] ) : '';
+}
+
+function ip_url_key( $url ) {
+	$p = wp_parse_url( trim( $url ) );
+	return isset( $p['path'] ) ? trailingslashit( strtolower( $p['path'] ) ) : '/';
+}
+
+function ip_local_links( $html ) {
+	if ( false === stripos( (string) $html, 'unimarconi.it' ) ) {
+		return $html;
+	}
+	return preg_replace_callback( '#<a\b[^>]*\bhref=(["\'])(https?://(?:[a-z0-9-]+\.)*unimarconi\.it[^"\']*)\1[^>]*>(.*?)</a>#is', function ( $m ) {
+		$url = html_entity_decode( $m[2] );
+		if ( preg_match( '/\.(pdf|docx?|xlsx?|pptx?|zip)(\?|#|$)/i', $url ) ) {
+			return '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . $m[3] . '</a>';
+		}
+		$local = ip_local_url( $url );
+		return $local ? '<a href="' . esc_url( $local ) . '">' . $m[3] . '</a>' : $m[3];
+	}, $html );
+}
+add_filter( 'the_content', 'ip_local_links', 99 );
+

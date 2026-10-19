@@ -134,7 +134,7 @@ $head = function ( $title, $sub = '' ) {
 					'button'   => $o['pulsante'],
 				) );
 				?>
-				<p class="lp-assure">Gratuito e senza impegno · L’iscrizione si completa con l’Ateneo</p>
+				<p class="lp-assure">Gratuito e senza impegno · Ti seguiamo fino all’iscrizione</p>
 			</div>
 		</div>
 	</section>
@@ -154,7 +154,7 @@ $head = function ( $title, $sub = '' ) {
 			<?php $tabs = ip_lp_tabs( $d['content'] ); ?>
 			<section class="lp-sec">
 				<div class="lp-w">
-					<?php $head( 'Cosa studi in ' . $name, 'Dalla scheda ufficiale del corso, aggiornata automaticamente.' ); ?>
+					<?php $head( 'Cosa studi in ' . $name, 'Insegnamenti, piani di studio e sbocchi del corso.' ); ?>
 					<div class="lp-tabs" data-lp-tabs>
 						<div class="lp-tabs-nav" role="tablist">
 							<?php foreach ( $tabs as $i => $t ) : ?>
@@ -208,7 +208,7 @@ $head = function ( $title, $sub = '' ) {
 					<div class="lp-w lp-split">
 						<div class="lp-split-h">
 							<?php $head( 'Come funziona ' . $name ); ?>
-							<p class="lp-note">Importi e condizioni stabiliti dall’Università Marconi e aggiornati automaticamente dal sito ufficiale. Ti confermiamo l’importo esatto prima dell’iscrizione.</p>
+							<p class="lp-note">Importi e condizioni stabiliti dall’Università Marconi. Ti confermiamo l’importo esatto prima dell’iscrizione.</p>
 							<?php if ( ! ip_agev_deadline( $d['agev'] ) ) : ?><?php echo ip_agev_deadline_note( 'lp-due-note' ); // phpcs:ignore ?><?php endif; ?>
 							<a class="lp-btn lp-btn-line" href="#richiedi" data-scroll-form>Verifica se ne hai diritto</a>
 						</div>
@@ -279,7 +279,7 @@ $head = function ( $title, $sub = '' ) {
 								<?php if ( $fees['std_rata'] ) : ?><p><span>oppure</span><strong><?php echo esc_html( ip_eur( $fees['std_rata'] ) ); ?></strong> al mese</p><?php endif; ?>
 							</div>
 						<?php endif; ?>
-						<p class="lp-note">Rate senza costi aggiuntivi. Importi dell’Ateneo, aggiornati automaticamente dal sito ufficiale.</p>
+						<p class="lp-note">Rate senza costi aggiuntivi. Importi stabiliti dall’Ateneo.</p>
 						<?php echo ip_agev_deadline_note( 'lp-due-note' ); // phpcs:ignore ?>
 					</div>
 					<div>

@@ -52,6 +52,15 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '2.7.9', '<' ) ) {
+		ip_upgrade_279();
+		// Avviso in testata: tolta la frase «Non è l’Università: l’iscrizione si completa…».
+		$o = get_option( 'ip_settings', array() );
+		if ( is_array( $o ) && ! empty( $o['disclosure'] ) ) {
+			$o['disclosure'] = trim( preg_replace( '/\s*Non (?:è|siamo) l[’\']Università:[^.]*\./u', '', $o['disclosure'] ) );
+			update_option( 'ip_settings', $o );
+		}
+	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.
@@ -364,3 +373,28 @@ function ip_upgrade_274() {
 	update_option( 'ip_settings', $o );
 	ip_legal_pages();
 }
+
+/**
+ * 2.7.9: nessun rimando al sito ufficiale. Via la frase sul sito ufficiale
+ * dal piè di pagina e i «aggiornato dal sito ufficiale» dalle pagine.
+ */
+function ip_upgrade_279() {
+	$o = get_option( 'ip_settings', array() );
+	if ( is_array( $o ) && ! empty( $o['disclaimer'] ) ) {
+		$o['disclaimer'] = trim( preg_replace( '/\s*Questo non è il sito ufficiale.*?unimarconi\.it\.?/us', ' Marchi e denominazioni dell’Università appartengono ai rispettivi titolari.', $o['disclaimer'] ) );
+		update_option( 'ip_settings', $o );
+	}
+	$swap = array(
+		', aggiornata dal sito ufficiale.'      => '.',
+		', presa dal sito ufficiale dell’Ateneo.' => '.',
+		', aggiornate dal sito ufficiale.'      => '.',
+	);
+	foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'any', 'posts_per_page' => -1 ) ) as $p ) {
+		$c = strtr( $p->post_content, $swap );
+		$e = strtr( $p->post_excerpt, $swap );
+		if ( $c !== $p->post_content || $e !== $p->post_excerpt ) {
+			wp_update_post( wp_slash( array( 'ID' => $p->ID, 'post_content' => $c, 'post_excerpt' => $e ) ) );
+		}
+	}
+}
+

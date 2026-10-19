@@ -82,7 +82,7 @@ add_shortcode( 'ip_privacy', function () {
 		<?php if ( ip_opt( 'dpo' ) ) : ?>
 			<p>Responsabile della protezione dei dati (DPO): <?php echo esc_html( ip_opt( 'dpo' ) ); ?>.</p>
 		<?php endif; ?>
-		<p><strong>Non siamo l’Università.</strong> L’Università degli Studi Guglielmo Marconi tratta i dati di chi si immatricola come titolare autonomo, secondo la propria informativa pubblicata su <a href="https://www.unimarconi.it" target="_blank" rel="noopener">www.unimarconi.it</a>. Questa informativa riguarda solo i trattamenti svolti da <?php echo esc_html( $name ); ?>.</p>
+		<p><strong>Non siamo l’Università.</strong> L’Università degli Studi Guglielmo Marconi tratta i dati di chi si immatricola come titolare autonomo, secondo la propria informativa. Questa informativa riguarda solo i trattamenti svolti da <?php echo esc_html( $name ); ?>.</p>
 
 		<h2>2. Quali dati trattiamo</h2>
 		<ul>
@@ -220,7 +220,7 @@ add_shortcode( 'ip_cookie', function () {
 		<?php endif; ?>
 
 		<h2>Link a siti esterni</h2>
-		<p>I collegamenti a WhatsApp, Google Maps, unimarconi.it e ai social network portano a siti di terzi, che usano i propri cookie secondo le proprie informative. Nessuno di questi servizi viene caricato finché non fai clic sul collegamento.</p>
+		<p>I collegamenti a WhatsApp, Google Maps e ai social network portano a siti di terzi, che usano i propri cookie secondo le proprie informative. Nessuno di questi servizi viene caricato finché non fai clic sul collegamento.</p>
 
 		<h2>Come scegliere o cambiare idea</h2>
 		<?php if ( $gtm && ip_opt( 'consent_banner' ) ) : ?>

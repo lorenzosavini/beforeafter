@@ -30,7 +30,13 @@
 		if (nav) { nav.classList.remove('open'); if (toggle) toggle.setAttribute('aria-expanded', 'false'); }
 		var setI = a.getAttribute('data-set-interest');
 		var interest = a.getAttribute('data-interest');
-		if (setI) {
+		var preset = a.getAttribute('data-msg');
+		if (preset) {
+			var more2 = box.querySelector('details.more');
+			var msg2 = box.querySelector('textarea[name="ip_messaggio"]');
+			if (more2) more2.open = true;
+			if (msg2) msg2.value = preset;
+		} else if (setI) {
 			/* Landing: il corso scelto diventa l'interesse del modulo */
 			box.querySelectorAll('[data-interest-field]').forEach(function (f) { f.value = setI; });
 			box.querySelectorAll('[data-interest-label]').forEach(function (f) { f.textContent = setI; });
@@ -238,6 +244,57 @@
 	});
 	if (/[?&]grazie=/.test(location.search)) {
 		dl.push({ event: 'lead_thank_you', lead_type: new URLSearchParams(location.search).get('grazie') });
+	}
+
+	/* Schede lunghe da telefono (corsi, master, pagine con modulo a lato): ogni
+	   sezione «h2» diventa una tendina chiusa e l'introduzione si accorcia, così
+	   il modulo arriva subito dopo. Il testo resta tutto nella pagina. */
+	if (window.matchMedia && window.matchMedia('(max-width: 960px)').matches) {
+		var fold = function (box) {
+			var kids = Array.prototype.slice.call(box.children), cur = null, intro = [];
+			kids.forEach(function (el) {
+				if (el.matches('form, div.lead') || el.querySelector('form')) {
+					cur = null; /* I moduli restano sempre in vista, al loro posto. */
+					intro.stop = true;
+				} else if (el.tagName === 'H2') {
+					cur = d.createElement('details');
+					cur.className = 'm-sec';
+					if (el.id) { cur.id = el.id; }
+					var s = d.createElement('summary');
+					s.innerHTML = el.innerHTML;
+					cur.appendChild(s);
+					box.insertBefore(cur, el);
+					box.removeChild(el);
+				} else if (cur) {
+					cur.appendChild(el);
+				} else if (!el.classList.contains('ufficiale') && !intro.stop) {
+					intro.push(el);
+				}
+			});
+			if (!cur || !intro.length) return;
+			var wrap = d.createElement('div');
+			wrap.className = 'm-clamp';
+			box.insertBefore(wrap, intro[0]);
+			intro.forEach(function (el) { wrap.appendChild(el); });
+			if (wrap.scrollHeight < 340) { wrap.classList.add('open'); return; }
+			var more = d.createElement('button');
+			more.type = 'button';
+			more.className = 'm-more';
+			more.textContent = 'Continua a leggere';
+			more.addEventListener('click', function () { wrap.classList.add('open'); more.remove(); });
+			box.insertBefore(more, wrap.nextSibling);
+		};
+		d.querySelectorAll('.with-aside > .prose, .sec > .wrap.prose').forEach(function (pr) {
+			pr.querySelectorAll('.ufficiale').forEach(fold);
+			fold(pr);
+		});
+		/* Un link a una sezione chiusa (es. #piani-di-studio) la apre. */
+		var openHash = function () {
+			var t = location.hash && d.getElementById(location.hash.slice(1));
+			if (t && t.tagName === 'DETAILS') { t.open = true; t.scrollIntoView({ block: 'start' }); }
+		};
+		window.addEventListener('hashchange', openHash);
+		openHash();
 	}
 
 	/* Banner cookie */

@@ -290,7 +290,7 @@ add_shortcode( 'ip_chi_siamo', function () {
 						<div><dt><?php echo esc_html( $l ); ?></dt><dd><?php echo nl2br( esc_html( ip_opt( $k ) ) ); ?></dd></div>
 					<?php endif; ?>
 				<?php endforeach; ?>
-				<div><dt>Rapporto con l’Ateneo</dt><dd><?php echo esc_html( ucfirst( ip_opt( 'partner_role' ) ) ); ?><?php echo ip_opt( 'partner_since' ) ? ' (' . esc_html( ip_opt( 'partner_since' ) ) . ')' : ''; ?><?php if ( ip_opt( 'partner_proof' ) ) : ?>. <a href="<?php echo esc_url( ip_opt( 'partner_proof' ) ); ?>" target="_blank" rel="noopener">Elenco ufficiale dei poli UniMarconi</a><?php endif; ?><?php if ( ip_opt( 'partner_letter' ) ) : ?> · <a href="<?php echo esc_url( ip_opt( 'partner_letter' ) ); ?>" target="_blank" rel="noopener">Lettera di autorizzazione dell’Ateneo (PDF)</a><?php endif; ?></dd></div>
+				<div><dt>Rapporto con l’Ateneo</dt><dd><?php echo esc_html( ucfirst( ip_opt( 'partner_role' ) ) ); ?><?php echo ip_opt( 'partner_since' ) ? ' (' . esc_html( ip_opt( 'partner_since' ) ) . ')' : ''; ?><?php if ( ip_opt( 'partner_letter' ) ) : ?> · <a href="<?php echo esc_url( ip_opt( 'partner_letter' ) ); ?>" target="_blank" rel="noopener">Lettera di autorizzazione dell’Ateneo (PDF)</a><?php endif; ?></dd></div>
 			</dl>
 			<div class="whois-cols">
 				<section>
@@ -311,7 +311,7 @@ add_shortcode( 'ip_chi_siamo', function () {
 					</ul>
 				</section>
 			</div>
-			<p class="whois-note">Sito ufficiale dell’Università degli Studi Guglielmo Marconi: <a href="https://www.unimarconi.it" target="_blank" rel="noopener">www.unimarconi.it</a>. Marchi e denominazioni dell’Ateneo appartengono ai rispettivi titolari e sono citati per indicare il servizio offerto.</p>
+			<p class="whois-note">Marchi e denominazioni dell’Università degli Studi Guglielmo Marconi appartengono ai rispettivi titolari e sono citati per indicare il servizio offerto.</p>
 		</div>
 		<?php
 	} );
@@ -356,7 +356,7 @@ add_shortcode( 'ip_ufficiale', function ( $a ) {
 		return '';
 	}
 	$html = do_blocks( get_post_field( 'post_content', $id ) );
-	return '<div class="ufficiale">' . $html . '<p class="source">Testo dell’Università degli Studi Guglielmo Marconi, aggiornato automaticamente dal <a href="' . esc_url( $a['fonte'] ) . '" target="_blank" rel="noopener">sito ufficiale</a>.</p></div>';
+	return '<div class="ufficiale">' . ip_local_links( $html ) . '</div>';
 } );
 
 /**
