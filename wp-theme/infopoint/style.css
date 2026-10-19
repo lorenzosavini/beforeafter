@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.8.7
+Version: 2.8.8
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -822,3 +822,29 @@ summary.has-i::after { top: 50% !important; transform: translateY(-50%); }
 /* Sotto la banda il contenuto parte allineato al titolo; i testi restano a misura di lettura. */
 .phead-band + .sec > .wrap.prose { max-width: var(--wrap); }
 .phead-band + .sec > .wrap.prose > :is(p, ul, ol, h2, h3, h4, blockquote, table, details, .m-clamp, .m-more, .ufficiale, .faq, figure) { max-width: 760px; }
+
+/* Icone del menu principale e sottomenu chiusi nel menu del telefono. */
+.menu a { display: flex; align-items: center; gap: 7px; }
+.menu .mi { display: inline-flex; flex: none; color: var(--brand-mid); }
+.menu > li > a .mi .i { width: 15px; height: 15px; }
+.menu .sub-menu a { gap: 10px; }
+.menu .sub-menu .mi { width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 8px; background: var(--brand-tint); color: var(--brand); }
+.menu .sub-menu a:hover .mi { background: var(--brand); color: #fff; }
+.sub-toggle { display: none; }
+/* In testata le icone prendono il posto di telefono e pulsante (restano nella pagina, nella barra in basso e nei moduli). */
+@media (min-width: 1341px) { .nav-phone, .nav-cta { display: none !important; } .menu > li > a { padding-left: 7px; padding-right: 7px; gap: 6px; } }
+@media (max-width: 1340px) {
+	.menu > li { position: relative; }
+	.menu > li > a .mi { width: 32px; height: 32px; align-items: center; justify-content: center; border-radius: 9px; background: var(--brand-tint); color: var(--brand); }
+	.menu > li > a .mi .i { width: 17px; height: 17px; }
+	.menu a { gap: 12px; }
+	.menu > .menu-item-has-children > a { padding-right: 52px; }
+	.sub-toggle { display: block; position: absolute; right: 0; top: 6px; width: 44px; height: 44px; border: 0; border-radius: 10px; background: none; cursor: pointer; }
+	.sub-toggle::before { content: ""; position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -7px 0 0 -5px; border: solid var(--brand); border-width: 0 2px 2px 0; transform: rotate(45deg); transition: transform .2s, margin .2s; }
+	.menu > li.sub-open > .sub-toggle::before { margin-top: -2px; transform: rotate(-135deg); }
+	.menu .sub-menu { display: none; padding: 4px 0 8px 12px; }
+	.menu > li.sub-open > .sub-menu { display: block; }
+	.menu .sub-menu a { padding: 10px 0; font-size: .98rem; border-bottom: 0; }
+}
+
+@media (min-width: 1341px) { .menu > li > a { padding-left: 6px; padding-right: 6px; font-size: .88rem; } .menu .menu-item-has-children > a::after { margin-left: 4px; } .brand-text small { max-width: 15em; } }

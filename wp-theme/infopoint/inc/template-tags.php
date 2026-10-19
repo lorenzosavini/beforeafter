@@ -40,6 +40,9 @@ function ip_icon( $name, $size = 20 ) {
 		'question' => '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/>',
 		'info'     => '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
 		'calendar' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+		'globe'    => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+		'card'     => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+		'layers'   => '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
 	);
 	if ( ! isset( $paths[ $name ] ) ) {
 		return '';
@@ -591,4 +594,56 @@ function ip_page_band_pre( $id ) {
 	$parent = wp_get_post_parent_id( $id );
 	return $parent ? get_the_title( $parent ) : '';
 }
+
+/** Icona di una voce del menu principale, dal titolo. */
+function ip_menu_icon( $title ) {
+	$map = array(
+		'/stranier|ester/i'             => 'globe',
+		'/sedi/i'                       => 'pin',
+		'/requisit/i'                   => 'key',
+		'/riconosciment|cfu/i'          => 'percent',
+		'/tasse/i'                      => 'doc',
+		'/pagament/i'                   => 'card',
+		'/110 e lode/i'                 => 'building',
+		'/agevolazion|convenzion|cost/i' => 'euro',
+		'/sostegno/i'                   => 'heart',
+		'/abilitant/i'                  => 'check',
+		'/didattica/i'                  => 'book',
+		'/insegnant/i'                  => 'user',
+		'/master/i'                     => 'briefcase',
+		'/singol/i'                     => 'book',
+		'/doppia/i'                     => 'layers',
+		'/formazione/i'                 => 'target',
+		'/microcredenzial/i'            => 'star',
+		'/dottorat/i'                   => 'trophy',
+		'/altri corsi/i'                => 'list',
+		'/laurea|corsi di laurea/i'     => 'cap',
+		'/iscriv/i'                     => 'check',
+		'/chi siamo/i'                  => 'users',
+		'/contatt/i'                    => 'phone',
+	);
+	foreach ( $map as $re => $icon ) {
+		if ( preg_match( $re, $title ) ) {
+			return $icon;
+		}
+	}
+	return '';
+}
+
+// Icone nel menu principale (testata e menu a tendina del telefono).
+add_filter( 'nav_menu_item_title', function ( $title, $item, $args ) {
+	if ( empty( $args->theme_location ) || 'primary' !== $args->theme_location ) {
+		return $title;
+	}
+	$icon = ip_menu_icon( wp_strip_all_tags( $title ) );
+	return $icon ? '<span class="mi">' . ip_icon( $icon, 16 ) . '</span><span class="mt">' . $title . '</span>' : $title;
+}, 10, 3 );
+
+// Pulsante per aprire i sottomenu nel menu del telefono.
+add_filter( 'walker_nav_menu_start_el', function ( $out, $item, $depth, $args ) {
+	if ( ! empty( $args->theme_location ) && 'primary' === $args->theme_location && in_array( 'menu-item-has-children', (array) $item->classes, true ) ) {
+		$out .= '<button type="button" class="sub-toggle" aria-expanded="false" aria-label="Apri ' . esc_attr( wp_strip_all_tags( $item->title ) ) . '"></button>';
+	}
+	return $out;
+}, 10, 4 );
 

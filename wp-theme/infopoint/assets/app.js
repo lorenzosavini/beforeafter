@@ -19,6 +19,20 @@
 		});
 	}
 
+	/* Menu del telefono: sottomenu chiusi, si aprono con la freccia (uno alla volta). */
+	d.addEventListener('click', function (e) {
+		var b = e.target.closest('.sub-toggle');
+		if (!b) return;
+		var li = b.parentNode, open = !li.classList.contains('sub-open');
+		li.parentNode.querySelectorAll(':scope > li.sub-open').forEach(function (x) {
+			x.classList.remove('sub-open');
+			var t = x.querySelector(':scope > .sub-toggle');
+			if (t) t.setAttribute('aria-expanded', 'false');
+		});
+		li.classList.toggle('sub-open', open);
+		b.setAttribute('aria-expanded', open ? 'true' : 'false');
+	});
+
 	/* Link "Richiedi informazioni": portano al primo modulo della pagina */
 	d.addEventListener('click', function (e) {
 		var a = e.target.closest('[data-scroll-form]');
