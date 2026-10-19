@@ -210,3 +210,16 @@ add_filter( 'the_content', function ( $html ) {
 	}
 	return preg_replace( '#href="/(?!/)(?!' . preg_quote( ltrim( $base, '/' ), '#' ) . '/)#', 'href="' . $base . '/', $html );
 }, 20 );
+
+// Pagine tolte dal sito: il vecchio indirizzo porta a una pagina utile, non a un errore.
+add_action( 'template_redirect', function () {
+	if ( ! is_404() ) {
+		return;
+	}
+	$path = (string) wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '', PHP_URL_PATH );
+	if ( false !== strpos( $path, 'trasferimento-da-altro-ateneo' ) ) {
+		$to = ip_page_url( 'iscriversi' );
+		wp_safe_redirect( $to ? $to : home_url( '/' ), 301 );
+		exit;
+	}
+} );

@@ -26,7 +26,7 @@ endif;
 			<div class="ftr-brand">
 				<p class="ftr-name"><?php echo esc_html( ip_opt( 'brand' ) ); ?></p>
 				<?php if ( ip_opt( 'company_name' ) ) : ?>
-					<p><?php echo esc_html( ip_text( 'disclosure' ) ? ip_opt( 'company_name' ) . ' – ' . ip_opt( 'partner_role' ) : ip_opt( 'company_name' ) ); ?></p>
+					<p><?php echo esc_html( ip_role_label() . ( ip_opt( 'company_name' ) ? ', gestito da ' . ip_opt( 'company_name' ) : '' ) ); ?></p>
 				<?php endif; ?>
 				<?php if ( ip_opt( 'address' ) ) : ?>
 					<p><?php echo nl2br( esc_html( ip_opt( 'address' ) ) ); ?></p>

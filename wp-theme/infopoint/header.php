@@ -31,7 +31,7 @@ $wa      = ip_wa_href();
 				<span class="brand-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></span>
 				<span class="brand-text">
 					<strong><?php echo esc_html( ip_opt( 'brand' ) ); ?></strong>
-					<small>Agenzia partner UniMarconi<?php echo ip_opt( 'city' ) ? ' · ' . esc_html( ip_opt( 'city' ) ) : ''; ?></small>
+					<small><?php echo esc_html( ip_role_label() ); ?></small>
 				</span>
 			<?php endif; ?>
 		</a>

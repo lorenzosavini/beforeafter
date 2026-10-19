@@ -128,7 +128,7 @@ function ip_lp_data( $id ) {
 	$from = ip_price_from();
 	$d    = array(
 		'type'     => $type,
-		'kicker'   => ip_opt( 'brand' ) . ' · Agenzia partner UniMarconi',
+		'kicker'   => ip_opt( 'brand' ) . ' · ' . ip_role_label(),
 		'title'    => ip_opt( 'hero_title' ),
 		'sub'      => ip_opt( 'hero_text' ),
 		'points'   => array(),

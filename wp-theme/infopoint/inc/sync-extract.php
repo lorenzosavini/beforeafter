@@ -276,6 +276,10 @@ function ip_src_blocks( $x ) {
 		if ( '' === ip_src_text( $inner ) ) {
 			continue;
 		}
+		// La doppia iscrizione si spiega solo nella sua pagina, non nei rimandi sparsi.
+		if ( 'p' === $tag && preg_match( '/vuoi\s+iscriverti\s+a\s+due\s+corsi/iu', ip_src_text( $inner ) ) ) {
+			continue;
+		}
 		// Etichette di pulsanti rimaste senza pulsante (moduli dell'Ateneo).
 		if ( in_array( $tag, array( 'p', 'h2', 'h3', 'h4' ), true ) && preg_match( '/^(?:form|guarda una demo)?(?:\s*(?:compila il modulo|richiedi informazioni|scopri di più|clicca qui)\s*)+$/iu', ip_src_text( $inner ) ) ) {
 			continue;
@@ -542,7 +546,12 @@ function ip_src_curriculum( $url, $html ) {
 /**
  * Pagina informativa (tasse, immatricolazione…) → contenuto in blocchi.
  */
-function ip_src_page( $html ) {
+/**
+ * @param string   $html Pagina ufficiale.
+ * @param string[] $keep Se indicato, solo le sezioni (titoli h2) che iniziano
+ *                       con questi testi: il resto della pagina viene scartato.
+ */
+function ip_src_page( $html, $keep = array() ) {
 	$a = ip_src_body_start( $html );
 	$b = strpos( $html, '</main>' );
 	if ( false === $a || false === $b ) {
@@ -550,8 +559,14 @@ function ip_src_page( $html ) {
 	}
 	$clean = ip_src_clean( substr( $html, $a, $b - $a ) );
 	list( $intro, $secs ) = ip_src_sections( $clean['html'] );
-	$parts = '' !== ip_src_text( $intro ) ? array( ip_src_tidy( $intro ) ) : array();
+	$keep  = array_filter( (array) $keep );
+	$parts = '' !== ip_src_text( $intro ) && ! $keep ? array( ip_src_tidy( $intro ) ) : array();
 	foreach ( $secs as $s ) {
+		if ( $keep && ! array_filter( $keep, function ( $k ) use ( $s ) {
+			return 0 === mb_stripos( $s[0], $k );
+		} ) ) {
+			continue;
+		}
 		if ( preg_match( '/contatt|per informazioni|informazioni$|link utili|orari|segreteria|ufficio|^$/iu', $s[0] ) ) {
 			continue;
 		}

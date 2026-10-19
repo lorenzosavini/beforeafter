@@ -1,4 +1,4 @@
-# Google Ads per un'agenzia partner UniMarconi
+# Google Ads per un centro di orientamento accreditato UniMarconi
 
 Guida pratica per ZDM S.r.l. dopo la sospensione per «Pratiche commerciali
 scorrette» e in vista dell'aggiornamento del 19 ottobre 2026 sui requisiti
@@ -9,9 +9,9 @@ del nome dell'attività.
 1. **Il nome dell'attività negli annunci deve essere il vostro**, non quello
    dell'Ateneo. L'aggiornamento di ottobre 2026 lo dice esplicitamente:
    rivenditori, intermediari e affiliati *non* possono usare come nome
-   dell'attività il marchio di ciò che offrono. Quindi: «ZDM S.r.l.» o un
-   vostro marchio (es. «ZDM Orientamento»), mai «UniMarconi» o «Università
-   Marconi».
+   dell'attività il marchio di ciò che offrono. Quindi: il nome del polo
+   («Infopoint Lanciano», come da contratto con l'Ateneo) o la società che lo
+   gestisce («ZDM S.r.l.»), mai «UniMarconi» o «Università Marconi».
 2. **Il sito non deve poter essere scambiato per quello ufficiale.** La
    sospensione per pratiche commerciali scorrette scatta quando un utente
    può credere di essere sul sito dell'Università: stesso logo, stessi
@@ -23,7 +23,8 @@ del nome dell'attività.
 ## Cosa fa già il tema (versione 2.1)
 
 - Avviso di trasparenza in cima a **ogni** pagina, landing comprese:
-  «{marchio} è un servizio di {ragione sociale}, agenzia partner… Non siamo
+  «{nome del polo} è un centro di orientamento accreditato dall'Università
+  degli Studi Guglielmo Marconi, gestito da {ragione sociale}… Non è
   l'Università…» con link a «Chi siamo».
 - Pagina **Chi siamo** generata con i dati di legge (ragione sociale, sede
   legale, P.IVA, REA, PEC, capitale), il rapporto con l'Ateneo, cosa fate e
@@ -68,7 +69,7 @@ cliente Google Ads tramite il modulo di autorizzazione marchi di Google (lo
 compila il titolare del marchio, non voi). Chiedete anche una **lettera su
 carta intestata** che confermi la partnership: vi servirà nel ricorso.
 Senza autorizzazione, scrivete annunci descrittivi: «Lauree online
-riconosciute – Orientamento gratuito – ZDM Orientamento».
+riconosciute – Orientamento gratuito – Infopoint Lanciano».
 
 ## Piano per il ricorso (una volta sola, fatto bene)
 
@@ -99,16 +100,16 @@ secondo rifiuto rende tutto più difficile: niente ricorsi «di prova».
    restano agli atti della pratica.
 5. **Presentate il ricorso dal Centro norme**, spiegando cosa avete
    cambiato e allegando tutto. Negli annunci, da quel momento, il nome
-   attività è «ZDM S.r.l.» (o «ZDM Orientamento»), mai «UniMarconi».
+   attività è «ZDM S.r.l.» (o «Infopoint Lanciano»), mai «UniMarconi».
 
 ### Bozza del testo (da adattare)
 
 > Oggetto: nuovo ricorso – account 761-818-9109 – Pratiche commerciali
 > scorrette
 >
-> Siamo ZDM S.r.l. (P.IVA …), agenzia partner dell'Università degli Studi
-> Guglielmo Marconi per l'orientamento e l'assistenza alle iscrizioni, in
-> virtù dell'accordo del … (allegato). Il nostro polo è elencato sul sito
+> Siamo ZDM S.r.l. (P.IVA …), società che gestisce l'Infopoint Lanciano,
+> centro di orientamento accreditato dall'Università degli Studi Guglielmo
+> Marconi, in virtù dell'accordo del … (allegato). Il nostro polo è elencato sul sito
 > ufficiale dell'Ateneo: <link>.
 >
 > Comprendiamo che il nostro sito precedente poteva far credere agli

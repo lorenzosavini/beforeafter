@@ -66,7 +66,7 @@ $head = function ( $title, $sub = '' ) {
 				<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'lp-logo', 'alt' => esc_attr( ip_opt( 'brand' ) ), 'loading' => 'eager' ) ); ?>
 			<?php else : ?>
 				<span class="lp-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></span>
-				<span class="lp-brand-t"><strong><?php echo esc_html( ip_opt( 'brand' ) ); ?></strong><small>Agenzia partner Università Marconi<?php echo ip_opt( 'city' ) ? ' · ' . esc_html( ip_opt( 'city' ) ) : ''; ?></small></span>
+				<span class="lp-brand-t"><strong><?php echo esc_html( ip_opt( 'brand' ) ); ?></strong><small><?php echo esc_html( ip_role_label() ); ?></small></span>
 			<?php endif; ?>
 		</span>
 		<div class="lp-top-act">
@@ -115,6 +115,7 @@ $head = function ( $title, $sub = '' ) {
 				<?php endif; ?>
 				<?php if ( $d['price'] && 'agevolazione' !== $d['type'] ) : ?>
 					<p class="lp-price"><?php echo wp_kses( $d['price'], array( 'strong' => array() ) ); ?></p>
+					<?php if ( false !== strpos( $d['price'], 'agevolazioni' ) ) : ?><?php echo ip_agev_deadline_note( 'lp-due-note' ); // phpcs:ignore ?><?php endif; ?>
 				<?php endif; ?>
 			</div>
 
@@ -206,6 +207,7 @@ $head = function ( $title, $sub = '' ) {
 						<div class="lp-split-h">
 							<?php $head( 'Come funziona ' . $name ); ?>
 							<p class="lp-note">Importi e condizioni stabiliti dall’Università Marconi e aggiornati automaticamente dal sito ufficiale. Ti confermiamo l’importo esatto prima dell’iscrizione.</p>
+							<?php if ( ! ip_agev_deadline( $d['agev'] ) ) : ?><?php echo ip_agev_deadline_note( 'lp-due-note' ); // phpcs:ignore ?><?php endif; ?>
 							<a class="lp-btn lp-btn-line" href="#richiedi" data-scroll-form>Verifica se ne hai diritto</a>
 						</div>
 						<div>
@@ -276,6 +278,7 @@ $head = function ( $title, $sub = '' ) {
 							</div>
 						<?php endif; ?>
 						<p class="lp-note">Rate senza costi aggiuntivi. Importi dell’Ateneo, aggiornati automaticamente dal sito ufficiale.</p>
+						<?php echo ip_agev_deadline_note( 'lp-due-note' ); // phpcs:ignore ?>
 					</div>
 					<div>
 						<?php
@@ -296,7 +299,7 @@ $head = function ( $title, $sub = '' ) {
 								$shown++;
 								?>
 								<tr>
-									<th scope="row"><strong><?php echo esc_html( html_entity_decode( $ag->post_title, ENT_QUOTES, 'UTF-8' ) ); ?></strong><span><?php echo esc_html( ip_meta( 'dest', $ag->ID ) ); ?></span></th>
+									<th scope="row"><strong><?php echo esc_html( html_entity_decode( $ag->post_title, ENT_QUOTES, 'UTF-8' ) ); ?></strong><?php if ( ip_agev_deadline( $ag->ID ) ) : ?><em class="lp-tab-due">Richieste entro il <?php echo esc_html( ip_agev_deadline( $ag->ID ) ); ?></em><?php endif; ?><span><?php echo esc_html( ip_meta( 'dest', $ag->ID ) ); ?></span></th>
 									<td class="n"><?php echo $rata ? '<strong>' . esc_html( ip_eur( $rata ) ) . '</strong>' : '—'; ?></td>
 									<td class="n"><?php echo $retta ? esc_html( ip_eur( $retta ) ) : '—'; ?></td>
 								</tr>

@@ -416,3 +416,7 @@
 	/* Su telefono il modulo arriva prima: punti e prezzo restano nelle sezioni sotto. */
 	.lp-hero .lp-pts, .lp-hero .lp-price { display: none; }
 }
+/* Scadenze delle agevolazioni */
+.lp-tab-due { display: block; width: fit-content; margin: 5px 0 0; padding: 2px 8px; border-radius: 4px; background: #fbf3ef; border: 1px solid #e3c9bd; font-size: .76rem; font-style: normal; font-weight: 700; color: #8a2a0c; }
+.lp-due-note { margin: 12px 0 0; padding: 9px 12px; border-left: 3px solid var(--accent); background: #fbf3ef; font-size: .86rem; line-height: 1.45; color: #5c2009; }
+.lp-sec .lp-due-note { margin: 0 0 22px; }

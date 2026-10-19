@@ -122,6 +122,7 @@ function ip_agevolazioni( $limit = -1 ) {
 		<article class="agev-item">
 			<header>
 				<h3><?php echo esc_html( get_the_title( $p ) ); ?></h3>
+				<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="agev-badge">Richieste entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
 				<p class="agev-dest"><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
 			</header>
 			<p class="agev-price">
@@ -146,6 +147,7 @@ function ip_agevolazioni( $limit = -1 ) {
 		<?php
 	}
 	echo '</div>';
+	echo ip_agev_deadline_note(); // phpcs:ignore
 }
 
 add_shortcode( 'ip_sedi', function () {
@@ -281,8 +283,8 @@ add_shortcode( 'ip_chi_siamo', function () {
 		<div class="whois">
 			<p class="whois-lead"><?php echo esc_html( ip_text( 'disclosure' ) ); ?></p>
 			<dl class="whois-dl">
-				<div><dt>Marchio</dt><dd><?php echo esc_html( ip_opt( 'brand' ) ); ?></dd></div>
-				<div><dt>Ragione sociale</dt><dd><?php echo esc_html( $azienda ); ?></dd></div>
+				<div><dt>Denominazione del polo</dt><dd><?php echo esc_html( ip_opt( 'brand' ) ); ?></dd></div>
+				<div><dt>Gestito da</dt><dd><?php echo esc_html( $azienda ); ?></dd></div>
 				<?php foreach ( array( 'legal_address' => 'Sede legale', 'address' => 'Sede operativa', 'vat' => 'Partita IVA', 'rea' => 'REA', 'capital' => 'Capitale sociale', 'pec' => 'PEC', 'email' => 'Email', 'phone1' => 'Telefono' ) as $k => $l ) : ?>
 					<?php if ( ip_opt( $k ) ) : ?>
 						<div><dt><?php echo esc_html( $l ); ?></dt><dd><?php echo nl2br( esc_html( ip_opt( $k ) ) ); ?></dd></div>
@@ -329,8 +331,9 @@ function ip_agevolazioni_table( $limit = -1 ) {
 		$retta = ip_meta( 'retta', $p->ID );
 		$rata  = ip_meta( 'rata', $p->ID );
 		printf(
-			'<tr><th scope="row">%s</th><td>%s</td><td class="num">%s</td><td class="num">%s</td><td class="act"><a href="#richiedi" data-scroll-form data-interest="%s">Verifica</a></td></tr>',
+			'<tr><th scope="row">%s%s</th><td>%s</td><td class="num">%s</td><td class="num">%s</td><td class="act"><a href="#richiedi" data-scroll-form data-interest="%s">Verifica</a></td></tr>',
 			esc_html( get_the_title( $p ) ),
+			ip_agev_deadline( $p->ID ) ? '<span class="agev-badge">Entro il ' . esc_html( ip_agev_deadline( $p->ID ) ) . '</span>' : '',
 			esc_html( ip_meta( 'dest', $p->ID ) ),
 			$rata ? '<strong>€ ' . esc_html( $rata ) . '</strong>' : '—',
 			$retta ? '€ ' . esc_html( number_format( (float) $retta, 0, ',', '.' ) ) : '—',
@@ -338,6 +341,7 @@ function ip_agevolazioni_table( $limit = -1 ) {
 		);
 	}
 	echo '</tbody></table></div>';
+	echo ip_agev_deadline_note(); // phpcs:ignore
 }
 
 /**

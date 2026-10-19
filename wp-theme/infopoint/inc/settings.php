@@ -13,9 +13,9 @@ function ip_settings_fields() {
 		'identita'    => array(
 			'title'  => 'Identità',
 			'fields' => array(
-				'brand'        => array( 'Nome del vostro marchio', 'text', '', 'Il <strong>vostro</strong> nome commerciale (es. «ZDM Orientamento»), lo stesso da usare come nome dell’attività in Google Ads. Non usare «UniMarconi» o «Università Marconi»: Google lo considera uso del marchio altrui. Se vuoto viene usato il titolo del sito.' ),
-				'city'         => array( 'Città', 'text', '', 'Usata nei testi (es. «… a Pescara»).' ),
-				'disclaimer'   => array( 'Nota a piè di pagina', 'textarea', '{brand} è un servizio di {azienda}, agenzia partner dell’Università degli Studi Guglielmo Marconi per l’orientamento e l’assistenza alle iscrizioni. Questo non è il sito ufficiale dell’Ateneo: il sito ufficiale è www.unimarconi.it.', 'Segnaposto: {brand}, {azienda}.' ),
+				'brand'        => array( 'Nome del vostro marchio', 'text', '', 'Il nome del polo, con la sua presenza territoriale come da contratto (es. «Infopoint Lanciano»). La società che lo gestisce va in «Trasparenza» e non sostituisce questo nome. Non usare «UniMarconi» o «Università Marconi»: Google lo considera uso del marchio altrui. Se vuoto viene usato il titolo del sito.' ),
+				'city'         => array( 'Città', 'text', '', 'Usata nei testi (es. «… a Lanciano»).' ),
+				'disclaimer'   => array( 'Nota a piè di pagina', 'textarea', '{brand} è un {ruolo}, gestito da {azienda}. Questo non è il sito ufficiale dell’Ateneo: il sito ufficiale è www.unimarconi.it.', 'Segnaposto: {brand}, {azienda}, {ruolo}.' ),
 			),
 		),
 		'trasparenza' => array(
@@ -27,13 +27,13 @@ function ip_settings_fields() {
 				'rea'            => array( 'Numero REA', 'text', '' ),
 				'pec'            => array( 'PEC', 'text', '' ),
 				'capital'        => array( 'Capitale sociale', 'text', '', 'Es. € 10.000 i.v.' ),
-				'partner_role'   => array( 'Ruolo rispetto all’Ateneo', 'text', 'agenzia partner dell’Università degli Studi Guglielmo Marconi per l’orientamento e l’assistenza alle iscrizioni' ),
+				'partner_role'   => array( 'Ruolo rispetto all’Ateneo', 'text', 'centro di orientamento accreditato dall’Università degli Studi Guglielmo Marconi', 'Come indicato nel contratto con l’Ateneo. Non usare «agenzia partner».' ),
 				'partner_since'  => array( 'Riferimento dell’accordo', 'text', '', 'Es. «accordo di collaborazione in vigore dal 2021». Mostrato nella pagina Chi siamo.' ),
 				'partner_letter' => array( 'Lettera di autorizzazione dell’Ateneo (PDF)', 'url', '', 'Facoltativo. Se l’Ateneo è d’accordo a renderla pubblica, caricala nella Libreria media e incolla qui il link: compare nella pagina Chi siamo come prova verificabile.' ),
 				'partner_proof'  => array( 'Link alla pagina ufficiale UniMarconi che vi elenca', 'url', 'https://www.unimarconi.it/sedi-esami-e-poli-di-orientamento/', 'Prova pubblica e verificabile del rapporto con l’Ateneo (es. elenco dei poli di orientamento). Google la cerca quando valuta il ricorso.' ),
 				'disclosure_bar' => array( 'Avviso di trasparenza in cima a ogni pagina', 'checkbox', '1', 'Consigliato: rende evidente fin dal primo sguardo che il sito non è quello dell’Università.' ),
-				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un servizio di {azienda} (P.IVA {piva}), {ruolo}. Non siamo l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.', 'Segnaposto: {brand}, {azienda}, {piva}, {ruolo}. Scrivete «partner autorizzato» solo se avete un’autorizzazione scritta dell’Ateneo.' ),
-				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', 'Stai contattando {azienda}, agenzia partner. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.', 'Mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
+				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un {ruolo}, gestito da {azienda} (P.IVA {piva}). Non è l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.', 'Segnaposto: {brand}, {azienda}, {piva}, {ruolo}. Usate la dicitura prevista dal contratto con l’Ateneo («centro di orientamento accreditato»).' ),
+				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', 'Stai contattando {brand}, gestito da {azienda}. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.', 'Mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
 			),
 		),
 		'contatti'    => array(
@@ -60,7 +60,7 @@ function ip_settings_fields() {
 		'home'        => array(
 			'title'  => 'Home page',
 			'fields' => array(
-				'hero_eyebrow' => array( 'Occhiello sopra il titolo', 'text', '', 'Vuoto = «{vostro marchio} · Agenzia partner UniMarconi».' ),
+				'hero_eyebrow' => array( 'Occhiello sopra il titolo', 'text', '', 'Vuoto = «{nome del polo} · Centro di orientamento accreditato dall’Università Guglielmo Marconi».' ),
 				'hero_image'   => array( 'Foto di copertina', 'image', '', 'Grande foto dietro al titolo. Vuoto = copertina del primo corso in evidenza.' ),
 				'hero_title'   => array( 'Titolo principale', 'text', 'Iscriviti all’Università Marconi con un orientatore al tuo fianco' ),
 				'hero_text'    => array( 'Sottotitolo', 'textarea', 'Lauree triennali, magistrali e master online con esami in presenza. Ti aiutiamo a scegliere il corso, verifichiamo gratis i crediti già maturati e seguiamo con te l’immatricolazione.' ),
@@ -143,7 +143,7 @@ function ip_settings_fields() {
 			'title'  => 'Landing',
 			'fields' => array(
 				'lp_team_title' => array( 'Riquadro persone: titolo', 'text', 'Chi ti segue' ),
-				'lp_team_text'  => array( 'Riquadro persone: testo', 'textarea', 'Siamo {azienda}, {ruolo}. Ti seguiamo al telefono, su WhatsApp o di persona in sede, dalla scelta del corso all’immatricolazione. La consulenza è gratuita.' ),
+				'lp_team_text'  => array( 'Riquadro persone: testo', 'textarea', '{brand} è un {ruolo}, gestito da {azienda}. Ti seguiamo al telefono, su WhatsApp o di persona in sede, dalla scelta del corso all’immatricolazione. La consulenza è gratuita.' ),
 				'lp_team_photo' => array( 'Foto della sede o del gruppo', 'image', '', 'Una foto vera della vostra sede o delle persone vale più di qualsiasi testo. Vuoto = riquadro senza foto.' ),
 				'lp_team'       => array( 'Le persone che rispondono', 'repeater', array(), 'Facoltativo: nome, ruolo e foto (ritratto quadrato).', array( 'nome' => array( 'Nome', 'text' ), 'ruolo' => array( 'Ruolo', 'text' ), 'foto' => array( 'Foto', 'media' ) ) ),
 			),
@@ -206,7 +206,7 @@ function ip_default_faq() {
 		array( 'domanda' => 'La laurea online UniMarconi ha lo stesso valore di una laurea tradizionale?', 'risposta' => 'Sì. L’Università degli Studi Guglielmo Marconi è un ateneo riconosciuto dal Ministero dell’Università e della Ricerca dal 2004. I titoli hanno pieno valore legale: valgono per i concorsi pubblici, per l’accesso a master e abilitazioni e per l’iscrizione agli ordini professionali, dove previsto dal corso.' ),
 		array( 'domanda' => 'Dove si sostengono gli esami?', 'risposta' => 'Gli esami si svolgono in presenza, nelle sedi d’esame autorizzate distribuite in tutta Italia. Prenoti l’appello dalla piattaforma MyUnimarconi e scegli la sede più comoda.' ),
 		array( 'domanda' => 'Quando posso iscrivermi? Serve un test d’ingresso?', 'risposta' => 'Ai corsi di laurea ad accesso libero ci si iscrive in qualsiasi periodo dell’anno, senza test d’ingresso. Dopo l’immatricolazione è previsto solo un test orientativo non selettivo.' ),
-		array( 'domanda' => 'Quanto costa?', 'risposta' => 'La retta standard dei corsi di laurea è di {retta_std}, comprensiva di diritti di segreteria e tasse d’esame. Con le agevolazioni dell’Ateneo si parte da {rata_min} al mese. Tassa regionale e tassa di laurea sono a parte. Gli importi e le condizioni aggiornati sono nella pagina delle agevolazioni.' ),
+		array( 'domanda' => 'Quanto costa?', 'risposta' => 'La retta standard dei corsi di laurea è di {retta_std}, comprensiva di diritti di segreteria e tasse d’esame. Con le agevolazioni dell’Ateneo si parte da {rata_min} al mese. {scadenze} Tassa regionale e tassa di laurea sono a parte. Gli importi e le condizioni aggiornati sono nella pagina delle agevolazioni.' ),
 		array( 'domanda' => 'Lavoro: riuscirò a seguire le lezioni?', 'risposta' => 'Videolezioni e materiali sono disponibili sulla piattaforma 24 ore su 24 e non c’è obbligo di frequenza. È possibile anche l’iscrizione a tempo parziale.' ),
 		array( 'domanda' => 'Che cosa fa l’infopoint e quanto costa la consulenza?', 'risposta' => 'Siamo un punto informativo per l’orientamento e le iscrizioni all’Università Marconi: ti aiutiamo a scegliere il corso, chiediamo per te la valutazione dei crediti, seguiamo l’immatricolazione e restiamo un riferimento durante il percorso. La consulenza è gratuita.' ),
 	);
@@ -303,13 +303,15 @@ function ip_text( $key ) {
 	if ( ! ip_opt( 'vat' ) ) {
 		$t = preg_replace( '/\s*\(P\.?\s?IVA \{piva\}\)/i', '', $t );
 	}
-	return strtr( ip_fill( $t ), array(
+	$t = strtr( ip_fill( $t ), array(
 		'{brand}'   => ip_opt( 'brand' ),
 		'{azienda}' => ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ),
 		'{ruolo}'   => ip_opt( 'partner_role' ),
 		'{piva}'    => ip_opt( 'vat' ) ? ip_opt( 'vat' ) : '—',
 		'{citta}'   => ip_opt( 'city' ),
 	) );
+	// «ZDM S.r.l.» a fine frase non deve lasciare due punti di fila.
+	return preg_replace( '/(?<!\.)\.\.(?!\.)/', '.', $t );
 }
 
 function ip_rows( $key ) {

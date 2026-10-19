@@ -23,6 +23,9 @@ function ip_upgrade() {
 			}
 		}
 	}
+	if ( version_compare( $v, '2.7.0', '<' ) ) {
+		ip_upgrade_270();
+	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.
@@ -142,5 +145,124 @@ function ip_upgrade_240() {
 		if ( ! get_post_meta( $id, '_ip_fonte', true ) && $key !== get_post_field( 'post_name', $id ) ) {
 			update_post_meta( $id, '_ip_fonte', $key );
 		}
+	}
+}
+
+/**
+ * 2.7: revisione dell'Ateneo.
+ * - Il polo si chiama per nome e territorio («Infopoint Lanciano»): è un
+ *   «centro di orientamento accreditato», non un'«agenzia partner»; la società
+ *   che lo gestisce resta indicata ma non lo sostituisce.
+ * - «Come immatricolarsi» mostra solo i requisiti di accesso; niente rimandi
+ *   alla doppia iscrizione fuori dalla sua pagina.
+ * - Niente pagina sui trasferimenti da altro ateneo.
+ */
+function ip_upgrade_270() {
+	$role_old = 'agenzia partner dell’Università degli Studi Guglielmo Marconi per l’orientamento e l’assistenza alle iscrizioni';
+	$role_new = 'centro di orientamento accreditato dall’Università degli Studi Guglielmo Marconi';
+	$o        = get_option( 'ip_settings', null );
+	if ( is_array( $o ) ) {
+		// Testi rimasti ai valori predefiniti: si torna ai nuovi predefiniti.
+		$old = array(
+			'disclaimer'   => '{brand} è un servizio di {azienda}, agenzia partner dell’Università degli Studi Guglielmo Marconi per l’orientamento e l’assistenza alle iscrizioni. Questo non è il sito ufficiale dell’Ateneo: il sito ufficiale è www.unimarconi.it.',
+			'disclosure'   => '{brand} è un servizio di {azienda} (P.IVA {piva}), {ruolo}. Non siamo l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.',
+			'form_notice'  => 'Stai contattando {azienda}, agenzia partner. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.',
+			'lp_team_text' => 'Siamo {azienda}, {ruolo}. Ti seguiamo al telefono, su WhatsApp o di persona in sede, dalla scelta del corso all’immatricolazione. La consulenza è gratuita.',
+			'partner_role' => $role_old,
+		);
+		foreach ( $old as $k => $v ) {
+			if ( isset( $o[ $k ] ) && trim( $o[ $k ] ) === $v ) {
+				unset( $o[ $k ] );
+			}
+		}
+		// Testi personalizzati: si cambia solo la dicitura.
+		foreach ( $o as $k => $v ) {
+			if ( is_string( $v ) ) {
+				$o[ $k ] = str_replace( array( $role_old, 'agenzia partner', 'Agenzia partner' ), array( $role_new, 'centro di orientamento accreditato', 'Centro di orientamento accreditato' ), $v );
+			}
+		}
+		// Nome del polo dei dati di esempio.
+		if ( isset( $o['brand'] ) && 'ZDM Orientamento' === $o['brand'] ) {
+			$o['brand'] = 'Infopoint Lanciano';
+			if ( empty( $o['city'] ) || 'Pescara' === $o['city'] ) {
+				$o['city'] = 'Lanciano';
+			}
+		}
+		if ( ! empty( $o['faq'] ) && is_array( $o['faq'] ) ) {
+			foreach ( $o['faq'] as $i => $r ) {
+				if ( isset( $r['risposta'] ) && false !== strpos( $r['risposta'], 'si parte da {rata_min} al mese. Tassa regionale' ) ) {
+					$o['faq'][ $i ]['risposta'] = str_replace( 'si parte da {rata_min} al mese. Tassa regionale', 'si parte da {rata_min} al mese. {scadenze} Tassa regionale', $r['risposta'] );
+				}
+			}
+		}
+		update_option( 'ip_settings', $o );
+	}
+
+	$data = ip_import_data( 'pagine' );
+
+	// «Come immatricolarsi»: solo i requisiti di accesso, anche dopo gli aggiornamenti.
+	foreach ( array( 'immatricolazione', 'iscrizione-master' ) as $slug ) {
+		if ( empty( $data[ $slug ] ) ) {
+			continue;
+		}
+		$id = ip_official_page( $data[ $slug ]['source'] );
+		if ( ! $id ) {
+			continue;
+		}
+		$up = array( 'ID' => $id );
+		if ( ! empty( $data[ $slug ]['sezioni'] ) ) {
+			update_post_meta( $id, '_ip_sezioni', $data[ $slug ]['sezioni'] );
+			$up['post_title'] = $data[ $slug ]['title'];
+		}
+		if ( 'no' !== get_post_meta( $id, '_ip_sync', true ) ) {
+			$up['post_content'] = wp_slash( $data[ $slug ]['content'] );
+		}
+		wp_update_post( $up );
+	}
+
+	// Trasferimento da altro ateneo: pagina tolta dal sito.
+	$gone = array();
+	foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1, 'meta_key' => '_ip_fonte', 'meta_value' => 'https://www.unimarconi.it/immatricolazione-con-trasferimento-da-altro-ateneo/' ) ) as $p ) {
+		wp_update_post( array( 'ID' => $p->ID, 'post_status' => 'draft' ) );
+		$gone[] = $p->ID;
+	}
+	$immatricolazione = ! empty( $data['immatricolazione'] ) ? ip_official_page( $data['immatricolazione']['source'] ) : 0;
+	foreach ( wp_get_nav_menus() as $menu ) {
+		foreach ( (array) wp_get_nav_menu_items( $menu->term_id, array( 'post_status' => 'any' ) ) as $item ) {
+			if ( 'post_type' === $item->type && ( in_array( (int) $item->object_id, $gone, true ) || ( $immatricolazione && (int) $item->object_id === $immatricolazione ) ) ) {
+				wp_delete_post( $item->ID, true );
+			}
+		}
+	}
+
+	// Pagine del tema: «Iscriversi» e «Requisiti di accesso».
+	$defs = ip_import_pages();
+	$pg   = get_posts( array( 'post_type' => 'page', 'name' => 'iscriversi', 'post_status' => 'any', 'posts_per_page' => 1 ) );
+	if ( $pg ) {
+		$c = $pg[0]->post_content;
+		$c = preg_replace( '#<!-- wp:list-item -->\s*<li><a href="[^"]*trasferimento-da-altro-ateneo/?">[^<]*</a></li>\s*<!-- /wp:list-item -->\s*#u', '', $c );
+		$c = preg_replace( '#<a href="[^"]*/iscriversi/immatricolazione/?">Come immatricolarsi</a>#u', '<a href="/area-studenti/">Requisiti di accesso</a>', $c );
+		$up = array( 'ID' => $pg[0]->ID, 'post_content' => wp_slash( $c ) );
+		if ( 'f6e4c380ebbc92e24cab7174be759f8b' === md5( ip_sync_norm( $pg[0]->post_excerpt ) ) ) {
+			$up['post_excerpt'] = wp_slash( $defs['iscriversi']['excerpt'] );
+		}
+		wp_update_post( $up );
+	}
+	$pg = get_posts( array( 'post_type' => 'page', 'name' => 'area-studenti', 'post_status' => 'any', 'posts_per_page' => 1 ) );
+	if ( $pg ) {
+		$p  = $pg[0];
+		$up = array( 'ID' => $p->ID );
+		if ( '28b62ec1178d3cbc36c26c340792168a' === md5( ip_sync_norm( $p->post_content ) ) ) {
+			$up['post_content'] = wp_slash( $defs['area-studenti']['content'] );
+		} else {
+			$up['post_content'] = wp_slash( preg_replace( '#\s*Leggi anche come funziona il <a href="[^"]*trasferimento-da-altro-ateneo/?">[^<]*</a>\.#u', '', $p->post_content ) );
+		}
+		if ( 'Requisiti e iscrizione' === $p->post_title ) {
+			$up['post_title'] = $defs['area-studenti']['title'];
+		}
+		if ( 'ca0b1ccc3b7f87997d23f595cb874a4d' === md5( ip_sync_norm( $p->post_excerpt ) ) ) {
+			$up['post_excerpt'] = wp_slash( $defs['area-studenti']['excerpt'] );
+		}
+		wp_update_post( $up );
 	}
 }

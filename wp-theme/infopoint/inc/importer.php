@@ -65,7 +65,7 @@ function ip_import_page() {
 				<label style="display:block;margin:6px 0"><input type="radio" name="ip_mode" value="fill" checked> <strong>Completa</strong> — crea i nuovi e riempie solo i campi vuoti di quelli esistenti (consigliato)</label>
 				<label style="display:block;margin:6px 0"><input type="radio" name="ip_mode" value="overwrite"> <strong>Sovrascrivi</strong> — riporta testi, dati, piani di studio e documenti ai valori ufficiali (le modifiche fatte a mano su quei campi vanno perse; le revisioni restano)</label>
 			</fieldset>
-			<p><label><input type="checkbox" name="ip_pages" value="1" checked> Crea le pagine mancanti (iscrizione, tasse, trasferimenti, contatti…)</label></p>
+			<p><label><input type="checkbox" name="ip_pages" value="1" checked> Crea le pagine mancanti (iscrizione, tasse, requisiti, contatti…)</label></p>
 			<p><label><input type="checkbox" name="ip_menus" value="1" checked> Crea i menu se non ne è assegnato nessuno</label></p>
 			<p><label><input type="checkbox" name="ip_retire" value="1"> Metti in bozza i corsi che non sono più nell’offerta ufficiale</label></p>
 			<?php submit_button( 'Avvia', 'primary', 'ip_import' ); ?>
@@ -399,6 +399,9 @@ function ip_run_import( $o ) {
 			if ( 'overwrite' === $mode ) {
 				wp_update_post( array( 'ID' => $ex->ID, 'post_content' => wp_slash( $p['content'] ) ) );
 			}
+			if ( ! empty( $p['sezioni'] ) ) {
+				update_post_meta( $ex->ID, '_ip_sezioni', $p['sezioni'] );
+			}
 			$pages[ $slug ] = $ex->ID;
 			continue;
 		}
@@ -414,6 +417,9 @@ function ip_run_import( $o ) {
 		if ( $id && ! is_wp_error( $id ) ) {
 			update_post_meta( $id, '_wp_page_template', 'page-templates/sidebar-form.php' );
 			update_post_meta( $id, '_ip_fonte', $p['source'] );
+			if ( ! empty( $p['sezioni'] ) ) {
+				update_post_meta( $id, '_ip_sezioni', $p['sezioni'] );
+			}
 			// Testo già mostrato dentro una pagina del tema: niente doppioni nei motori di ricerca.
 			if ( in_array( trailingslashit( $p['source'] ), $embed, true ) ) {
 				update_post_meta( $id, '_ip_seo_noindex', '1' );
@@ -469,7 +475,7 @@ function ip_import_menus( $pages, $tip_ids ) {
 				array( $page( 'corsi-insegnanti', 'Insegnanti' ), array( $page( 'percorsi-abilitanti' ), $tip( 'specializzazione-sostegno' ), $tip( 'master-di-i-livello-discipline-per-la-didattica' ), $tip( 'master-di-ii-livello-discipline-per-la-didattica' ) ) ),
 				array( $page( 'altri-corsi', 'Altri corsi' ), array( $tip( 'corsi-di-formazione' ), $tip( 'microcredenziali' ), $tip( 'dottorato-di-ricerca' ) ) ),
 				array( $page( 'convenzioni-e-agevolazioni', 'Costi e agevolazioni' ), array( $page( 'tasse-di-iscrizione' ), $page( 'convenzioni-e-agevolazioni', 'Agevolazioni e convenzioni' ), $page( 'modalita-di-pagamento' ), $page( 'pa-110-e-lode' ) ) ),
-				array( $page( 'iscriversi', 'Iscriversi' ), array( $page( 'immatricolazione' ), $page( 'riconoscimento-cfu' ), $page( 'trasferimento-da-altro-ateneo' ), $page( 'area-studenti', 'Requisiti di accesso' ), $page( 'sedi-esame' ), $page( 'studenti-stranieri' ) ) ),
+				array( $page( 'iscriversi', 'Iscriversi' ), array( $page( 'area-studenti', 'Requisiti di accesso' ), $page( 'riconoscimento-cfu' ), $page( 'sedi-esame' ), $page( 'studenti-stranieri' ) ) ),
 				array( $page( 'contatti' ), array( $page( 'chi-siamo' ) ) ),
 			);
 			foreach ( $tree as $node ) {
@@ -615,15 +621,14 @@ function ip_import_pages() {
 
 		'iscriversi' => array(
 			'title'   => 'Iscriversi all’Università Marconi',
-			'excerpt' => 'Immatricolazione, tasse, agevolazioni, trasferimenti, riconoscimento crediti: tutto quello che serve sapere, e un orientatore che ti segue passo passo.',
+			'excerpt' => 'Requisiti di accesso, tasse, agevolazioni, riconoscimento crediti: tutto quello che serve sapere, e un orientatore che ti segue passo passo.',
 			'content' => $p( 'Ci si iscrive in qualsiasi periodo dell’anno. Scegli l’argomento che ti interessa oppure lasciaci i tuoi dati: un orientatore ti guida nella procedura e nella scelta dell’agevolazione giusta.' )
 				. $ul( array(
-					'<a href="/iscriversi/immatricolazione/">Come immatricolarsi</a>',
+					'<a href="/area-studenti/">Requisiti di accesso</a>',
 					'<a href="/iscriversi/tasse-di-iscrizione/">Tasse di iscrizione</a>',
 					'<a href="/convenzioni-e-agevolazioni/">Agevolazioni e convenzioni</a>',
 					'<a href="/iscriversi/modalita-di-pagamento/">Modalità di pagamento</a>',
 					'<a href="/riconoscimento-cfu/">Riconoscimento dei CFU</a>',
-					'<a href="/iscriversi/trasferimento-da-altro-ateneo/">Trasferimento da un altro ateneo</a>',
 					'<a href="/iscriversi/iscrizione-master/">Iscrizione ai master</a>',
 					'<a href="/iscriversi/integrazioni-curriculari-ica/">Integrazioni curriculari per le magistrali (ICA)</a>',
 					'<a href="/iscriversi/studenti-stranieri/">Studenti stranieri e titoli esteri</a>',
@@ -651,13 +656,13 @@ function ip_import_pages() {
 		),
 
 		'area-studenti' => array(
-			'title'    => 'Requisiti e iscrizione',
+			'title'    => 'Requisiti di accesso',
 			'template' => 'page-templates/sidebar-form.php',
-			'excerpt'  => 'Titoli di accesso, procedura di immatricolazione e trasferimenti: quello che serve sapere prima di iscriversi.',
-			'content'  => $p( 'Requisiti di accesso e procedura di immatricolazione, come li descrive l’Ateneo e sempre aggiornati. Noi ti affianchiamo in ogni passaggio, dalla scelta del corso al caricamento dei documenti.' )
+			'excerpt'  => 'I titoli di studio richiesti per iscriversi ai corsi di laurea dell’Università Marconi e i requisiti curriculari per le lauree magistrali.',
+			'content'  => $p( 'I requisiti di accesso ai corsi di laurea, come li stabilisce l’Ateneo e sempre aggiornati. Per tutto il resto ti affianchiamo noi, dalla scelta del corso all’iscrizione.' )
 				. $sc( '[ip_ufficiale fonte="https://www.unimarconi.it/immatricolazione-corso-di-laurea/"]' )
-				. $h( 'Arrivi da un’altra università?' )
-				. $p( 'Con la <a href="/riconoscimento-cfu/">prevalutazione dei CFU</a> sai in anticipo quali esami ti vengono riconosciuti e a quale anno puoi iscriverti. Leggi anche come funziona il <a href="/iscriversi/trasferimento-da-altro-ateneo/">trasferimento da un altro ateneo</a>.' ),
+				. $h( 'Hai già sostenuto esami?' )
+				. $p( 'Con la <a href="/riconoscimento-cfu/">prevalutazione dei CFU</a> sai in anticipo quali esami ti vengono riconosciuti e a quale anno puoi iscriverti.' ),
 		),
 
 		'doppia-laurea' => array(

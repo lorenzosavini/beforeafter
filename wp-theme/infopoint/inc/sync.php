@@ -470,7 +470,7 @@ function ip_sync_page( $url, $html ) {
 	if ( 'no' === get_post_meta( $page_id, '_ip_sync', true ) ) {
 		return false;
 	}
-	$content = ip_src_page( $html );
+	$content = ip_src_page( $html, (array) get_post_meta( $page_id, '_ip_sezioni', true ) );
 	if ( ! $content || ip_sync_norm( $content ) === ip_sync_norm( get_post_field( 'post_content', $page_id ) ) ) {
 		ip_sync_close( 'pagina', $page_id );
 		return false;

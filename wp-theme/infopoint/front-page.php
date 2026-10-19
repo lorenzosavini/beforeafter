@@ -10,7 +10,7 @@ get_header();
 $price   = ip_price_from();
 $agev    = ip_page_url( 'convenzioni-e-agevolazioni' );
 $cfu     = ip_page_url( 'riconoscimento-cfu' );
-$eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand' ) . ' · Agenzia partner UniMarconi' . ( ip_opt( 'city' ) ? ' a ' . ip_opt( 'city' ) : '' );
+$eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand' ) . ' · ' . ip_role_label();
 ?>
 
 <?php $hero_img = ip_hero_image_id(); ?>
@@ -35,7 +35,7 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 				<?php echo ip_phone_link( 'phone1', 'btn btn-line-light' ); // phpcs:ignore ?>
 			</div>
 			<?php if ( $price ) : ?>
-				<p class="hero-price">Retta da <strong><?php echo esc_html( $price ); ?> al mese</strong> con le agevolazioni dell’Ateneo<?php if ( $agev ) : ?> · <a href="<?php echo esc_url( $agev ); ?>">vedi tutte</a><?php endif; ?></p>
+				<p class="hero-price">Retta da <strong><?php echo esc_html( $price ); ?> al mese</strong> con le agevolazioni dell’Ateneo<?php echo ip_agev_deadline_text() ? '<br><small>' . esc_html( ip_agev_deadline_text() ) . '</small>' : ''; // phpcs:ignore ?><?php if ( $agev ) : ?> · <a href="<?php echo esc_url( $agev ); ?>">vedi tutte</a><?php endif; ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="hero-form">

@@ -13,7 +13,7 @@ while ( have_posts() ) :
 	<section class="hero hero-landing">
 		<div class="wrap hero-in">
 			<div class="hero-text">
-				<p class="eyebrow"><?php echo esc_html( ip_opt( 'brand' ) ); ?> · Agenzia partner UniMarconi</p>
+				<p class="eyebrow"><?php echo esc_html( ip_opt( 'brand' ) . ' · ' . ip_role_label() ); ?></p>
 				<h1><?php the_title(); ?></h1>
 				<?php if ( has_excerpt() ) : ?>
 					<p class="hero-lead"><?php echo esc_html( get_the_excerpt() ); ?></p>
@@ -28,7 +28,7 @@ while ( have_posts() ) :
 					<p class="hero-who"><?php echo esc_html( ip_text( 'disclosure' ) ); ?></p>
 				<?php endif; ?>
 				<?php if ( ip_price_from() ) : ?>
-					<p class="hero-price">Retta da <strong><?php echo esc_html( ip_price_from() ); ?> al mese</strong> con le agevolazioni</p>
+					<p class="hero-price">Retta da <strong><?php echo esc_html( ip_price_from() ); ?> al mese</strong> con le agevolazioni<?php echo ip_agev_deadline_text() ? '<br><small>' . esc_html( ip_agev_deadline_text() ) . '</small>' : ''; // phpcs:ignore ?></p>
 				<?php endif; ?>
 			</div>
 			<div class="hero-form">

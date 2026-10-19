@@ -203,8 +203,22 @@ function ip_cta_band( $title = '' ) {
 /**
  * Ragione sociale con i dati di legge, su una riga.
  */
+/**
+ * Ruolo rispetto all'Ateneo in forma breve, per testate e occhielli:
+ * «Centro di orientamento accreditato dall’Università Guglielmo Marconi».
+ */
+function ip_role_label() {
+	$r = trim( (string) ip_opt( 'partner_role' ) );
+	$r = str_replace( 'dall’Università degli Studi Guglielmo Marconi', 'dall’Università Guglielmo Marconi', $r );
+	return $r ? mb_strtoupper( mb_substr( $r, 0, 1 ) ) . mb_substr( $r, 1 ) : '';
+}
+
 function ip_legal_line() {
-	$parts = array( ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' ) );
+	// Il nome del polo viene prima; la società che lo gestisce lo accompagna, non lo sostituisce.
+	$parts = array( ip_opt( 'brand' ) );
+	if ( ip_opt( 'company_name' ) && ip_opt( 'company_name' ) !== ip_opt( 'brand' ) ) {
+		$parts[] = 'gestito da ' . ip_opt( 'company_name' );
+	}
 	if ( ip_opt( 'legal_address' ) ) {
 		$parts[] = 'Sede legale ' . preg_replace( '/\s*\n\s*/', ', ', trim( ip_opt( 'legal_address' ) ) );
 	}
@@ -280,7 +294,47 @@ function ip_fees() {
 }
 
 /**
- * Sostituisce i segnaposto degli importi: {retta_std}, {retta_min}, {rata_min}.
+ * Scadenza di un'agevolazione, letta dalle condizioni ufficiali
+ * («richieste presentate entro il 30 novembre 2026»). Vuota se passata.
+ */
+function ip_agev_deadline( $id ) {
+	return function_exists( 'ip_lp_deadline' ) ? ip_lp_deadline( ip_meta( 'cond', $id ) . "\n" . ip_meta( 'det', $id ) ) : '';
+}
+
+/**
+ * Agevolazioni pubblicate con una scadenza ancora valida: [titolo, data].
+ */
+function ip_agev_deadlines() {
+	static $out = null;
+	if ( null === $out ) {
+		$out = array();
+		foreach ( get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => -1, 'orderby' => 'menu_order', 'order' => 'ASC' ) ) as $p ) {
+			$d = ip_agev_deadline( $p->ID );
+			if ( $d ) {
+				$out[] = array( html_entity_decode( get_the_title( $p ), ENT_QUOTES, 'UTF-8' ), $d );
+			}
+		}
+	}
+	return $out;
+}
+
+/**
+ * Promemoria delle scadenze, da mettere ovunque si parli di agevolazioni.
+ */
+function ip_agev_deadline_text() {
+	return implode( ' ', array_map( function ( $x ) {
+		return $x[0] . ': richieste entro il ' . $x[1] . '.';
+	}, ip_agev_deadlines() ) );
+}
+
+function ip_agev_deadline_note( $class = 'agev-due' ) {
+	$t = ip_agev_deadline_text();
+	return $t ? '<p class="' . esc_attr( $class ) . '">' . esc_html( $t ) . '</p>' : '';
+}
+
+/**
+ * Sostituisce i segnaposto degli importi: {retta_std}, {retta_min}, {rata_min},
+ * e quello delle scadenze delle agevolazioni: {scadenze}.
  */
 function ip_fill( $t ) {
 	$t = (string) $t;
@@ -292,6 +346,7 @@ function ip_fill( $t ) {
 		'{retta_std}' => ip_retta_std(),
 		'{retta_min}' => ip_eur( $f['min_retta'] ),
 		'{rata_min}'  => ip_price_from(),
+		'{scadenze}'  => ip_agev_deadline_text(),
 	) );
 }
 add_filter( 'the_content', 'ip_fill', 1 );
