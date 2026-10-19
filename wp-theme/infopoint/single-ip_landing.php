@@ -464,14 +464,11 @@ ip_lp_dialog( 'privacy', 'Informativa privacy', ip_lp_page_html( $privacy_id ), 
 ip_lp_dialog( 'cookie', 'Cookie policy', ip_lp_page_html( $cookie_id ), $cookie_id ? get_permalink( $cookie_id ) : '' );
 ?>
 
-<?php if ( $o['uscita'] ) : ?>
-	<dialog class="lp-dialog lp-exit" data-lp-exit aria-label="Ti richiamiamo noi">
-		<div class="lp-dialog-in">
-			<button type="button" class="lp-x" data-lp-close aria-label="Chiudi"><?php echo ip_icon( 'close', 20 ); // phpcs:ignore ?></button>
-			<?php ip_form( array( 'type' => 'callback', 'course' => $d['course'], 'interest' => $d['interest'], 'landing' => $lp_id, 'inline' => true, 'id' => 'lp-exit-form', 'title' => 'Prima di andare: ti richiamiamo noi?', 'text' => 'Lascia nome e numero. Un orientatore ti spiega costi e agevolazioni, gratis e senza impegno.' ) ); ?>
-		</div>
-	</dialog>
-<?php endif; ?>
+<?php
+if ( $o['uscita'] ) {
+	ip_exit_banner( array( 'landing' => $lp_id, 'course' => $d['course'], 'interest' => $d['interest'] ) );
+}
+?>
 
 <?php wp_footer(); ?>
 </body>

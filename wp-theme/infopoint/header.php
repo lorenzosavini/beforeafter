@@ -24,7 +24,8 @@ $wa      = ip_wa_href();
 
 <header class="hdr">
 	<div class="wrap hdr-in">
-		<a class="brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
+		<?php // Nelle landing il logo non porta fuori dalla pagina. ?>
+		<<?php echo $landing ? 'span' : 'a'; ?> class="brand"<?php echo $landing ? '' : ' href="' . esc_url( home_url( '/' ) ) . '" rel="home"'; ?>>
 			<?php if ( has_custom_logo() ) : ?>
 				<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'brand-logo', 'alt' => esc_attr( ip_opt( 'brand' ) ), 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?>
 			<?php else : ?>
@@ -34,7 +35,7 @@ $wa      = ip_wa_href();
 					<small><?php echo esc_html( ip_role_label() ); ?></small>
 				</span>
 			<?php endif; ?>
-		</a>
+		</<?php echo $landing ? 'span' : 'a'; ?>>
 
 		<?php if ( $landing ) : ?>
 			<?php echo ip_phone_link( 'phone1', 'hdr-phone' ); // phpcs:ignore ?>

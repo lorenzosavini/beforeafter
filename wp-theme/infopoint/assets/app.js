@@ -177,7 +177,7 @@
 		var link = e.target.closest('a[href]');
 		var dlg = null;
 		if (o) dlg = d.getElementById(o.getAttribute('data-lp-open'));
-		if (!o && link && d.body.classList.contains('lp')) {
+		if (!o && link) {
 			d.querySelectorAll('dialog[data-url]').forEach(function (x) { if (x.getAttribute('data-url') === link.href.split('#')[0]) dlg = x; });
 		}
 		if (dlg && dlg.showModal) { e.preventDefault(); dlg.showModal(); }

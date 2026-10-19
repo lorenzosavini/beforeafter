@@ -666,8 +666,11 @@ add_filter( 'walker_nav_menu_start_el', function ( $out, $item, $depth, $args ) 
  * Banner d'uscita: una richiesta di richiamata mostrata a chi sta lasciando il sito.
  * Le landing hanno il loro; la pagina di ringraziamento non lo mostra mai.
  */
-function ip_exit_banner() {
-	if ( ! ip_opt( 'exit_on' ) || is_404() || is_singular( 'ip_landing' ) || is_page_template( 'page-templates/landing.php' ) ) {
+function ip_exit_banner( $args = array() ) {
+	$args = wp_parse_args( $args, array( 'landing' => 0, 'course' => 0, 'interest' => '' ) );
+	if ( $args['landing'] ) {
+		$course = (int) $args['course'];
+	} elseif ( ! ip_opt( 'exit_on' ) || is_404() || is_singular( 'ip_landing' ) ) {
 		return;
 	}
 	$thanks = (int) ip_opt( 'thanks_page' );
@@ -675,9 +678,11 @@ function ip_exit_banner() {
 		return;
 	}
 	$points = array_slice( array_filter( array_map( 'trim', explode( "\n", (string) ip_opt( 'exit_points' ) ) ) ), 0, 3 );
-	$course = is_singular( 'corso' ) ? get_the_ID() : 0;
+	if ( ! $args['landing'] ) {
+		$course = is_singular( 'corso' ) ? get_the_ID() : 0;
+	}
 	?>
-	<dialog class="exit-dlg" data-lp-exit<?php echo ip_opt( 'exit_mobile' ) ? ' data-mobile' : ''; ?> aria-labelledby="exit-t">
+	<dialog class="exit-dlg" data-lp-exit<?php echo ( $args['landing'] || ip_opt( 'exit_mobile' ) ) ? ' data-mobile' : ''; ?> aria-labelledby="exit-t">
 		<div class="exit-in">
 			<button type="button" class="exit-x" data-lp-close aria-label="Chiudi"><?php echo ip_icon( 'close', 20 ); // phpcs:ignore ?></button>
 			<div class="exit-side">
@@ -696,7 +701,7 @@ function ip_exit_banner() {
 					<p class="exit-call">Preferisci chiamare tu? <a href="<?php echo esc_attr( ip_tel_href( ip_opt( 'phone1' ) ) ); ?>" data-track="call"><?php echo esc_html( ip_opt( 'phone1' ) ); ?></a></p>
 				<?php endif; ?>
 			</div>
-			<?php ip_form( array( 'type' => 'callback', 'course' => $course, 'inline' => true, 'id' => 'exit-form', 'title' => 'Ti richiamiamo noi', 'text' => 'Gratis, quando preferisci.' ) ); ?>
+			<?php ip_form( array( 'type' => 'callback', 'course' => $course, 'interest' => $args['interest'], 'landing' => (int) $args['landing'], 'inline' => true, 'id' => 'exit-form', 'title' => 'Ti richiamiamo noi', 'text' => 'Gratis, quando preferisci.' ) ); ?>
 		</div>
 	</dialog>
 	<?php
