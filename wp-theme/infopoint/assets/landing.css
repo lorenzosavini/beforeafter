@@ -409,7 +409,7 @@
 	.lp-pts { margin-top: 14px; }
 	.lp-pts li { font-size: .9rem; }
 }
-.lp-hero-f .lead-alt, .lp-hero-f details.more { display: none; }
+.lp-hero-f .lead-alt { display: none; }
 .lp-hero-f .lead > .lead-text { display: none; }
 .lp-hero-f .lead > .lead-title { padding-bottom: 16px; }
 @media (max-width: 900px) {
@@ -420,3 +420,4 @@
 .lp-tab-due { display: block; width: fit-content; margin: 5px 0 0; padding: 2px 8px; border-radius: 4px; background: #fbf3ef; border: 1px solid #e3c9bd; font-size: .76rem; font-style: normal; font-weight: 700; color: #8a2a0c; }
 .lp-due-note { margin: 12px 0 0; padding: 9px 12px; border-left: 3px solid var(--accent); background: #fbf3ef; font-size: .86rem; line-height: 1.45; color: #5c2009; }
 .lp-sec .lp-due-note { margin: 0 0 22px; }
+.lp-hero .hl { color: var(--accent); font-style: italic; }

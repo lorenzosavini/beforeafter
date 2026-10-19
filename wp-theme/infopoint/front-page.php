@@ -20,9 +20,13 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 	<?php endif; ?>
 	<div class="wrap hero-in">
 		<div class="hero-text">
-			<p class="hero-kicker"><?php echo esc_html( $eyebrow ); ?></p>
-			<h1><?php echo esc_html( ip_opt( 'hero_title' ) ); ?></h1>
-			<p class="hero-lead"><?php echo esc_html( ip_opt( 'hero_text' ) ); ?></p>
+			<?php if ( ip_opt( 'hero_eyebrow' ) ) : ?>
+				<p class="hero-kicker"><?php echo esc_html( $eyebrow ); ?></p>
+			<?php else : ?>
+				<p class="hero-kicker"><span class="hero-badge"><?php echo esc_html( ip_opt( 'brand' ) ); ?></span> <?php echo esc_html( ip_role_label() ); ?></p>
+			<?php endif; ?>
+			<h1><?php echo ip_hl( ip_opt( 'hero_title' ) ); // phpcs:ignore ?></h1>
+			<p class="hero-lead"><?php echo ip_hl( ip_opt( 'hero_text' ) ); // phpcs:ignore ?></p>
 			<?php if ( ip_rows( 'hero_ticks' ) ) : ?>
 				<ul class="hero-points">
 					<?php foreach ( ip_rows( 'hero_ticks' ) as $t ) : ?>
@@ -31,7 +35,7 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 				</ul>
 			<?php endif; ?>
 			<div class="hero-actions">
-				<a class="btn btn-white" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
+				<a class="btn btn-gold" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
 				<?php echo ip_phone_link( 'phone1', 'btn btn-line-light' ); // phpcs:ignore ?>
 			</div>
 			<?php if ( $price ) : ?>

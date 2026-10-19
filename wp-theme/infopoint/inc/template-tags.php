@@ -437,3 +437,22 @@ function ip_course_card( $id = null ) {
 	</article>
 	<?php
 }
+
+/**
+ * Testo con parole evidenziate: *così* diventa <span class="hl">così</span>.
+ * Con $auto, in un titolo senza asterischi si evidenzia la parte dopo i due
+ * punti (es. «Futuro Giovani: retta € 1.620 l’anno»).
+ */
+function ip_hl( $text, $auto = false ) {
+	$text = (string) $text;
+	if ( $auto && false === strpos( $text, '*' ) && preg_match( '/^(.{3,60}?):\s+(.{3,})$/u', $text, $m ) ) {
+		$text = $m[1] . ': *' . $m[2] . '*';
+	}
+	return preg_replace( '/\*([^*]+)\*/u', '<span class="hl">$1</span>', esc_html( $text ) );
+}
+
+/** Lo stesso testo senza asterischi, per title, meta e attributi. */
+function ip_hl_plain( $text ) {
+	return str_replace( '*', '', (string) $text );
+}
+

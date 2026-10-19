@@ -36,6 +36,22 @@ function ip_upgrade() {
 	if ( version_compare( $v, '2.7.4', '<' ) ) {
 		ip_upgrade_274();
 	}
+	if ( version_compare( $v, '2.7.5', '<' ) ) {
+		// Hero della home: titolo con evidenziazione e sottotitolo breve, se mai modificati.
+		$o   = get_option( 'ip_settings', array() );
+		$old = array(
+			'hero_title' => 'Iscriviti all’Università Marconi con un orientatore al tuo fianco',
+			'hero_text'  => 'Lauree triennali, magistrali e master online con esami in presenza. Ti aiutiamo a scegliere il corso, verifichiamo gratis i crediti già maturati e seguiamo con te l’immatricolazione.',
+		);
+		if ( is_array( $o ) ) {
+			foreach ( $old as $k => $t ) {
+				if ( isset( $o[ $k ] ) && trim( $o[ $k ] ) === $t ) {
+					unset( $o[ $k ] );
+				}
+			}
+			update_option( 'ip_settings', $o );
+		}
+	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.

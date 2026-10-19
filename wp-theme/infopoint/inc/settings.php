@@ -62,8 +62,8 @@ function ip_settings_fields() {
 			'fields' => array(
 				'hero_eyebrow' => array( 'Occhiello sopra il titolo', 'text', '', 'Vuoto = «{nome del polo} · Centro di orientamento accreditato dall’Università Guglielmo Marconi».' ),
 				'hero_image'   => array( 'Foto di copertina', 'image', '', 'Grande foto dietro al titolo. Vuoto = copertina del primo corso in evidenza.' ),
-				'hero_title'   => array( 'Titolo principale', 'text', 'Iscriviti all’Università Marconi con un orientatore al tuo fianco' ),
-				'hero_text'    => array( 'Sottotitolo', 'textarea', 'Lauree triennali, magistrali e master online con esami in presenza. Ti aiutiamo a scegliere il corso, verifichiamo gratis i crediti già maturati e seguiamo con te l’immatricolazione.' ),
+				'hero_title'   => array( 'Titolo principale', 'text', 'Iscriviti all’Università Marconi con un *orientatore al tuo fianco*', 'Le parole tra asterischi vengono evidenziate con un altro colore.' ),
+				'hero_text'    => array( 'Sottotitolo', 'textarea', 'Lauree e master online, esami in presenza. Orientamento e *verifica dei crediti gratuiti*.', 'Breve: si legge sopra la foto. Asterischi = evidenziato.' ),
 				'hero_ticks'   => array( 'Punti di forza (sotto il titolo)', 'repeater', array(), 'Facoltativi. Meglio pochi e concreti.', array( 'testo' => array( 'Testo', 'text' ) ) ),
 				'facts'        => array( 'Striscia numeri', 'repeater', array(), 'Facoltativa: compare sotto la foto solo se compilata.', array( 'titolo' => array( 'Titolo', 'text' ), 'testo' => array( 'Testo', 'text' ) ) ),
 				'sections'     => array( 'Sezioni e ordine', 'checklist', array( 'featured', 'offerta', 'contenuto', 'agevolazioni', 'cfu', 'recensioni', 'faq', 'news', 'cta' ), '', array(
@@ -122,10 +122,6 @@ function ip_settings_fields() {
 				'thanks_page'  => array( 'Pagina di ringraziamento', 'page', '' ),
 				'privacy_page' => array( 'Pagina informativa privacy', 'page', '', 'Creata dal tema con lo shortcode [ip_privacy]: il testo si aggiorna con i dati della società.' ),
 				'webhook_url'  => array( 'Webhook (CRM, Make, Zapier)', 'url', '', 'Ogni richiesta viene inviata qui in JSON. Facoltativo.' ),
-				'form_courses' => array( 'Voci del campo «Ti interessa»', 'repeater', array(
-					array( 'voce' => 'Laurea triennale' ), array( 'voce' => 'Laurea magistrale' ), array( 'voce' => 'Laurea a ciclo unico' ),
-					array( 'voce' => 'Master' ), array( 'voce' => 'Corsi per insegnanti' ), array( 'voce' => 'Corsi di formazione' ), array( 'voce' => 'Non lo so ancora' ),
-				), '', array( 'voce' => array( 'Voce', 'text' ) ) ),
 				'form_title'   => array( 'Titolo modulo informazioni', 'text', 'Ricevi costi e piano di studi' ),
 				'form_text'    => array( 'Testo modulo informazioni', 'text', 'Ti rispondiamo entro un giorno lavorativo, anche su WhatsApp se preferisci.' ),
 				'form_button'  => array( 'Pulsante modulo informazioni', 'text', 'Invia la richiesta' ),

@@ -93,10 +93,10 @@ $head = function ( $title, $sub = '' ) {
 				<?php if ( $d['kicker'] ) : ?><p class="lp-k"><?php echo esc_html( $d['kicker'] ); ?></p><?php endif; ?>
 				<h1>
 					<?php if ( $t_pre ) : ?><span class="lp-h1-pre"><?php echo esc_html( $t_pre ); ?></span><?php endif; ?>
-					<?php echo esc_html( $t_main ); ?>
+					<?php echo ip_hl( $t_main, true ); // phpcs:ignore ?>
 					<?php if ( $t_code ) : ?><span class="lp-h1-code"><?php echo esc_html( $t_code ); ?></span><?php endif; ?>
 				</h1>
-				<?php if ( $d['sub'] ) : ?><p class="lp-lead"><?php echo esc_html( $d['sub'] ); ?></p><?php endif; ?>
+				<?php if ( $d['sub'] ) : ?><p class="lp-lead"><?php echo ip_hl( $d['sub'] ); // phpcs:ignore ?></p><?php endif; ?>
 
 				<?php if ( $spec ) : ?>
 					<dl class="lp-spec">

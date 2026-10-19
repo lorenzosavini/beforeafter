@@ -61,7 +61,7 @@ function ip_seo_title_for( $id, $custom = true ) {
 	}
 	if ( 'ip_landing' === get_post_type( $id ) ) {
 		$d = ip_lp_data( $id );
-		return $d['title'] . ' | ' . ip_city_suffix();
+		return ip_hl_plain( $d['title'] ) . ' | ' . ip_city_suffix();
 	}
 	if ( 'corso' === get_post_type( $id ) ) {
 		$tip  = ip_course_tipologia( $id );
@@ -82,7 +82,7 @@ function ip_seo_desc_for( $id, $custom = true ) {
 	$p = get_post( $id );
 	if ( 'ip_landing' === $p->post_type ) {
 		$d = ip_lp_data( $id );
-		return wp_strip_all_tags( $d['sub'] );
+		return ip_hl_plain( wp_strip_all_tags( $d['sub'] ) );
 	}
 	if ( 'corso' === $p->post_type && ! $p->post_excerpt ) {
 		$tip   = ip_course_tipologia( $id );
@@ -133,7 +133,7 @@ add_action( 'wp_head', function () {
 		$image = get_the_post_thumbnail_url( $id, 'large' );
 		$type  = is_singular( 'post' ) ? 'article' : 'website';
 	} elseif ( is_front_page() || is_home() ) {
-		$desc = ip_opt( 'hero_text' );
+		$desc = ip_hl_plain( ip_opt( 'hero_text' ) );
 		$url  = home_url( '/' );
 	} elseif ( is_post_type_archive( 'corso' ) ) {
 		$desc = 'Tutti i corsi di laurea triennale, magistrale, ciclo unico, master e corsi per insegnanti dell’Università Marconi. Costi, agevolazioni e iscrizioni con un orientatore.';

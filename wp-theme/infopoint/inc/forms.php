@@ -100,12 +100,17 @@ function ip_form( $a = array() ) {
 					<?php ip_textarea( $uid, 'messaggio', 'Note', false, 'Esami sostenuti, università di provenienza, anno di iscrizione…' ); ?>
 				<?php else : ?>
 					<?php if ( $course ) : ?>
+						<?php ip_field( $uid, 'citta', 'Città', 'text', true, array( 'autocomplete' => 'address-level2' ) ); ?>
 						<p class="lead-course"><?php echo ip_icon( 'doc', 16 ); // phpcs:ignore ?> <span><?php echo esc_html( ip_course_name( $course->ID ) ); ?></span></p>
 					<?php elseif ( $a['interest'] ) : ?>
+						<?php ip_field( $uid, 'citta', 'Città', 'text', true, array( 'autocomplete' => 'address-level2' ) ); ?>
 						<input type="hidden" name="ip_interesse" value="<?php echo esc_attr( $a['interest'] ); ?>" data-interest-field>
 						<p class="lead-course"><?php echo ip_icon( 'doc', 16 ); // phpcs:ignore ?> <span data-interest-label><?php echo esc_html( $a['interest'] ); ?></span></p>
 					<?php else : ?>
-						<?php ip_select( $uid, 'interesse', 'Ti interessa', wp_list_pluck( ip_rows( 'form_courses' ), 'voce' ), true ); ?>
+						<div class="row2">
+							<?php ip_field( $uid, 'citta', 'Città', 'text', true, array( 'autocomplete' => 'address-level2' ) ); ?>
+							<?php ip_select( $uid, 'corso_sel', 'Corso di interesse', ip_interest_options(), true ); ?>
+						</div>
 					<?php endif; ?>
 					<details class="more">
 						<summary>Aggiungi un messaggio</summary>
@@ -176,6 +181,23 @@ function ip_textarea( $uid, $name, $label, $req = false, $ph = '' ) {
 /**
  * Corsi di laurea raggruppati per tipologia (per il modulo CFU).
  */
+/**
+ * Voci del campo «Corso di interesse»: i corsi di laurea e i master per
+ * tipologia, poi gli altri percorsi e «non lo so ancora».
+ */
+function ip_interest_options() {
+	$opts  = ip_course_options();
+	$other = array();
+	foreach ( ip_tipologie() as $t ) {
+		if ( ! isset( $opts[ $t->name ] ) ) {
+			$other[] = $t->name;
+		}
+	}
+	$other[]                  = 'Non lo so ancora: voglio un consiglio';
+	$opts['Altri percorsi'] = $other;
+	return $opts;
+}
+
 function ip_course_options( $current = null ) {
 	$cache = get_transient( 'ip_course_options' );
 	if ( false === $cache ) {
@@ -253,6 +275,7 @@ function ip_handle_lead() {
 		'corso'     => $get( 'corso_sel' ),
 		'nascita'   => $get( 'nascita' ),
 		'regione'   => $get( 'regione' ),
+		'citta'     => $get( 'citta' ),
 		'fascia'    => $get( 'fascia' ),
 		'messaggio' => isset( $in['ip_messaggio'] ) ? sanitize_textarea_field( $in['ip_messaggio'] ) : '',
 		'marketing' => $get( 'marketing' ) ? 'sì' : 'no',
@@ -279,6 +302,9 @@ function ip_handle_lead() {
 	}
 	if ( strlen( preg_replace( '/\D/', '', $data['telefono'] ) ) < 8 ) {
 		$fail( 'Inserisci un numero di telefono valido.' );
+	}
+	if ( 'info' === $type && mb_strlen( $data['citta'] ) < 2 ) {
+		$fail( 'Inserisci la tua città.' );
 	}
 	if ( 'callback' !== $type && ! is_email( $data['email'] ) ) {
 		$fail( 'Inserisci un indirizzo email valido.' );
@@ -384,7 +410,7 @@ function ip_notify_lead( $id, $type, $data, $files ) {
 	$lines = array();
 	foreach ( $data as $k => $v ) {
 		if ( '' !== $v ) {
-			$lines[] = str_pad( ucfirst( $k ) . ':', 12 ) . ' ' . $v;
+			$lines[] = str_pad( ( 'citta' === $k ? 'Città' : ucfirst( $k ) ) . ':', 12 ) . ' ' . $v;
 		}
 	}
 	$lines[] = '';

@@ -86,7 +86,7 @@ add_shortcode( 'ip_privacy', function () {
 
 		<h2>2. Quali dati trattiamo</h2>
 		<ul>
-			<li><strong>Dati che ci fornisci con i moduli</strong>: nome e cognome, telefono, email, corso o area di interesse, messaggio e, a seconda del modulo, anno di nascita, regione, fascia oraria preferita per essere richiamato.</li>
+			<li><strong>Dati che ci fornisci con i moduli</strong>: nome e cognome, telefono, email, città, corso di interesse, messaggio e, a seconda del modulo, anno di nascita, regione, fascia oraria preferita per essere richiamato.</li>
 			<li><strong>Documenti per la prevalutazione dei CFU</strong>: piano di studi, autocertificazione degli esami o altri documenti che scegli di allegare. Possono contenere dati sulla tua carriera universitaria: ti chiediamo di non inserire informazioni che non servono alla valutazione.</li>
 			<li><strong>Dati che ci comunichi per telefono, email<?php echo $wa ? ' o WhatsApp' : ''; ?></strong>, quando ci scrivi o ci chiami.</li>
 			<li><strong>Dati tecnici di navigazione</strong>: indirizzo IP, tipo di browser, pagine visitate, data e ora della richiesta, raccolti dai sistemi che fanno funzionare il sito e lo proteggono da abusi. Con il modulo registriamo anche la pagina da cui ci scrivi e, se presente, la campagna pubblicitaria di provenienza.</li>
