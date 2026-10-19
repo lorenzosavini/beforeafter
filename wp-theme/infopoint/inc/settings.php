@@ -173,7 +173,7 @@ function ip_settings_fields() {
 				'color_accent'      => array( 'Colore pulsanti di conversione', 'color', '#a0300e', 'Rosso mattone UniMarconi.' ),
 				'color_accent_dark' => array( 'Colore pulsanti di conversione (hover)', 'color', '#ca451d' ),
 				'color_soft'        => array( 'Sfondo sezioni', 'color', '#f0f0f0' ),
-				'color_dark'        => array( 'Sfondo piè di pagina', 'color', '#373737' ),
+				'color_dark'        => array( 'Sfondo piè di pagina', 'color', '#0e261d' ),
 				'font_brand'        => array( 'Font Montserrat (come unimarconi.it)', 'checkbox', '1', 'Incluso nel tema, 38 KB. Disattivato = font di sistema, ancora più veloce.' ),
 			),
 		),

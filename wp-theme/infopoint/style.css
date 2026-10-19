@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.9.9
+Version: 3.0.0
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -957,3 +957,22 @@ details[open] > :not(summary) { animation: ip-fade .35s ease both; }
 /* Nelle pagine con modulo a lato elenchi e schede restano nella colonna del testo. */
 .with-aside .prose .clist, .with-aside .prose .agev { width: auto; left: 0; transform: none; }
 .with-aside .prose .clist .cgroup:first-child .cgroup-title { margin-top: 0; }
+
+/* Piè di pagina nel verde del marchio: titoli con filetto arancione, link chiari che si accendono al passaggio. */
+.ftr { position: relative; color: #c9dbd2; }
+.ftr::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: linear-gradient(90deg, var(--accent) 0 18%, var(--brand) 18% 100%); }
+.ftr a { color: #fff; text-decoration: none; text-underline-offset: 3px; transition: color .15s; }
+.ftr a:hover { color: #ffb08f; text-decoration: underline; }
+.ftr-name { font-size: 1.15rem; }
+.ftr-label { color: #8fbfa9; }
+.ftr-h { position: relative; padding-bottom: 10px; margin-bottom: 16px; color: #fff; }
+.ftr-h::after { content: ""; position: absolute; left: 0; bottom: 0; width: 28px; height: 2px; background: var(--accent); }
+.ftr-list li { margin-bottom: 10px; }
+.ftr-list a { display: inline-flex; align-items: flex-start; gap: 8px; color: #e6eee9; }
+.ftr-list a::before { content: ""; flex: none; margin-top: .55em; width: 6px; height: 6px; border-right: 1.5px solid #8fbfa9; border-bottom: 1.5px solid #8fbfa9; transform: rotate(-45deg); transition: border-color .15s, transform .15s; }
+.ftr-list a:hover::before { border-color: #ffb08f; transform: translateX(2px) rotate(-45deg); }
+.ftr-hours { color: #c9dbd2; }
+.ftr-bottom { border-top-color: rgba(255, 255, 255, .14); color: #a9c4b8; }
+.ftr-bottom a, .ftr-btn { color: #e6eee9; }
+.ftr-disc { color: #8fae9f; }
+

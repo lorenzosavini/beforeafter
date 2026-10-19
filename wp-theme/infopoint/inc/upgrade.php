@@ -52,6 +52,14 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.0.0', '<' ) ) {
+		// Piè di pagina nel verde scuro del marchio, se era ancora il grigio predefinito.
+		$o = get_option( 'ip_settings', array() );
+		if ( is_array( $o ) && isset( $o['color_dark'] ) && in_array( strtolower( $o['color_dark'] ), array( '#373737', '' ), true ) ) {
+			unset( $o['color_dark'] );
+			update_option( 'ip_settings', $o );
+		}
+	}
 	if ( version_compare( $v, '2.9.9', '<' ) ) {
 		ip_upgrade_299();
 	}
