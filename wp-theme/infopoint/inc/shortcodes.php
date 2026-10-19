@@ -117,6 +117,7 @@ function ip_agevolazioni( $limit = -1 ) {
 	};
 	$fees = ip_fees();
 	$std  = $num( $fees['std_retta'] );
+	$best = $num( $fees['min_rata'] );
 	echo '<div class="agev">';
 	foreach ( $q as $p ) {
 		$title = get_the_title( $p );
@@ -127,12 +128,14 @@ function ip_agevolazioni( $limit = -1 ) {
 		$save  = $std && $num( $retta ) > 0 && $num( $retta ) < $std ? $std - $num( $retta ) : 0;
 		$full  = $std && $num( $retta ) === $std;
 		?>
-		<article class="agev-item">
-			<div class="agev-top">
-				<span class="agev-ico"><?php echo ip_icon( ip_agev_icon( $title ), 22 ); // phpcs:ignore ?></span>
-				<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="agev-badge"><?php echo ip_icon( 'calendar', 14 ); // phpcs:ignore ?> Entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
+		<?php $is_best = $best && $num( $rata ) === $best; ?>
+		<article class="agev-item<?php echo $is_best ? ' agev-best' : ''; ?>">
+			<?php if ( $is_best ) : ?><p class="agev-flag">La più conveniente</p><?php endif; ?>
+			<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="agev-badge"><?php echo ip_icon( 'calendar', 14 ); // phpcs:ignore ?> Richieste entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
+			<div class="agev-head">
+				<span class="agev-ico"><?php echo ip_icon( ip_agev_icon( $title ), 20 ); // phpcs:ignore ?></span>
+				<h3><?php echo esc_html( $title ); ?></h3>
 			</div>
-			<h3><?php echo esc_html( $title ); ?></h3>
 			<p class="agev-dest"><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
 			<div class="agev-price<?php echo $rata || $retta ? '' : ' agev-price-none'; ?>">
 				<?php if ( $rata ) : ?>
