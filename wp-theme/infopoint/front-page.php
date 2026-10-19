@@ -146,7 +146,7 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 						<?php if ( $agev ) : ?><a class="more-link" href="<?php echo esc_url( $agev ); ?>">Tutte le agevolazioni</a><?php endif; ?>
 					</header>
 					<?php if ( ip_opt( 'agev_text' ) ) : ?><p class="sec-lead"><?php echo esc_html( ip_opt( 'agev_text' ) ); ?></p><?php endif; ?>
-					<?php ip_agevolazioni_table( max( 1, (int) ip_opt( 'agev_count' ) ) ); ?>
+					<?php ip_agevolazioni_list( max( 1, (int) ip_opt( 'agev_count' ) ) ); ?>
 				</div>
 			</section>
 			<?php

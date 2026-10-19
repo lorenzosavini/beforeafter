@@ -374,6 +374,75 @@ add_shortcode( 'ip_chi_siamo', function () {
  * Agevolazioni in tabella: più leggibile delle schede quando si confrontano
  * gli importi. [ip_agevolazioni stile="tabella"]
  */
+/**
+ * Elenco compatto delle agevolazioni (home): retta standard come riferimento,
+ * poi una riga per agevolazione con icona, a chi è rivolta, prezzo e risparmio.
+ * Su telefono ogni riga diventa un blocco, senza scorrimento laterale.
+ */
+function ip_agevolazioni_list( $limit = 6 ) {
+	$num  = function ( $v ) {
+		return (float) str_replace( ',', '.', str_replace( '.', '', (string) $v ) );
+	};
+	$fees = ip_fees();
+	$std  = $num( $fees['std_retta'] );
+	$best = $num( $fees['min_rata'] );
+	$rows = array();
+	foreach ( get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => -1, 'orderby' => array( 'menu_order' => 'ASC', 'title' => 'ASC' ) ) ) as $p ) {
+		$key = get_post_meta( $p->ID, '_ip_fonte', true ) ? get_post_meta( $p->ID, '_ip_fonte', true ) : $p->post_name;
+		if ( 'retta-standard' !== $key && ( ip_meta( 'rata', $p->ID ) || ip_meta( 'retta', $p->ID ) ) ) {
+			$rows[] = $p;
+		}
+	}
+	// Dalla più conveniente: costo mensile (rata, o retta annua divisa per 12).
+	$month = function ( $p ) use ( $num ) {
+		return ip_meta( 'rata', $p->ID ) ? $num( ip_meta( 'rata', $p->ID ) ) : $num( ip_meta( 'retta', $p->ID ) ) / 12;
+	};
+	usort( $rows, function ( $a, $b ) use ( $month ) {
+		return $month( $a ) <=> $month( $b );
+	} );
+	$rows = array_slice( $rows, 0, $limit > 0 ? $limit : count( $rows ) );
+	if ( ! $rows ) {
+		return;
+	}
+	?>
+	<div class="alist">
+		<?php if ( $std ) : ?>
+			<p class="alist-std"><span>Retta standard</span> <strong><?php echo esc_html( ip_eur( $fees['std_retta'] ) ); ?> l’anno</strong><?php echo $fees['std_rata'] ? ' · ' . esc_html( ip_eur( $fees['std_rata'] ) ) . ' al mese' : ''; ?> <em>Con le agevolazioni paghi meno:</em></p>
+		<?php endif; ?>
+		<ul class="alist-rows">
+			<?php foreach ( $rows as $p ) : ?>
+				<?php
+				$title = get_the_title( $p );
+				$rata  = ip_meta( 'rata', $p->ID );
+				$retta = ip_meta( 'retta', $p->ID );
+				$save  = $std && $num( $retta ) > 0 && $num( $retta ) < $std ? $std - $num( $retta ) : 0;
+				$is_b  = $best && $num( $rata ) === $best;
+				?>
+				<li class="alist-row<?php echo $is_b ? ' is-best' : ''; ?>">
+					<span class="alist-ico"><?php echo ip_icon( ip_agev_icon( $title ), 20 ); // phpcs:ignore ?></span>
+					<div class="alist-t">
+						<h3><?php echo esc_html( $title ); ?><?php if ( $is_b ) : ?> <span class="alist-flag">La più conveniente</span><?php endif; ?></h3>
+						<p><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
+						<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="alist-due"><?php echo ip_icon( 'calendar', 14 ); // phpcs:ignore ?> Richieste entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
+					</div>
+					<div class="alist-p">
+						<?php if ( $rata ) : ?>
+							<strong>€ <?php echo esc_html( $rata ); ?><small>/mese</small></strong>
+							<?php if ( $retta ) : ?><span>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?> l’anno</span><?php endif; ?>
+						<?php else : ?>
+							<strong>€ <?php echo esc_html( number_format( $num( $retta ), 0, ',', '.' ) ); ?><small>/anno</small></strong>
+						<?php endif; ?>
+						<?php if ( $save ) : ?><em>−€ <?php echo esc_html( number_format( $save, 0, ',', '.' ) ); ?> l’anno</em><?php endif; ?>
+					</div>
+					<a class="alist-cta" href="#richiedi" data-scroll-form data-interest="<?php echo esc_attr( $title ); ?>">Verifica <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+	<?php
+	echo ip_agev_deadline_note(); // phpcs:ignore
+}
+
 function ip_agevolazioni_table( $limit = -1 ) {
 	$q = get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => $limit, 'orderby' => array( 'menu_order' => 'ASC', 'title' => 'ASC' ) ) );
 	if ( ! $q ) {

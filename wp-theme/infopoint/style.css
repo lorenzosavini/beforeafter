@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.9.7
+Version: 2.9.8
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -916,3 +916,37 @@ details[open] > :not(summary) { animation: ip-fade .35s ease both; }
 .brand-logo { display: block; height: 52px; max-height: none; width: auto; max-width: 260px; object-fit: contain; }
 @media (max-width: 600px) { .brand-logo { height: 40px; max-width: 200px; } }
 .ftr-logo { display: block; height: 56px; width: auto; max-width: 260px; margin-bottom: 14px; padding: 10px 14px; border-radius: 10px; background: #fff; object-fit: contain; }
+
+/* Agevolazioni in home: elenco a righe (niente tabella da scorrere). */
+.alist { margin-top: 8px; }
+.alist-std { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 14px; padding: 14px 18px; border-radius: 12px; background: var(--soft); font-size: .95rem; color: var(--ink-2); }
+.alist-std span { font-size: .76rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.alist-std strong { color: var(--ink); }
+.alist-std em { margin-left: auto; font-style: normal; font-weight: 600; color: var(--accent); }
+.alist-rows { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.alist-row { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto auto; align-items: center; gap: 18px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--white); transition: border-color .2s, box-shadow .2s, transform .2s; }
+.alist-row:hover { border-color: var(--brand-soft); box-shadow: 0 10px 26px rgba(14, 38, 29, .08); }
+.alist-row.is-best { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.alist-ico { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; background: var(--brand-deep); color: #fff; }
+.alist-t h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 3px; font-size: 1.02rem; line-height: 1.3; }
+.alist-t p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; margin: 0; font-size: .86rem; line-height: 1.45; color: var(--muted); }
+.alist-t .alist-due { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: .74rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+.alist-flag { padding: 2px 8px; border-radius: 4px; background: var(--accent); color: #fff; font-size: .68rem; font-weight: 700; letter-spacing: .03em; }
+.alist-p { display: flex; flex-direction: column; align-items: flex-end; text-align: right; white-space: nowrap; }
+.alist-p strong { font-size: 1.55rem; font-weight: 800; line-height: 1.1; letter-spacing: -.02em; color: var(--brand-deep); }
+.alist-p small { margin-left: 2px; font-size: .78rem; font-weight: 500; color: var(--muted); }
+.alist-p span { font-size: .8rem; color: var(--muted); }
+.alist-p em { margin-top: 3px; padding: 1px 8px; border-radius: 5px; background: #fbf1ec; font-style: normal; font-size: .76rem; font-weight: 700; color: var(--accent); }
+.alist-cta { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: var(--r-btn); background: #fbf1ec; color: var(--accent); font-weight: 700; font-size: .9rem; text-decoration: none; white-space: nowrap; transition: background-color .15s, color .15s; }
+.alist-cta:hover, .alist-row.is-best .alist-cta { background: var(--accent); color: #fff; }
+@media (max-width: 760px) {
+	.alist-std em { margin-left: 0; flex-basis: 100%; }
+	.alist-row { grid-template-columns: 42px minmax(0, 1fr) auto; grid-template-areas: "i t t" "p p c"; gap: 12px 12px; padding: 14px; }
+	.alist-ico { grid-area: i; width: 42px; height: 42px; }
+	.alist-t { grid-area: t; }
+	.alist-t p { -webkit-line-clamp: 2; }
+	.alist-p { grid-area: p; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; text-align: left; padding-top: 10px; border-top: 1px solid var(--line); }
+	.alist-p strong { font-size: 1.35rem; }
+	.alist-cta { grid-area: c; align-self: end; padding: 9px 14px; }
+}
+
