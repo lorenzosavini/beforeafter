@@ -23,7 +23,7 @@ form{padding:24px 26px 26px;display:grid;gap:12px}label{font-size:.85rem;font-we
 input{width:100%;padding:12px;border:1px solid #c5ccc9;border-radius:6px;font-size:1rem}input:focus{outline:0;border-color:#225e48;box-shadow:0 0 0 3px rgba(34,94,72,.16)}
 button{padding:13px;border:0;border-radius:6px;background:#a0300e;color:#fff;font-size:1rem;font-weight:700;cursor:pointer}
 .e{margin:0;color:#b42318;font-size:.9rem}.n{margin:0;font-size:.8rem;color:#5f676f}</style></head>
-<body><div class="box"><div class="h"><strong>Anteprima del nuovo sito</strong><span>ZDM Orientamento · accesso riservato</span></div>
+<body><div class="box"><div class="h"><strong>Anteprima del nuovo sito</strong><span>Infopoint Lanciano · accesso riservato</span></div>
 <form method="post" action="/__accesso"><input type="hidden" name="next" value="${esc(next)}">
 <label for="pw">Password</label><input id="pw" name="password" type="password" autocomplete="current-password" required autofocus>
 ${error ? '<p class="e">Password non corretta.</p>' : ''}<button>Entra</button>

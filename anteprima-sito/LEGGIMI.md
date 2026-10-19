@@ -1,4 +1,4 @@
-# Anteprima statica del sito ZDM Orientamento
+# Anteprima statica del sito Infopoint Lanciano
 
 Copia di sola visione del sito WordPress (tema Infopoint), generata dal sito di
 esempio per presentarlo prima della pubblicazione. Non è il sito vero: i moduli
