@@ -246,10 +246,13 @@
 		dl.push({ event: 'lead_thank_you', lead_type: new URLSearchParams(location.search).get('grazie') });
 	}
 
-	/* Schede lunghe da telefono (corsi, master, pagine con modulo a lato): ogni
-	   sezione «h2» diventa una tendina chiusa e l'introduzione si accorcia, così
-	   il modulo arriva subito dopo. Il testo resta tutto nella pagina. */
-	if (window.matchMedia && window.matchMedia('(max-width: 960px)').matches) {
+	/* Schede lunghe (corsi, master, pagine informative): ogni sezione «h2»
+	   diventa una tendina, aperta solo la prima. Da telefono anche
+	   l'introduzione si accorcia, così il modulo arriva subito. Il testo resta
+	   tutto nella pagina. */
+	var small = window.matchMedia && window.matchMedia('(max-width: 960px)').matches;
+	(function () {
+		var first = true;
 		var fold = function (box) {
 			var kids = Array.prototype.slice.call(box.children), cur = null, intro = [];
 			kids.forEach(function (el) {
@@ -259,6 +262,7 @@
 				} else if (el.tagName === 'H2') {
 					cur = d.createElement('details');
 					cur.className = 'm-sec';
+					if (first) { cur.open = true; first = false; }
 					if (el.id) { cur.id = el.id; }
 					var s = d.createElement('summary');
 					s.innerHTML = el.innerHTML;
@@ -271,7 +275,7 @@
 					intro.push(el);
 				}
 			});
-			if (!cur || !intro.length) return;
+			if (!cur || !intro.length || !small) return;
 			var wrap = d.createElement('div');
 			wrap.className = 'm-clamp';
 			box.insertBefore(wrap, intro[0]);
@@ -295,7 +299,7 @@
 		};
 		window.addEventListener('hashchange', openHash);
 		openHash();
-	}
+	})();
 
 	/* Banner cookie */
 	var banner = d.querySelector('[data-consent]');
