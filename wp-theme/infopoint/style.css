@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.7.2
+Version: 2.7.3
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -464,6 +464,12 @@ a.contact:hover { color: var(--brand); }
 .ftr-bottom { padding-top: 20px; padding-bottom: 28px; border-top: 1px solid rgba(255,255,255,.1); font-size: .84rem; }
 .ftr-bottom p { margin: 0 0 6px; }
 .ftr-disc { color: #a9a9a9; }
+.ftr-btn { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
+.ftr-btn:hover { text-decoration: underline; }
+.legal-upd { color: var(--ink-2); font-size: .9rem; }
+.legal h2 { margin-top: 1.8em; }
+.legal-table code { font-size: .86em; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .legal-table { font-size: .84rem; } .legal-table th, .legal-table td { padding: 8px 6px; } }
 @media (max-width: 900px) { .ftr-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .ftr-grid { grid-template-columns: 1fr; } }
 

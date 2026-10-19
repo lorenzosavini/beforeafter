@@ -33,6 +33,9 @@ function ip_upgrade() {
 	if ( version_compare( $v, '2.7.2', '<' ) ) {
 		ip_upgrade_272();
 	}
+	if ( version_compare( $v, '2.7.3', '<' ) ) {
+		ip_upgrade_273();
+	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.
@@ -309,4 +312,37 @@ function ip_upgrade_272() {
 		$o['hours'] = '';
 	}
 	update_option( 'ip_settings', $o );
+}
+
+/**
+ * 2.7.3: WhatsApp, email e orari della sede; consensi riscritti secondo il
+ * GDPR; pagine «Informativa privacy» e «Cookie policy» generate dai dati.
+ */
+function ip_upgrade_273() {
+	$o = get_option( 'ip_settings', array() );
+	$o = is_array( $o ) ? $o : array();
+	$set = array(
+		'whatsapp' => '+39 375 637 3330',
+		'email'    => 'info@unimarconilanciano.it',
+		'lead_to'  => 'info@unimarconilanciano.it',
+		'hours'    => "Lunedì–venerdì\n10:00–13:00 e 15:00–18:00",
+	);
+	foreach ( $set as $k => $v ) {
+		$cur = isset( $o[ $k ] ) ? trim( (string) $o[ $k ] ) : '';
+		if ( in_array( $cur, array( '', '+39 333 000 0000', 'info@esempio.it' ), true ) ) {
+			$o[ $k ] = $v;
+		}
+	}
+	// Consensi: sostituiti solo se ancora quelli predefiniti.
+	$old = array(
+		'privacy_text' => array( 'Ho letto l’informativa privacy e acconsento al trattamento dei miei dati da parte di {azienda} per ricevere le informazioni richieste.', 'Ho letto l’informativa privacy: i miei dati saranno trattati da {azienda} per rispondere alla mia richiesta.' ),
+		'mkt_text'     => array( 'Voglio ricevere aggiornamenti su corsi, agevolazioni e scadenze (facoltativo).', 'Acconsento a ricevere da {azienda} aggiornamenti su corsi, agevolazioni e scadenze via email, telefono o WhatsApp (facoltativo).' ),
+	);
+	foreach ( $old as $k => $pair ) {
+		if ( ! isset( $o[ $k ] ) || trim( $o[ $k ] ) === $pair[0] ) {
+			$o[ $k ] = $pair[1];
+		}
+	}
+	update_option( 'ip_settings', $o );
+	ip_legal_pages();
 }

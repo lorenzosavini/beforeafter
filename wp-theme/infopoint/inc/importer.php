@@ -451,6 +451,7 @@ function ip_run_import( $o ) {
 		$opts['thanks_page'] = (string) $pages['grazie'];
 		update_option( 'ip_settings', $opts );
 	}
+	ip_legal_pages();
 
 	if ( $o['menus'] ) {
 		$log = array_merge( $log, ip_import_menus( $pages, $tip_ids ) );

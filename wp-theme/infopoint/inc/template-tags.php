@@ -73,7 +73,7 @@ function ip_privacy_url() {
 	if ( ! $id ) {
 		$id = (int) get_option( 'wp_page_for_privacy_policy' );
 	}
-	return $id ? get_permalink( $id ) : '';
+	return $id && 'publish' === get_post_status( $id ) ? get_permalink( $id ) : '';
 }
 
 function ip_courses_url( $tipologia = '' ) {

@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'IP_VERSION', '2.7.2' );
+define( 'IP_VERSION', '2.7.3' );
 define( 'IP_DIR', get_template_directory() );
 define( 'IP_URI', get_template_directory_uri() );
 
@@ -22,6 +22,7 @@ require IP_DIR . '/inc/leads-admin.php';
 require IP_DIR . '/inc/shortcodes.php';
 require IP_DIR . '/inc/seo.php';
 require IP_DIR . '/inc/consent.php';
+require IP_DIR . '/inc/legal.php';
 require IP_DIR . '/inc/importer.php';
 require IP_DIR . '/inc/sync-extract.php';
 require IP_DIR . '/inc/sync.php';

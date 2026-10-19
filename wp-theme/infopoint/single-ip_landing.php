@@ -22,6 +22,8 @@ $form_titles = array(
 );
 $privacy_id = (int) ip_opt( 'privacy_page' ) ? (int) ip_opt( 'privacy_page' ) : (int) get_option( 'wp_page_for_privacy_policy' );
 $cookie_id  = (int) ip_opt( 'cookie_page' );
+$privacy_id = 'publish' === get_post_status( $privacy_id ) ? $privacy_id : 0;
+$cookie_id  = 'publish' === get_post_status( $cookie_id ) ? $cookie_id : 0;
 $chi        = ip_page_url( 'chi-siamo' );
 $tip        = $d['course'] ? ip_course_tipologia( $d['course'] ) : null;
 $is_degree  = ( $tip && 0 === strpos( $tip->slug, 'laurea' ) )
@@ -447,6 +449,7 @@ $head = function ( $title, $sub = '' ) {
 			<?php if ( $chi ) : ?><button type="button" class="lp-link" data-lp-open="lp-chi">Chi siamo</button><?php endif; ?>
 			<?php if ( $privacy_id ) : ?><button type="button" class="lp-link" data-lp-open="lp-privacy">Privacy</button><?php endif; ?>
 			<?php if ( $cookie_id ) : ?><button type="button" class="lp-link" data-lp-open="lp-cookie">Cookie</button><?php endif; ?>
+			<?php echo ip_consent_button( 'lp-link', 'Preferenze cookie' ); // phpcs:ignore ?>
 		</p>
 		<?php if ( ip_opt( 'disclaimer' ) ) : ?><p class="lp-foot-d"><?php echo esc_html( ip_text( 'disclaimer' ) ); ?></p><?php endif; ?>
 	</div>
@@ -476,7 +479,7 @@ $head = function ( $title, $sub = '' ) {
 // Pagine legali e «chi siamo» in finestre: si leggono senza lasciare la landing.
 ip_lp_dialog( 'chi', 'Chi siamo', do_shortcode( '[ip_chi_siamo]' ), $chi );
 ip_lp_dialog( 'privacy', 'Informativa privacy', ip_lp_page_html( $privacy_id ), $privacy_id ? get_permalink( $privacy_id ) : '' );
-ip_lp_dialog( 'cookie', 'Cookie', ip_lp_page_html( $cookie_id ), $cookie_id ? get_permalink( $cookie_id ) : '' );
+ip_lp_dialog( 'cookie', 'Cookie policy', ip_lp_page_html( $cookie_id ), $cookie_id ? get_permalink( $cookie_id ) : '' );
 ?>
 
 <?php if ( $o['uscita'] ) : ?>

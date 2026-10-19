@@ -120,7 +120,7 @@ function ip_form( $a = array() ) {
 			</div>
 			<div class="check">
 				<input type="checkbox" id="<?php echo esc_attr( $uid ); ?>-mkt" name="ip_marketing" value="1">
-				<label for="<?php echo esc_attr( $uid ); ?>-mkt"><?php echo esc_html( ip_opt( 'mkt_text' ) ); ?></label>
+				<label for="<?php echo esc_attr( $uid ); ?>-mkt"><?php echo esc_html( ip_text( 'mkt_text' ) ); ?></label>
 			</div>
 			<?php if ( ip_text( 'form_notice' ) ) : ?>
 				<p class="form-notice"><?php echo esc_html( ip_text( 'form_notice' ) ); ?></p>

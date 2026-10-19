@@ -243,6 +243,13 @@
 	/* Banner cookie */
 	var banner = d.querySelector('[data-consent]');
 	if (banner) {
+		d.addEventListener('click', function (e) {
+			if (!e.target.closest('[data-consent-open]')) return;
+			d.querySelectorAll('dialog[open]').forEach(function (x) { x.close(); });
+			banner.hidden = false;
+			var f = banner.querySelector('button');
+			if (f) f.focus();
+		});
 		if (!store.get('ip_consent')) banner.hidden = false;
 		banner.addEventListener('click', function (e) {
 			var b = e.target.closest('[data-consent-set]');

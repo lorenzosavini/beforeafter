@@ -82,7 +82,7 @@ endif;
 		</div>
 	<?php endif; ?>
 	<div class="wrap ftr-bottom">
-		<p>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( ip_legal_line() ); ?><?php if ( ip_page_url( 'chi-siamo' ) ) : ?> · <a href="<?php echo esc_url( ip_page_url( 'chi-siamo' ) ); ?>">Chi siamo</a><?php endif; ?><?php if ( ip_privacy_url() ) : ?> · <a href="<?php echo esc_url( ip_privacy_url() ); ?>">Privacy</a><?php endif; ?><?php if ( (int) ip_opt( 'cookie_page' ) ) : ?> · <a href="<?php echo esc_url( get_permalink( (int) ip_opt( 'cookie_page' ) ) ); ?>">Cookie</a><?php endif; ?></p>
+		<p>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( ip_legal_line() ); ?><?php if ( ip_page_url( 'chi-siamo' ) ) : ?> · <a href="<?php echo esc_url( ip_page_url( 'chi-siamo' ) ); ?>">Chi siamo</a><?php endif; ?><?php if ( ip_privacy_url() ) : ?> · <a href="<?php echo esc_url( ip_privacy_url() ); ?>">Privacy</a><?php endif; ?><?php if ( 'publish' === get_post_status( (int) ip_opt( 'cookie_page' ) ) ) : ?> · <a href="<?php echo esc_url( get_permalink( (int) ip_opt( 'cookie_page' ) ) ); ?>">Cookie</a><?php endif; ?><?php if ( ip_consent_button() ) : ?> · <?php echo ip_consent_button( 'ftr-btn', 'Preferenze cookie' ); // phpcs:ignore ?><?php endif; ?></p>
 		<?php if ( ip_opt( 'disclaimer' ) ) : ?>
 			<p class="ftr-disc"><?php echo esc_html( ip_text( 'disclaimer' ) ); ?></p>
 		<?php endif; ?>
