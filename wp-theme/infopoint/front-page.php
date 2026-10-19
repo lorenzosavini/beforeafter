@@ -35,7 +35,7 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 				</ul>
 			<?php endif; ?>
 			<div class="hero-actions">
-				<a class="btn btn-gold" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
+				<a class="btn btn-accent" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
 				<?php echo ip_phone_link( 'phone1', 'btn btn-line-light' ); // phpcs:ignore ?>
 			</div>
 			<?php if ( $price ) : ?>
