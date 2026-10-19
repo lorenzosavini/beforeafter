@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.8.3
+Version: 2.8.4
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -777,4 +777,37 @@ details[open] > summary .acc-i { background: var(--brand); color: #fff; }
 .agev-item summary .acc-i { width: 26px; height: 26px; border-radius: 7px; }
 .agev-item summary .acc-i svg { width: 15px; height: 15px; }
 summary.has-i::after { top: 50% !important; transform: translateY(-50%); }
+
+/* Pagine di ricerca dei corsi: banda verde come le schede corso e ricerca a tutta larghezza. */
+.phead-band { padding: 26px 0 40px; border: 0; background: var(--brand-deep); color: #fff; }
+.phead-band .crumbs ol, .phead-band .crumbs a { color: #b9cfc5; }
+.phead-band .crumbs li + li::before { color: rgba(255, 255, 255, .35); }
+.phead-band h1 { max-width: none; margin-bottom: .45em; color: #fff; line-height: 1.22; }
+.phead-band .h1-pre { display: block; margin-bottom: .3em; font-size: .5em; font-weight: 600; color: #cfe0d8; }
+.phead-band .hl { padding: 0 .2em; border-radius: 4px; background: var(--accent); color: #fff; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.phead-band .phead-lead { color: #e6eee9; }
+.band-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 22px 40px; margin-top: 26px; }
+.band-stats { display: flex; flex-wrap: wrap; gap: 0; margin: 0; }
+.band-stats div { padding: 0 28px 0 0; margin-right: 28px; border-right: 1px solid rgba(255, 255, 255, .18); }
+.band-stats div:last-child { border-right: 0; margin-right: 0; }
+.band-stats dt { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #b9cfc5; }
+.band-stats dd { margin: 2px 0 0; font-family: "Source Serif 4", Georgia, serif; font-size: 1.9rem; font-weight: 600; line-height: 1.1; color: #fff; }
+.phead-band .phead-acts { margin: 0; }
+.phead-band + .sec { padding-top: 0; }
+.phead-band + .sec .cfilter { margin-top: 0; padding: 22px 0 16px; border-bottom: 0; }
+.cfilter-search { max-width: none; }
+.cfilter-search input { height: 58px; padding: 0 18px 0 52px; border: 1px solid var(--line-2); border-radius: 14px; font-size: 1.05rem; box-shadow: 0 8px 24px rgba(14, 38, 29, .08); }
+.cfilter-search input:focus { border-color: var(--brand); outline: 3px solid var(--brand-tint); outline-offset: 0; }
+.cfilter-search .i { left: 18px; width: 20px; height: 20px; color: var(--brand); }
+.chips { gap: 10px; }
+.chip { padding: 8px 14px; }
+@media (max-width: 760px) {
+	.phead-band { padding: 18px 0 30px; }
+	.band-row { flex-direction: column; align-items: stretch; }
+	.band-stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 0; }
+	.band-stats div { padding-right: 14px; margin-right: 14px; }
+	.band-stats dt { font-size: .66rem; }
+	.band-stats dd { font-size: 1.25rem; white-space: nowrap; }
+	.cfilter-search input { height: 52px; font-size: 1rem; }
+}
 

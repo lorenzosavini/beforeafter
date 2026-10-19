@@ -82,8 +82,10 @@ function ip_course_list( $slugs = array(), $filter = true, $limit = 300 ) {
 			}
 			?>
 			<section class="cgroup" data-group="<?php echo esc_attr( $t->slug ); ?>">
+				<?php if ( count( $tips ) > 1 ) : // Con una sola tipologia titolo e descrizione sono già nella testata. ?>
 				<h2 class="cgroup-title"><?php echo esc_html( $t->name ); ?> <span><?php echo (int) $q->post_count; ?></span></h2>
-				<?php if ( $t->description ) : ?>
+				<?php endif; ?>
+				<?php if ( $t->description && count( $tips ) > 1 ) : ?>
 					<p class="cgroup-desc"><?php echo esc_html( $t->description ); ?></p>
 				<?php endif; ?>
 				<ul class="crows">
