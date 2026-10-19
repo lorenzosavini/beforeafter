@@ -30,6 +30,9 @@ function ip_upgrade() {
 		// La pagina dei trasferimenti, tolta su richiesta dell'Ateneo, non va più importata.
 		ip_sync_block( 'https://www.unimarconi.it/immatricolazione-con-trasferimento-da-altro-ateneo/' );
 	}
+	if ( version_compare( $v, '2.7.2', '<' ) ) {
+		ip_upgrade_272();
+	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.
@@ -272,4 +275,38 @@ function ip_upgrade_270() {
 		}
 		wp_update_post( $up );
 	}
+}
+
+/**
+ * 2.7.2: dati legali e di contatto dell'Infopoint Lanciano (ZDM S.r.l.).
+ * Si compilano solo i campi vuoti o rimasti ai valori di esempio.
+ */
+function ip_upgrade_272() {
+	$o = get_option( 'ip_settings', array() );
+	$o = is_array( $o ) ? $o : array();
+	$demo = array( '', '085 000 0000', '0872 000 000', '+39 333 000 0000', 'info@esempio.it', "Via Esempio 1\n65100 Pescara", "Via Esempio 1\n66034 Lanciano (CH)", "Lun–Ven 9:00–13:00 / 15:00–19:00\nSabato su appuntamento" );
+	$set  = array(
+		'company_name'  => 'ZDM S.r.l.',
+		'vat'           => '02365510698',
+		'legal_address' => "Via Venezia, 10\nPescara (PE)",
+		'address'       => "Via Salita della Posta, 13\n66034 Lanciano (CH)",
+		'phone1'        => '0872 676609',
+		'phone1_label'  => 'Telefono',
+		'phone2'        => '375 637 3330',
+		'phone2_label'  => 'Cellulare',
+		'pec'           => 'ZDMSRL@pec-legal.com',
+	);
+	foreach ( $set as $k => $v ) {
+		$cur = isset( $o[ $k ] ) ? trim( (string) $o[ $k ] ) : '';
+		if ( in_array( $cur, $demo, true ) || in_array( $cur, array( 'Orientamento', 'Segreteria' ), true ) ) {
+			$o[ $k ] = $v;
+		}
+	}
+	// Orari di esempio: meglio nessun orario che uno sbagliato.
+	if ( isset( $o['hours'] ) && in_array( trim( $o['hours'] ), $demo, true ) ) {
+		$o['hours'] = '';
+	} elseif ( ! isset( $o['hours'] ) ) {
+		$o['hours'] = '';
+	}
+	update_option( 'ip_settings', $o );
 }

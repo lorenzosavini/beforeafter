@@ -285,7 +285,7 @@ add_shortcode( 'ip_chi_siamo', function () {
 			<dl class="whois-dl">
 				<div><dt>Denominazione del polo</dt><dd><?php echo esc_html( ip_opt( 'brand' ) ); ?></dd></div>
 				<div><dt>Gestito da</dt><dd><?php echo esc_html( $azienda ); ?></dd></div>
-				<?php foreach ( array( 'legal_address' => 'Sede legale', 'address' => 'Sede operativa', 'vat' => 'Partita IVA', 'rea' => 'REA', 'capital' => 'Capitale sociale', 'pec' => 'PEC', 'email' => 'Email', 'phone1' => 'Telefono' ) as $k => $l ) : ?>
+				<?php foreach ( array( 'legal_address' => 'Sede legale', 'address' => 'Sede operativa', 'vat' => 'Partita IVA', 'rea' => 'REA', 'capital' => 'Capitale sociale', 'pec' => 'PEC', 'email' => 'Email', 'phone1' => 'Telefono', 'phone2' => 'Altro telefono' ) as $k => $l ) : ?>
 					<?php if ( ip_opt( $k ) ) : ?>
 						<div><dt><?php echo esc_html( $l ); ?></dt><dd><?php echo nl2br( esc_html( ip_opt( $k ) ) ); ?></dd></div>
 					<?php endif; ?>

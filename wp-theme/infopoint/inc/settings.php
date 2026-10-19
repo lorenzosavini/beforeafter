@@ -48,7 +48,7 @@ function ip_settings_fields() {
 				'email'        => array( 'Email pubblica', 'text', '' ),
 				'address'      => array( 'Indirizzo sede', 'textarea', '' ),
 				'address_exam' => array( 'Indirizzo sede d’esame', 'textarea', '' ),
-				'hours'        => array( 'Orari', 'textarea', "Lun–Ven 9:00–13:00 / 15:00–19:00\nSabato su appuntamento" ),
+				'hours'        => array( 'Orari', 'textarea', '', 'Vuoto = orari non mostrati.' ),
 				'maps_url'     => array( 'Link Google Maps', 'url', '' ),
 				'facebook'     => array( 'Facebook', 'url', '' ),
 				'instagram'    => array( 'Instagram', 'url', '' ),

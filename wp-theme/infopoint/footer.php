@@ -25,11 +25,15 @@ endif;
 		<div class="wrap ftr-grid">
 			<div class="ftr-brand">
 				<p class="ftr-name"><?php echo esc_html( ip_opt( 'brand' ) ); ?></p>
-				<?php if ( ip_opt( 'company_name' ) ) : ?>
-					<p><?php echo esc_html( ip_role_label() . ( ip_opt( 'company_name' ) ? ', gestito da ' . ip_opt( 'company_name' ) : '' ) ); ?></p>
-				<?php endif; ?>
+				<p><?php echo esc_html( ip_role_label() ); ?></p>
 				<?php if ( ip_opt( 'address' ) ) : ?>
-					<p><?php echo nl2br( esc_html( ip_opt( 'address' ) ) ); ?></p>
+					<p><span class="ftr-label">Sede operativa</span><br><?php echo nl2br( esc_html( ip_opt( 'address' ) ) ); ?></p>
+				<?php endif; ?>
+				<?php if ( ip_opt( 'company_name' ) ) : ?>
+					<p><span class="ftr-label">Gestito da</span><br><?php echo esc_html( ip_opt( 'company_name' ) ); ?><?php echo ip_opt( 'vat' ) ? ' · P.IVA ' . esc_html( ip_opt( 'vat' ) ) : ''; ?>
+						<?php if ( ip_opt( 'legal_address' ) ) : ?><br>Sede legale: <?php echo esc_html( preg_replace( '/\s*\n\s*/', ', ', trim( ip_opt( 'legal_address' ) ) ) ); ?><?php endif; ?>
+						<?php if ( ip_opt( 'pec' ) ) : ?><br>PEC: <?php echo esc_html( ip_opt( 'pec' ) ); ?><?php endif; ?>
+					</p>
 				<?php endif; ?>
 				<?php if ( ip_opt( 'address_exam' ) ) : ?>
 					<p><span class="ftr-label">Sede d’esame</span><br><?php echo nl2br( esc_html( ip_opt( 'address_exam' ) ) ); ?></p>
