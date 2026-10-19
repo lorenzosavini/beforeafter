@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.7.9
+Version: 2.8.0
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -706,4 +706,37 @@ a.contact:hover { color: var(--brand); }
 .m-clamp.open { max-height: none; }
 .m-clamp.open::after { content: none; }
 .m-more { display: block; margin: 4px 0 22px; padding: 0; border: 0; background: none; font: 600 .98rem/1.4 var(--font); color: var(--brand); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+/* Testata dei corsi: banda verde, nome del corso evidenziato, foto ad arco,
+   scheda dati bianca a cavallo del bordo. */
+.phead-course { padding: 26px 0 0; border: 0; background: linear-gradient(180deg, var(--brand-deep) 0, var(--brand-deep) calc(100% - 64px), var(--white) calc(100% - 64px)); color: #fff; }
+.phead-course .phead-grid { padding-bottom: 0; }
+.phead-course.has-img .phead-grid { grid-template-columns: minmax(0, 1fr) 380px; gap: 56px; align-items: end; }
+.phead-course .phead-main { display: flex; flex-direction: column; align-items: flex-start; }
+.phead-course .crumbs ol, .phead-course .crumbs a { color: #b9cfc5; }
+.phead-course .crumbs li + li::before { color: rgba(255, 255, 255, .35); }
+.phead-course .eyebrow { color: #cfe0d8; }
+.phead-course h1 { max-width: none; margin-bottom: .5em; color: #fff; line-height: 1.22; }
+.phead-course h1.h1-long { font-size: clamp(1.5rem, 2.3vw, 1.95rem); }
+.phead-course .h1-pre { display: block; margin-bottom: .3em; font-size: .52em; font-weight: 600; color: #cfe0d8; }
+.phead-course .hl { padding: 0 .2em; border-radius: 4px; background: var(--accent); color: #fff; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.phead-course .h1-code { display: inline-block; vertical-align: middle; padding: .15em .55em; border-radius: 6px; background: rgba(255, 255, 255, .14); font-size: .42em; font-weight: 700; letter-spacing: .04em; color: #fff; }
+.phead-course .phead-sub, .phead-course .phead-sub a { color: #e6eee9; }
+.phead-course .phead-note { background: rgba(255, 255, 255, .12); color: #fff; }
+.phead-acts { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.phead-acts .btn-white .i { color: var(--accent); }
+.phead-course .facts-dl { position: relative; z-index: 2; max-width: none; margin: 30px 0 0; border: 0; background: var(--white); color: var(--ink); box-shadow: 0 18px 40px rgba(14, 38, 29, .18); }
+.phead-course .facts-dl dd { font-size: 1.08rem; }
+.phead-course .facts-price { background: #fbf1ec; }
+.phead-course .facts-price dd { color: var(--accent); }
+.phead-course .phead-img img { aspect-ratio: 4 / 5; border-radius: 200px 200px 16px 16px; box-shadow: 0 24px 50px rgba(0, 0, 0, .3); }
+@media (max-width: 960px) {
+	.phead-course { padding-top: 18px; background: linear-gradient(180deg, var(--brand-deep) 0, var(--brand-deep) calc(100% - 56px), var(--white) calc(100% - 56px)); }
+	.phead-course.has-img .phead-grid { grid-template-columns: 1fr; gap: 24px; }
+	.phead-course .phead-main { align-items: stretch; }
+	.phead-course .phead-img img { aspect-ratio: 16 / 10; border-radius: 120px 120px 14px 14px; }
+	.phead-acts { flex-direction: column; margin-top: 4px; }
+	.phead-acts .btn { width: 100%; }
+	.phead-course .facts-dl div:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: 0; }
+}
 

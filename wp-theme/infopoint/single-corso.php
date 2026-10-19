@@ -16,6 +16,28 @@ while ( have_posts() ) :
 		'Lingua'     => ip_meta( 'lingua' ),
 		'Modalità'   => $is_degree ? 'Online, esami in presenza' : '',
 	) );
+	// Scheda dati della testata: al massimo cinque voci, la retta sempre.
+	$price = ip_meta( 'retta' ) ? ip_meta( 'retta' ) : ( $is_degree && ip_price_from() ? 'da ' . ip_price_from() . '/mese' : '' );
+	foreach ( array( 'Modalità', 'Lingua' ) as $drop ) {
+		if ( count( $facts ) + ( $price ? 1 : 0 ) > 5 ) {
+			unset( $facts[ $drop ] );
+		}
+	}
+	// Titolo: «Laurea triennale in» piccolo sopra, nome del corso evidenziato, classe a parte.
+	$t_pre  = '';
+	$t_main = get_the_title();
+	$t_code = '';
+	if ( preg_match( '/^(.*\S)\s*\(([A-Z0-9][A-Z0-9\/ -]{0,14})\)$/u', $t_main, $m ) ) {
+		$t_main = $m[1];
+		$t_code = $m[2];
+	}
+	if ( $tip && 0 === mb_stripos( $t_main, $tip->name . ' in ' ) ) {
+		$t_pre  = mb_substr( $t_main, 0, mb_strlen( $tip->name ) + 3 );
+		$t_main = mb_substr( $t_main, mb_strlen( $tip->name ) + 4 );
+	} elseif ( preg_match( '/^(.{6,60}?\sin)\s(.+)$/u', $t_main, $m ) ) {
+		$t_pre  = $m[1];
+		$t_main = $m[2];
+	}
 	?>
 	<article class="course">
 		<header class="phead phead-course<?php echo has_post_thumbnail() ? ' has-img' : ''; ?>">
@@ -23,10 +45,14 @@ while ( have_posts() ) :
 				<div class="phead-main">
 				<?php ip_breadcrumbs(); ?>
 				<p class="eyebrow">
-					<?php echo esc_html( $tip ? $tip->name : 'Corso' ); ?>
+					<?php echo $t_pre ? '' : esc_html( $tip ? $tip->name : 'Corso' ); ?>
 					<span class="status status-<?php echo esc_attr( $stato ); ?>"><?php echo esc_html( ip_status_label( $stato ) ); ?></span>
 				</p>
-				<h1><?php the_title(); ?></h1>
+				<h1<?php echo mb_strlen( $t_main ) > 38 ? ' class="h1-long"' : ''; ?>>
+					<?php if ( $t_pre ) : ?><span class="h1-pre"><?php echo esc_html( $t_pre ); ?></span><?php endif; ?>
+					<span class="hl"><?php echo esc_html( $t_main ); ?></span>
+					<?php if ( $t_code ) : ?><span class="h1-code"><?php echo esc_html( $t_code ); ?></span><?php endif; ?>
+				</h1>
 				<?php if ( ip_meta( 'evidenza' ) ) : ?>
 					<p class="phead-note"><?php echo esc_html( ip_meta( 'evidenza' ) ); ?></p>
 				<?php endif; ?>
@@ -42,12 +68,18 @@ while ( have_posts() ) :
 				<?php if ( $sub ) : ?>
 					<p class="phead-sub"><?php echo implode( ' · ', $sub ); // phpcs:ignore ?></p>
 				<?php endif; ?>
+				<div class="phead-acts">
+					<a class="btn btn-accent" href="#richiedi" data-scroll-form>Ricevi costi e piano di studi</a>
+					<?php echo ip_phone_link( 'phone1', 'btn btn-white' ); // phpcs:ignore ?>
+				</div>
 				<dl class="facts-dl">
 					<?php foreach ( $facts as $k => $v ) : ?>
 						<div><dt><?php echo esc_html( $k ); ?></dt><dd><?php echo esc_html( $v ); ?></dd></div>
 					<?php endforeach; ?>
+					<?php if ( $price ) : ?>
+						<div class="facts-price"><dt><?php echo ip_meta( 'retta' ) ? 'Costo' : 'Retta'; ?></dt><dd><?php echo esc_html( $price ); ?></dd></div>
+					<?php endif; ?>
 				</dl>
-				<a class="btn btn-accent jump" href="#richiedi" data-scroll-form>Ricevi costi e piano di studi</a>
 				</div>
 				<?php if ( has_post_thumbnail() ) : ?>
 					<figure class="phead-img"><?php the_post_thumbnail( 'medium_large', array( 'loading' => 'eager', 'fetchpriority' => 'high', 'alt' => '' ) ); ?></figure>
