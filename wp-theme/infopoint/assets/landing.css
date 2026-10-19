@@ -541,3 +541,9 @@
 	.lp-hero-img::before { background: rgba(9, 28, 21, .96); }
 	.lp-hero-img img { filter: blur(2px) grayscale(.4); }
 }
+@media (max-width: 900px) {
+	.lp-hero { background: #0b2219; }
+	.lp-hero-img { left: auto; right: 0; width: 62%; }
+	.lp-hero-img img { object-position: 65% center; filter: grayscale(.25); -webkit-mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 100%); mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 100%); }
+	.lp-hero-img::before { left: auto; right: 0; width: 161%; background: linear-gradient(90deg, rgba(11, 34, 25, .97) 0%, rgba(11, 34, 25, .9) 50%, rgba(11, 34, 25, .72) 100%); }
+}
