@@ -537,3 +537,7 @@
 	/* Telefono: subito il modulo. Chiama e WhatsApp sono nella barra in basso, i dati nelle sezioni sotto. */
 	.lp-hero .lp-chips, .lp-hero .lp-pts, .lp-hero .lp-acts, .lp-hero .lp-price { display: none; }
 }
+@media (max-width: 900px) {
+	.lp-hero-img::before { background: rgba(9, 28, 21, .96); }
+	.lp-hero-img img { filter: blur(2px) grayscale(.4); }
+}
