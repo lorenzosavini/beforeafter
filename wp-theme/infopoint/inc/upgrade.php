@@ -33,8 +33,8 @@ function ip_upgrade() {
 	if ( version_compare( $v, '2.7.2', '<' ) ) {
 		ip_upgrade_272();
 	}
-	if ( version_compare( $v, '2.7.3', '<' ) ) {
-		ip_upgrade_273();
+	if ( version_compare( $v, '2.7.4', '<' ) ) {
+		ip_upgrade_274();
 	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
@@ -315,10 +315,10 @@ function ip_upgrade_272() {
 }
 
 /**
- * 2.7.3: WhatsApp, email e orari della sede; consensi riscritti secondo il
- * GDPR; pagine «Informativa privacy» e «Cookie policy» generate dai dati.
+ * 2.7.3–2.7.4: WhatsApp, email e orari della sede; consensi brevi e niente
+ * avviso nei moduli; pagine «Informativa privacy» e «Cookie policy».
  */
-function ip_upgrade_273() {
+function ip_upgrade_274() {
 	$o = get_option( 'ip_settings', array() );
 	$o = is_array( $o ) ? $o : array();
 	$set = array(
@@ -336,11 +336,13 @@ function ip_upgrade_273() {
 	// Consensi: sostituiti solo se ancora quelli predefiniti.
 	$old = array(
 		'privacy_text' => array( 'Ho letto l’informativa privacy e acconsento al trattamento dei miei dati da parte di {azienda} per ricevere le informazioni richieste.', 'Ho letto l’informativa privacy: i miei dati saranno trattati da {azienda} per rispondere alla mia richiesta.' ),
-		'mkt_text'     => array( 'Voglio ricevere aggiornamenti su corsi, agevolazioni e scadenze (facoltativo).', 'Acconsento a ricevere da {azienda} aggiornamenti su corsi, agevolazioni e scadenze via email, telefono o WhatsApp (facoltativo).' ),
+		'mkt_text'     => array( 'Acconsento a ricevere da {azienda} aggiornamenti su corsi, agevolazioni e scadenze via email, telefono o WhatsApp (facoltativo).' ),
+		'form_notice'  => array( 'Stai contattando {brand}, gestito da {azienda}. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.', 'Stai contattando {azienda}, agenzia partner. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.' ),
 	);
-	foreach ( $old as $k => $pair ) {
-		if ( ! isset( $o[ $k ] ) || trim( $o[ $k ] ) === $pair[0] ) {
-			$o[ $k ] = $pair[1];
+	// Moduli essenziali: consensi brevi (il dettaglio è nell'informativa), nessun avviso.
+	foreach ( $old as $k => $texts ) {
+		if ( isset( $o[ $k ] ) && in_array( trim( $o[ $k ] ), $texts, true ) ) {
+			unset( $o[ $k ] ); // Torna al testo predefinito.
 		}
 	}
 	update_option( 'ip_settings', $o );

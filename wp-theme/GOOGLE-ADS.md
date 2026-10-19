@@ -29,8 +29,9 @@ del nome dell'attività.
 - Pagina **Chi siamo** generata con i dati di legge (ragione sociale, sede
   legale, P.IVA, REA, PEC, capitale), il rapporto con l'Ateneo, cosa fate e
   cosa *non* fate, link all'elenco ufficiale dei poli UniMarconi.
-- Avviso **sopra ogni modulo** («Stai contattando ZDM S.r.l., agenzia
-  partner…») e consenso privacy intestato alla vostra società.
+- Moduli con consenso privacy che rimanda all'informativa intestata alla
+  vostra società (titolare del trattamento); un avviso facoltativo sopra i
+  moduli si attiva da *Impostazioni → Trasparenza*.
 - Titoli SEO, dati strutturati e piè di pagina con il **vostro** marchio
   (`legalName`, `vatID`); nessun «Infopoint UniMarconi» automatico.
 - Logo provvisorio con l'iniziale del vostro marchio (non più la «M»).

@@ -33,7 +33,7 @@ function ip_settings_fields() {
 				'partner_proof'  => array( 'Link alla pagina ufficiale UniMarconi che vi elenca', 'url', 'https://www.unimarconi.it/sedi-esami-e-poli-di-orientamento/', 'Prova pubblica e verificabile del rapporto con l’Ateneo (es. elenco dei poli di orientamento). Google la cerca quando valuta il ricorso.' ),
 				'disclosure_bar' => array( 'Avviso di trasparenza in cima a ogni pagina', 'checkbox', '1', 'Consigliato: rende evidente fin dal primo sguardo che il sito non è quello dell’Università.' ),
 				'disclosure'     => array( 'Testo dell’avviso', 'textarea', '{brand} è un {ruolo}, gestito da {azienda} (P.IVA {piva}). Non è l’Università: l’iscrizione si completa sui canali ufficiali dell’Ateneo e le tasse si pagano direttamente all’Università.', 'Segnaposto: {brand}, {azienda}, {piva}, {ruolo}. Usate la dicitura prevista dal contratto con l’Ateneo («centro di orientamento accreditato»).' ),
-				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', 'Stai contattando {brand}, gestito da {azienda}. La consulenza è gratuita; i tuoi dati non vengono inviati all’Università senza il tuo consenso.', 'Mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
+				'form_notice'    => array( 'Avviso sopra i moduli', 'textarea', '', 'Facoltativo: mostrato in ogni modulo, prima del pulsante. Vuoto = nascosto.' ),
 			),
 		),
 		'contatti'    => array(
@@ -129,8 +129,8 @@ function ip_settings_fields() {
 				'form_title'   => array( 'Titolo modulo informazioni', 'text', 'Ricevi costi e piano di studi' ),
 				'form_text'    => array( 'Testo modulo informazioni', 'text', 'Ti rispondiamo entro un giorno lavorativo, anche su WhatsApp se preferisci.' ),
 				'form_button'  => array( 'Pulsante modulo informazioni', 'text', 'Invia la richiesta' ),
-				'privacy_text' => array( 'Testo consenso privacy', 'textarea', 'Ho letto l’informativa privacy: i miei dati saranno trattati da {azienda} per rispondere alla mia richiesta.', 'Le parole «informativa privacy» diventano il link alla pagina scelta sopra. Segnaposto: {azienda}.' ),
-				'mkt_text'     => array( 'Testo consenso marketing', 'textarea', 'Acconsento a ricevere da {azienda} aggiornamenti su corsi, agevolazioni e scadenze via email, telefono o WhatsApp (facoltativo).' ),
+				'privacy_text' => array( 'Testo consenso privacy', 'textarea', 'Ho letto l’informativa privacy.', 'Le parole «informativa privacy» diventano il link alla pagina scelta sopra. Segnaposto: {azienda}.' ),
+				'mkt_text'     => array( 'Testo consenso marketing', 'textarea', 'Voglio ricevere aggiornamenti su corsi, agevolazioni e scadenze (facoltativo).' ),
 			),
 		),
 		'sedi'        => array(
