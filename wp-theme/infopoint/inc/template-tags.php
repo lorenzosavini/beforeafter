@@ -43,6 +43,13 @@ function ip_icon( $name, $size = 20 ) {
 		'globe'    => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
 		'card'     => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
 		'layers'   => '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+		'book-open' => '<path d="M12 6c-2-1.5-5-2-9-2v14c4 0 7 .5 9 2 2-1.5 5-2 9-2V4c-4 0-7 .5-9 2zM12 6v14"/>',
+		'scroll'   => '<path d="M7 4h11a2 2 0 0 1 2 2v1h-4M7 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7M7 4a2 2 0 0 1 2 2v12M12 10h3M12 14h3"/>',
+		'award'    => '<circle cx="12" cy="9" r="6"/><path d="m9 14.5-1.5 6.5 4.5-2.5 4.5 2.5-1.5-6.5M12 6.5l.9 1.8 2 .3-1.4 1.4.3 2-1.8-.9-1.8.9.3-2-1.4-1.4 2-.3z"/>',
+		'copy'     => '<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/>',
+		'bookmark' => '<path d="M6 3h12v18l-6-4-6 4z"/>',
+		'pencil'   => '<path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/>',
+		'board'    => '<rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20l2-4M16 20l-2-4M7 9h6M7 12h4M16 8l1.5 1.5L20 7"/>',
 	);
 	if ( ! isset( $paths[ $name ] ) ) {
 		return '';
@@ -598,6 +605,7 @@ function ip_page_band_pre( $id ) {
 /** Icona di una voce del menu principale, dal titolo. */
 function ip_menu_icon( $title ) {
 	$map = array(
+		'/abilitant/i'                  => 'check',
 		'/stranier|ester/i'             => 'globe',
 		'/sedi/i'                       => 'pin',
 		'/requisit/i'                   => 'key',
@@ -608,16 +616,22 @@ function ip_menu_icon( $title ) {
 		'/agevolazion|convenzion|cost/i' => 'euro',
 		'/sostegno/i'                   => 'heart',
 		'/abilitant/i'                  => 'check',
-		'/didattica/i'                  => 'book',
+		'/didattica.*\bII\b|\bII\b.*didattica/'  => 'board',
+		'/didattica/i'                  => 'pencil',
 		'/insegnant/i'                  => 'user',
+		'/master di II\b/i'            => 'award',
 		'/master/i'                     => 'briefcase',
-		'/singol/i'                     => 'book',
-		'/doppia/i'                     => 'layers',
+		'/singol/i'                     => 'bookmark',
+		'/doppia/i'                     => 'copy',
 		'/formazione/i'                 => 'target',
 		'/microcredenzial/i'            => 'star',
 		'/dottorat/i'                   => 'trophy',
 		'/altri corsi/i'                => 'list',
-		'/laurea|corsi di laurea/i'     => 'cap',
+		'/ciclo unico/i'                => 'scroll',
+		'/magistrale/i'                 => 'cap',
+		'/triennale/i'                  => 'book-open',
+		'/corsi di laurea/i'            => 'layers',
+		'/laurea/i'                     => 'cap',
 		'/iscriv/i'                     => 'check',
 		'/chi siamo/i'                  => 'users',
 		'/contatt/i'                    => 'phone',
