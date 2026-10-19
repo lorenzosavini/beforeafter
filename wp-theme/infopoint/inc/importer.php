@@ -302,7 +302,11 @@ function ip_run_import( $o ) {
 	$updated  = 0;
 	$curr_n   = 0;
 	$seen     = array();
+	$blocked = function_exists( 'ip_sync_blocked' ) ? ip_sync_blocked() : array();
 	foreach ( ip_import_data( 'corsi' ) as $i => $c ) {
+		if ( in_array( trailingslashit( $c['source'] ), $blocked, true ) ) {
+			continue; // Eliminato da voi: non si ricrea.
+		}
 		$r = ip_import_course( $c, $mode, $tip_ids, array( 'order' => $i, 'featured' => $featured ) );
 		if ( ! $r ) {
 			continue;
@@ -393,6 +397,9 @@ function ip_run_import( $o ) {
 	$parent = $pages['iscriversi'] ?? 0;
 	$embed  = ip_embedded_sources();
 	foreach ( ip_import_data( 'pagine' ) as $slug => $p ) {
+		if ( in_array( trailingslashit( $p['source'] ), $blocked, true ) ) {
+			continue;
+		}
 		$path = $parent ? get_page_uri( $parent ) . '/' . $slug : $slug;
 		$ex   = get_page_by_path( $path );
 		if ( $ex ) {

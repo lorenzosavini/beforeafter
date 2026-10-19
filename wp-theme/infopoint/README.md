@@ -85,6 +85,16 @@ automatici*).
   CFU, doppia iscrizione, requisiti) incorporano il testo ufficiale con
   `[ip_ufficiale fonte="…"]`, che si aggiorna da solo.
 - Ogni agevolazione ha la stessa opzione «Aggiornamento automatico».
+- **Cosa non riportare dal sito ufficiale** (resta valido a ogni aggiornamento):
+  - in ogni pagina o corso importato, riquadro «Aggiornamento dal sito
+    ufficiale»: *Mostra solo queste sezioni* e *Non importare queste sezioni*
+    (un titolo per riga). Le sezioni escluse spariscono subito e non tornano;
+  - *Impostazioni → Aggiornamenti automatici → Frasi da non importare mai*:
+    ogni paragrafo o voce di elenco che contiene una di queste frasi viene
+    scartato ovunque (predefinita: il rimando alla doppia iscrizione);
+  - una pagina o un corso ufficiale messo nel cestino finisce in *Pagine e
+    corsi ufficiali da non importare*: non viene più ricreato dall'importazione
+    né riproposto dagli aggiornamenti. Togliendo la riga torna disponibile.
 - «Verifica completa» rilegge tutte le ~225 pagine ufficiali (circa 5 minuti).
 
 WP-Cron parte quando qualcuno visita il sito. Su hosting con poco traffico

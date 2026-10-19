@@ -167,7 +167,11 @@ function ip_sync_check( $full = false ) {
 	$scope = (array) ip_opt( 'sync_scope' );
 
 	if ( in_array( 'corsi', $scope, true ) ) {
+		$blocked = ip_sync_blocked();
 		foreach ( $maps['formazione'] as $url => $lastmod ) {
+			if ( in_array( $url, $blocked, true ) ) {
+				continue; // Corso eliminato da voi: non si ripropone.
+			}
 			$changed = ! isset( $state['lastmod'][ $url ] ) || $state['lastmod'][ $url ] !== $lastmod;
 			$skip    = isset( $state['skip'][ $url ] ) && $state['skip'][ $url ] === $lastmod;
 			// Corso mai visto sul sito: va esaminato (potrebbe essere nuovo).
@@ -342,6 +346,9 @@ function ip_sync_course( $url, $html ) {
 	}
 	$c['curricula'] = $curr;
 	$c['old']       = '';
+	if ( in_array( trailingslashit( $url ), ip_sync_blocked(), true ) ) {
+		return false; // Corso eliminato da voi: non si ripropone.
+	}
 
 	$post_id = ip_import_find_course( $c );
 	if ( ! $post_id ) {
@@ -350,6 +357,10 @@ function ip_sync_course( $url, $html ) {
 	$lock = ip_meta( 'sync', $post_id );
 	if ( 'no' === $lock ) {
 		return false;
+	}
+	$excl = get_post_meta( $post_id, '_ip_sezioni_escluse', true );
+	if ( $excl ) {
+		$c['content'] = ip_src_filter( $c['content'], array(), $excl );
 	}
 	$changes = ip_sync_course_diff( $post_id, $c, 'dati' !== $lock );
 	if ( ! $changes ) {
@@ -470,7 +481,7 @@ function ip_sync_page( $url, $html ) {
 	if ( 'no' === get_post_meta( $page_id, '_ip_sync', true ) ) {
 		return false;
 	}
-	$content = ip_src_page( $html, (array) get_post_meta( $page_id, '_ip_sezioni', true ) );
+	$content = ip_src_filter( ip_src_page( $html ), get_post_meta( $page_id, '_ip_sezioni', true ), get_post_meta( $page_id, '_ip_sezioni_escluse', true ) );
 	if ( ! $content || ip_sync_norm( $content ) === ip_sync_norm( get_post_field( 'post_content', $page_id ) ) ) {
 		ip_sync_close( 'pagina', $page_id );
 		return false;
@@ -977,18 +988,72 @@ function ip_sync_page_render() {
 	<?php
 }
 
-// Blocco degli aggiornamenti sulle pagine importate dal sito ufficiale.
-add_action( 'add_meta_boxes_page', function ( $post ) {
-	if ( get_post_meta( $post->ID, '_ip_fonte', true ) ) {
-		add_meta_box( 'ip-sync-page', 'Aggiornamento automatico', function ( $post ) {
+// Indirizzi ufficiali da non importare più (pagine o corsi eliminati da voi).
+function ip_sync_blocked() {
+	return array_map( 'trailingslashit', ip_src_lines( ip_opt( 'sync_blocked' ) ) );
+}
+
+function ip_sync_block( $url ) {
+	$url  = trailingslashit( trim( $url ) );
+	$list = ip_sync_blocked();
+	if ( $url && ! in_array( $url, $list, true ) ) {
+		$list[] = $url;
+		$o      = get_option( 'ip_settings', array() );
+		$o      = is_array( $o ) ? $o : array();
+		$o['sync_blocked'] = implode( "\n", $list );
+		update_option( 'ip_settings', $o );
+	}
+}
+
+// Una pagina o un corso presi dal sito ufficiale e messi nel cestino non tornano più.
+add_action( 'wp_trash_post', function ( $id ) {
+	$type = get_post_type( $id );
+	$src  = 'corso' === $type ? get_post_meta( $id, '_ip_fonte', true ) : ( 'page' === $type ? get_post_meta( $id, '_ip_fonte', true ) : '' );
+	if ( $src && 0 === strpos( $src, 'http' ) ) {
+		ip_sync_block( $src );
+	}
+} );
+
+// Pagine e corsi importati: cosa prendere dal sito ufficiale.
+foreach ( array( 'page', 'corso' ) as $ip_pt ) {
+	add_action( 'add_meta_boxes_' . $ip_pt, function ( $post ) {
+		$src = get_post_meta( $post->ID, '_ip_fonte', true );
+		if ( ! $src || 0 !== strpos( $src, 'http' ) ) {
+			return;
+		}
+		add_meta_box( 'ip-sync-page', 'Aggiornamento dal sito ufficiale', function ( $post ) use ( $src ) {
 			wp_nonce_field( 'ip_sync_page', 'ip_sync_page_nonce' );
-			$v = get_post_meta( $post->ID, '_ip_sync', true );
-			printf( '<p><label><input type="checkbox" name="ip_sync_lock" value="1" %s> Non aggiornare questa pagina dal sito ufficiale</label></p><p class="description">Fonte: <a href="%s" target="_blank">%s</a></p>', checked( $v, 'no', false ), esc_url( get_post_meta( $post->ID, '_ip_fonte', true ) ), esc_html( ip_src_slug( get_post_meta( $post->ID, '_ip_fonte', true ) ) ) );
-		}, 'page', 'side' );
-	}
-} );
-add_action( 'save_post_page', function ( $id ) {
-	if ( isset( $_POST['ip_sync_page_nonce'] ) && wp_verify_nonce( $_POST['ip_sync_page_nonce'], 'ip_sync_page' ) && current_user_can( 'edit_post', $id ) ) {
-		! empty( $_POST['ip_sync_lock'] ) ? update_post_meta( $id, '_ip_sync', 'no' ) : delete_post_meta( $id, '_ip_sync' );
-	}
-} );
+			$is_page = 'page' === $post->post_type;
+			if ( $is_page ) {
+				printf( '<p><label><input type="checkbox" name="ip_sync_lock" value="1" %s> Non aggiornare questa pagina</label></p>', checked( get_post_meta( $post->ID, '_ip_sync', true ), 'no', false ) );
+				printf( '<p><label for="ip-keep"><strong>Mostra solo queste sezioni</strong></label><textarea id="ip-keep" name="ip_sezioni" rows="3" class="widefat">%s</textarea></p>', esc_textarea( implode( "\n", ip_src_lines( get_post_meta( $post->ID, '_ip_sezioni', true ) ) ) ) );
+			}
+			printf( '<p><label for="ip-excl"><strong>Non importare queste sezioni</strong></label><textarea id="ip-excl" name="ip_sezioni_escluse" rows="3" class="widefat">%s</textarea></p>', esc_textarea( implode( "\n", ip_src_lines( get_post_meta( $post->ID, '_ip_sezioni_escluse', true ) ) ) ) );
+			$titles = ip_src_h2_titles( $post->post_content );
+			echo '<p class="description">Un titolo di sezione per riga (basta l’inizio). Le sezioni escluse vengono tolte subito e non tornano con gli aggiornamenti.' . ( $titles ? ' Sezioni attuali: <em>' . esc_html( implode( ' · ', $titles ) ) . '</em>.' : '' ) . '</p>';
+			printf( '<p class="description">Fonte: <a href="%s" target="_blank" rel="noopener">%s</a>. Per togliere del tutto la pagina, mettila nel cestino: non verrà più ricreata.</p>', esc_url( $src ), esc_html( ip_src_slug( $src ) ) );
+		}, $post->post_type, 'side' );
+	} );
+	add_action( 'save_post_' . $ip_pt, function ( $id, $post ) {
+		if ( ! isset( $_POST['ip_sync_page_nonce'] ) || ! wp_verify_nonce( $_POST['ip_sync_page_nonce'], 'ip_sync_page' ) || ! current_user_can( 'edit_post', $id ) ) {
+			return;
+		}
+		if ( 'page' === $post->post_type ) {
+			! empty( $_POST['ip_sync_lock'] ) ? update_post_meta( $id, '_ip_sync', 'no' ) : delete_post_meta( $id, '_ip_sync' );
+			$keep = ip_src_lines( sanitize_textarea_field( wp_unslash( $_POST['ip_sezioni'] ?? '' ) ) );
+			$keep ? update_post_meta( $id, '_ip_sezioni', $keep ) : delete_post_meta( $id, '_ip_sezioni' );
+		}
+		$excl = ip_src_lines( sanitize_textarea_field( wp_unslash( $_POST['ip_sezioni_escluse'] ?? '' ) ) );
+		$excl ? update_post_meta( $id, '_ip_sezioni_escluse', $excl ) : delete_post_meta( $id, '_ip_sezioni_escluse' );
+		// Le esclusioni valgono subito anche sul testo già presente.
+		$keep = 'page' === $post->post_type ? get_post_meta( $id, '_ip_sezioni', true ) : array();
+		if ( $keep || $excl ) {
+			$new = ip_src_filter( $post->post_content, $keep, $excl );
+			if ( $new !== $post->post_content ) {
+				global $wpdb;
+				$wpdb->update( $wpdb->posts, array( 'post_content' => $new ), array( 'ID' => $id ) ); // phpcs:ignore
+				clean_post_cache( $id );
+			}
+		}
+	}, 20, 2 );
+}

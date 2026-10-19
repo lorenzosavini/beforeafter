@@ -26,6 +26,10 @@ function ip_upgrade() {
 	if ( version_compare( $v, '2.7.0', '<' ) ) {
 		ip_upgrade_270();
 	}
+	if ( version_compare( $v, '2.7.1', '<' ) && function_exists( 'ip_sync_block' ) ) {
+		// La pagina dei trasferimenti, tolta su richiesta dell'Ateneo, non va più importata.
+		ip_sync_block( 'https://www.unimarconi.it/immatricolazione-con-trasferimento-da-altro-ateneo/' );
+	}
 	if ( IP_VERSION !== $v ) {
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.
@@ -100,6 +104,9 @@ function ip_upgrade_240() {
 	// Pagine ufficiali aggiunte in questa versione (es. costi dei corsi singoli).
 	$parent = get_page_by_path( 'iscriversi' );
 	foreach ( ip_import_data( 'pagine' ) as $slug => $p ) {
+		if ( function_exists( 'ip_sync_blocked' ) && in_array( trailingslashit( $p['source'] ), ip_sync_blocked(), true ) ) {
+			continue;
+		}
 		if ( $parent && ! ip_official_page( $p['source'] ) && ! get_page_by_path( 'iscriversi/' . $slug ) ) {
 			$id = wp_insert_post( array(
 				'post_type'    => 'page',

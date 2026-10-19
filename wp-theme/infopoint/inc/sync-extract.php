@@ -238,6 +238,80 @@ function ip_src_tidy( $c ) {
  * HTML pulito → blocchi Gutenberg
  * ------------------------------------------------------------------- */
 
+/**
+ * Frasi da non importare: dall'impostazione, con un valore di partenza.
+ */
+function ip_src_drop_phrases() {
+	static $list = null;
+	if ( null === $list ) {
+		$raw  = function_exists( 'ip_opt' ) ? (string) ip_opt( 'sync_drop' ) : 'Vuoi iscriverti a due corsi';
+		$list = array_values( array_filter( array_map( function ( $l ) {
+			return mb_strtolower( trim( preg_replace( '/\s+/u', ' ', $l ) ) );
+		}, explode( "\n", $raw ) ) ) );
+	}
+	return $list;
+}
+
+function ip_src_dropped( $html ) {
+	$t = mb_strtolower( preg_replace( '/\s+/u', ' ', ip_src_text( $html ) ) );
+	foreach ( ip_src_drop_phrases() as $ph ) {
+		if ( '' !== $ph && false !== mb_strpos( $t, $ph ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function ip_src_lines( $v ) {
+	return array_values( array_filter( array_map( 'trim', is_array( $v ) ? $v : explode( "\n", (string) $v ) ) ) );
+}
+
+/**
+ * Filtra un contenuto a blocchi per sezioni (titoli h2) e frasi escluse.
+ *
+ * @param string   $blocks  Contenuto a blocchi Gutenberg.
+ * @param string[] $keep    Solo le sezioni il cui titolo inizia così (vuoto = tutte).
+ * @param string[] $exclude Sezioni da togliere (titolo che inizia così).
+ */
+function ip_src_filter( $blocks, $keep = array(), $exclude = array() ) {
+	$keep    = ip_src_lines( $keep );
+	$exclude = ip_src_lines( $exclude );
+	$match   = function ( $title, $list ) {
+		foreach ( $list as $k ) {
+			if ( 0 === mb_stripos( trim( $title ), $k ) ) {
+				return true;
+			}
+		}
+		return false;
+	};
+	$out   = array();
+	$title = null; // null = testo prima del primo titolo h2.
+	foreach ( preg_split( '/\n{2,}(?=<!-- wp:)/', trim( (string) $blocks ) ) as $b ) {
+		if ( preg_match( '#^<!-- wp:heading -->\s*<h2[^>]*>(.*?)</h2>#su', $b, $m ) ) {
+			$title = ip_src_text( $m[1] );
+		}
+		if ( $keep && ( null === $title || ! $match( $title, $keep ) ) ) {
+			continue;
+		}
+		if ( null !== $title && $exclude && $match( $title, $exclude ) ) {
+			continue;
+		}
+		if ( preg_match( '#^<!-- wp:(paragraph|list-item)#', $b ) && ip_src_dropped( $b ) ) {
+			continue;
+		}
+		$out[] = $b;
+	}
+	return implode( "\n\n", $out );
+}
+
+/**
+ * Titoli h2 di un contenuto: per suggerire cosa si può escludere.
+ */
+function ip_src_h2_titles( $blocks ) {
+	preg_match_all( '#<h2[^>]*>(.*?)</h2>#su', (string) $blocks, $m );
+	return array_values( array_unique( array_map( 'ip_src_text', $m[1] ) ) );
+}
+
 function ip_src_blocks( $x ) {
 	$res = array();
 	$pos = 0;
@@ -276,8 +350,9 @@ function ip_src_blocks( $x ) {
 		if ( '' === ip_src_text( $inner ) ) {
 			continue;
 		}
-		// La doppia iscrizione si spiega solo nella sua pagina, non nei rimandi sparsi.
-		if ( 'p' === $tag && preg_match( '/vuoi\s+iscriverti\s+a\s+due\s+corsi/iu', ip_src_text( $inner ) ) ) {
+		// Frasi da non importare mai (Impostazioni → Aggiornamenti automatici),
+		// es. il rimando alla doppia iscrizione fuori dalla sua pagina.
+		if ( 'p' === $tag && ip_src_dropped( $inner ) ) {
 			continue;
 		}
 		// Etichette di pulsanti rimaste senza pulsante (moduli dell'Ateneo).
