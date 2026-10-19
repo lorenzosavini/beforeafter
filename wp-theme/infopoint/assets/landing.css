@@ -268,7 +268,7 @@
 }
 @media (max-width: 420px) {
 	.lp-tab thead th:nth-child(3), .lp-tab td:nth-child(3) { display: none; }
-	.lp .row2 { grid-template-columns: 1fr; }
+	.lp .row2 { grid-template-columns: 1fr 1fr; gap: 10px; }
 }
 
 /* Carattere con grazie per titoli e cifre: tono da prospetto ----------- */
@@ -547,3 +547,5 @@
 	.lp-hero-img img { object-position: 65% center; filter: grayscale(.25); -webkit-mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 100%); mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 100%); }
 	.lp-hero-img::before { left: auto; right: 0; width: 161%; background: linear-gradient(90deg, rgba(11, 34, 25, .97) 0%, rgba(11, 34, 25, .9) 50%, rgba(11, 34, 25, .72) 100%); }
 }
+.lp-logo { display: block; height: 50px; max-height: none; width: auto; max-width: 250px; object-fit: contain; }
+@media (max-width: 900px) { .lp-logo { height: 38px; max-width: 170px; } .lp .field input, .lp .field select, .lp .field textarea { font-size: 16px !important; } }

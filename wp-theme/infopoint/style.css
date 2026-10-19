@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.9.4
+Version: 2.9.6
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -173,7 +173,6 @@ p { margin: 0 0 1em; }
 	.brand-text small { display: none; }
 	.brand-text strong { font-size: .98rem; white-space: normal; }
 	.brand { min-width: 0; }
-	.nav-toggle span { display: none; }
 	.brand-mark { width: 36px; height: 36px; }
 	.hdr-in { min-height: 62px; gap: 12px; }
 	.lead { padding: 20px 16px; }
@@ -886,3 +885,34 @@ details[open] > :not(summary) { animation: ip-fade .35s ease both; }
 	.hero-photo .hero-bg { left: auto; right: 0; width: 62%; height: 100%; object-position: 65% center; filter: grayscale(.25); -webkit-mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 100%); mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 100%); }
 	.hero-photo::before { background: linear-gradient(90deg, rgba(11, 34, 25, .97) 0%, rgba(11, 34, 25, .9) 50%, rgba(11, 34, 25, .72) 100%); }
 }
+
+/* Pulsante del menu: pastiglia verde con linee sfalsate che diventano una X. */
+.nav-toggle { gap: 10px; height: 42px; padding: 0 14px 0 12px; border: 0; border-radius: 12px; background: var(--brand-deep); color: #fff; font: 700 .9rem var(--font); letter-spacing: .02em; box-shadow: 0 6px 16px rgba(14, 38, 29, .2); transition: background-color .2s, box-shadow .2s; }
+.nav-toggle:hover { background: var(--brand); }
+.nav-toggle[aria-expanded=true] { background: var(--accent); box-shadow: 0 6px 16px rgba(160, 48, 14, .3); }
+.burger { position: relative; display: block; width: 20px; height: 14px; }
+.burger i { position: absolute; right: 0; height: 2px; border-radius: 2px; background: currentColor; transition: transform .28s cubic-bezier(.2, .7, .2, 1), width .28s, opacity .2s, top .28s; }
+.burger i:nth-child(1) { top: 0; width: 20px; }
+.burger i:nth-child(2) { top: 6px; width: 14px; background: #ffb08f; }
+.burger i:nth-child(3) { top: 12px; width: 9px; }
+.nav-toggle:hover .burger i { width: 20px; }
+.nav-toggle[aria-expanded=true] .burger i:nth-child(1) { top: 6px; width: 20px; transform: rotate(45deg); }
+.nav-toggle[aria-expanded=true] .burger i:nth-child(2) { opacity: 0; transform: translateX(6px); }
+.nav-toggle[aria-expanded=true] .burger i:nth-child(3) { top: 6px; width: 20px; transform: rotate(-45deg); }
+@media (max-width: 380px) { .nav-toggle-t { display: none; } .nav-toggle { width: 44px; justify-content: center; padding: 0; } }
+@media (prefers-reduced-motion: reduce) { .burger i { transition: none; } }
+
+
+/* Telefono: moduli su due colonne e niente zoom automatico (iOS ingrandisce i campi sotto i 16px). */
+@media (max-width: 900px) {
+	.row2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+	.form .field input, .form .field select, .form .field textarea, .cfilter-search input { font-size: 16px !important; }
+	.form .field label { font-size: .78rem; }
+	.form .field select { padding-right: 26px; text-overflow: ellipsis; }
+}
+@media (max-width: 340px) { .row2 { grid-template-columns: 1fr; } }
+
+/* Logo caricato (Aspetto → Personalizza → Identità del sito): misure per testata e piè di pagina. */
+.brand-logo { display: block; height: 52px; max-height: none; width: auto; max-width: 260px; object-fit: contain; }
+@media (max-width: 600px) { .brand-logo { height: 40px; max-width: 200px; } }
+.ftr-logo { display: block; height: 56px; width: auto; max-width: 260px; margin-bottom: 14px; padding: 10px 14px; border-radius: 10px; background: #fff; object-fit: contain; }

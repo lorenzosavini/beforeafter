@@ -24,7 +24,11 @@ endif;
 	<?php if ( ! $landing ) : ?>
 		<div class="wrap ftr-grid">
 			<div class="ftr-brand">
-				<p class="ftr-name"><?php echo esc_html( ip_opt( 'brand' ) ); ?></p>
+				<?php if ( has_custom_logo() ) : ?>
+					<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'ftr-logo', 'alt' => esc_attr( ip_opt( 'brand' ) ), 'loading' => 'lazy' ) ); ?>
+				<?php else : ?>
+					<p class="ftr-name"><?php echo esc_html( ip_opt( 'brand' ) ); ?></p>
+				<?php endif; ?>
 				<p><?php echo esc_html( ip_role_label() ); ?></p>
 				<?php if ( ip_opt( 'address' ) ) : ?>
 					<p><span class="ftr-label">Sede operativa</span><br><?php echo nl2br( esc_html( ip_opt( 'address' ) ) ); ?></p>

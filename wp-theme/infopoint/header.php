@@ -40,7 +40,7 @@ $wa      = ip_wa_href();
 			<?php echo ip_phone_link( 'phone1', 'hdr-phone' ); // phpcs:ignore ?>
 		<?php else : ?>
 			<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" data-nav-toggle>
-				<?php echo ip_icon( 'menu', 22 ); // phpcs:ignore ?><span>Menu</span>
+				<span class="burger" aria-hidden="true"><i></i><i></i><i></i></span><span class="nav-toggle-t">Menu</span>
 			</button>
 			<nav id="nav" class="nav" aria-label="Principale">
 				<?php
