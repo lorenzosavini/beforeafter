@@ -86,6 +86,7 @@ automatici*).
   CFU, doppia iscrizione, requisiti) incorporano il testo ufficiale con
   `[ip_ufficiale fonte="…"]`, che si aggiorna da solo.
 - Ogni agevolazione ha la stessa opzione «Aggiornamento automatico».
+- Gli aggiornamenti dal sito ufficiale si applicano **in automatico** (Impostazioni → Aggiornamenti automatici → «Applica in automatico»): ogni modifica passa prima dalle esclusioni qui sotto, anche al momento di scrivere.
 - **Cosa non riportare dal sito ufficiale** (resta valido a ogni aggiornamento):
   - in ogni pagina o corso importato, riquadro «Aggiornamento dal sito
     ufficiale»: *Mostra solo queste sezioni* e *Non importare queste sezioni*

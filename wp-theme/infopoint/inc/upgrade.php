@@ -52,6 +52,13 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.0.1', '<' ) ) {
+		// Aggiornamenti dal sito ufficiale applicati in automatico (con le esclusioni).
+		$o = get_option( 'ip_settings', array() );
+		$o = is_array( $o ) ? $o : array();
+		$o['sync_mode'] = 'auto';
+		update_option( 'ip_settings', $o );
+	}
 	if ( version_compare( $v, '3.0.0', '<' ) ) {
 		// Piè di pagina nel verde scuro del marchio, se era ancora il grigio predefinito.
 		$o = get_option( 'ip_settings', array() );

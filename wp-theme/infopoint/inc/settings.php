@@ -149,7 +149,7 @@ function ip_settings_fields() {
 			'fields' => array(
 				'sync_enabled' => array( 'Controlla il sito ufficiale', 'checkbox', '1', 'Legge le sitemap di unimarconi.it e rilegge solo le pagine modificate. I risultati sono in <a href="admin.php?page=ip-sync">Infopoint → Aggiornamenti</a>.' ),
 				'sync_freq'    => array( 'Frequenza', 'select', 'daily', '', array( 'daily' => 'Ogni giorno', 'weekly' => 'Ogni settimana' ) ),
-				'sync_mode'    => array( 'Cosa fare con le novità', 'select', 'approva', 'Con l’approvazione vedi ogni differenza e decidi tu. In automatico le modifiche vengono applicate subito (le versioni precedenti restano nelle revisioni).', array( 'approva' => 'Proponi, approvo io (consigliato)', 'auto' => 'Applica in automatico' ) ),
+				'sync_mode'    => array( 'Cosa fare con le novità', 'select', 'auto', 'In automatico le modifiche vengono applicate subito, sempre senza le sezioni escluse e le frasi da non importare (le versioni precedenti restano nelle revisioni). Con l’approvazione vedi ogni differenza e decidi tu.', array( 'auto' => 'Applica in automatico (consigliato)', 'approva' => 'Proponi, approvo io' ) ),
 				'sync_scope'   => array( 'Cosa controllare', 'checklist', array( 'corsi', 'pagine', 'agevolazioni', 'sedi' ), '', array(
 					'corsi'        => 'Corsi, piani di studio, documenti, corsi nuovi e tolti',
 					'pagine'       => 'Pagine informative importate (tasse, immatricolazione…)',

@@ -358,10 +358,8 @@ function ip_sync_course( $url, $html ) {
 	if ( 'no' === $lock ) {
 		return false;
 	}
-	$excl = get_post_meta( $post_id, '_ip_sezioni_escluse', true );
-	if ( $excl ) {
-		$c['content'] = ip_src_filter( $c['content'], array(), $excl );
-	}
+	// Sezioni escluse e frasi da non importare: sempre, prima del confronto.
+	$c['content'] = ip_src_filter( $c['content'], array(), get_post_meta( $post_id, '_ip_sezioni_escluse', true ) );
 	$changes = ip_sync_course_diff( $post_id, $c, 'dati' !== $lock );
 	if ( ! $changes ) {
 		ip_sync_close( 'corso', $post_id );
@@ -768,6 +766,21 @@ function ip_sync_apply( $id, $state = 'applicata' ) {
 	$type    = get_post_meta( $id, '_type', true );
 	$target  = (int) get_post_meta( $id, '_target', true );
 	$payload = get_post_meta( $id, '_payload', true );
+	// Ultimo filtro al momento di scrivere: anche una proposta nata prima di
+	// una nuova esclusione non rimette testi tolti (sezioni escluse, frasi
+	// da non importare come i dati dei bonifici).
+	if ( is_array( $payload ) && function_exists( 'ip_src_filter' ) ) {
+		if ( ! empty( $payload['content'] ) ) {
+			$payload['content'] = ip_src_filter( $payload['content'], 'pagina' === $type && $target ? get_post_meta( $target, '_ip_sezioni', true ) : array(), $target ? get_post_meta( $target, '_ip_sezioni_escluse', true ) : array() );
+		}
+		if ( ! empty( $payload['curricula'] ) && is_array( $payload['curricula'] ) ) {
+			foreach ( $payload['curricula'] as $i => $cu ) {
+				if ( ! empty( $cu['content'] ) ) {
+					$payload['curricula'][ $i ]['content'] = ip_src_filter( $cu['content'] );
+				}
+			}
+		}
+	}
 	switch ( $type ) {
 		case 'nuovo':
 		case 'corso':
