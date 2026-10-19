@@ -555,3 +555,40 @@ function ip_agev_icon( $title ) {
 	return 'percent';
 }
 
+/**
+ * Testata a banda verde delle pagine (come schede corso e ricerca corsi):
+ * titolo piccolo sopra, titolo nella fascia arancione, sottotitolo e
+ * pulsanti di contatto.
+ */
+function ip_page_band( $title, $lead = '', $pre = '', $acts = true ) {
+	?>
+	<header class="phead phead-band">
+		<div class="wrap">
+			<?php ip_breadcrumbs(); ?>
+			<h1><?php if ( $pre ) : ?><span class="h1-pre"><?php echo esc_html( $pre ); ?></span> <?php endif; ?><span class="hl"><?php echo esc_html( $title ); ?></span></h1>
+			<?php if ( $lead ) : ?>
+				<p class="phead-lead"><?php echo esc_html( $lead ); ?></p>
+			<?php endif; ?>
+			<?php if ( $acts ) : ?>
+				<div class="phead-acts band-acts">
+					<a class="btn btn-accent" href="#richiedi" data-scroll-form>Chiedi a un orientatore</a>
+					<?php echo ip_phone_link( 'phone1', 'btn btn-white' ); // phpcs:ignore ?>
+				</div>
+			<?php endif; ?>
+		</div>
+	</header>
+	<?php
+}
+
+/** La pagina mostra i pulsanti di contatto in testata? Non su privacy, cookie e ringraziamento. */
+function ip_page_band_acts( $id ) {
+	$no = array_filter( array( (int) ip_opt( 'privacy_page' ), (int) ip_opt( 'cookie_page' ), (int) ip_opt( 'thanks_page' ), (int) get_option( 'wp_page_for_privacy_policy' ) ) );
+	return ! in_array( (int) $id, $no, true );
+}
+
+/** Titolo piccolo sopra quello della pagina: la pagina madre, se c'è. */
+function ip_page_band_pre( $id ) {
+	$parent = wp_get_post_parent_id( $id );
+	return $parent ? get_the_title( $parent ) : '';
+}
+

@@ -4,15 +4,7 @@ get_header();
 while ( have_posts() ) :
 	the_post();
 	?>
-	<header class="phead">
-		<div class="wrap">
-			<?php ip_breadcrumbs(); ?>
-			<h1><?php the_title(); ?></h1>
-			<?php if ( has_excerpt() ) : ?>
-				<p class="phead-lead"><?php echo esc_html( get_the_excerpt() ); ?></p>
-			<?php endif; ?>
-		</div>
-	</header>
+	<?php ip_page_band( get_the_title(), has_excerpt() ? get_the_excerpt() : '', ip_page_band_pre( get_the_ID() ), ip_page_band_acts( get_the_ID() ) ); ?>
 	<div class="sec">
 		<div class="wrap prose">
 			<?php the_content(); ?>

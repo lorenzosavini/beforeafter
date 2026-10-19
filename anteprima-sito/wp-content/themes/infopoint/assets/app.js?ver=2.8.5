@@ -253,11 +253,12 @@
 	var small = window.matchMedia && window.matchMedia('(max-width: 960px)').matches;
 	(function () {
 		var first = true;
+		var widgets = 'form, div.lead, .clist, .agev, .atable-wrap, .contacts, .sedi, .whois, .steps';
 		var fold = function (box) {
 			var kids = Array.prototype.slice.call(box.children), cur = null, intro = [];
 			kids.forEach(function (el) {
-				if (el.matches('form, div.lead') || el.querySelector('form')) {
-					cur = null; /* I moduli restano sempre in vista, al loro posto. */
+				if (el.matches(widgets) || el.querySelector(widgets)) {
+					cur = null; /* Moduli, elenchi corsi, agevolazioni, contatti: sempre in vista, al loro posto. */
 					intro.stop = true;
 				} else if (el.tagName === 'H2') {
 					cur = d.createElement('details');
@@ -271,8 +272,10 @@
 					box.removeChild(el);
 				} else if (cur) {
 					cur.appendChild(el);
-				} else if (!el.classList.contains('ufficiale') && !intro.stop) {
+				} else if (!intro.stop && el.matches('p, ul, ol, h3, h4, blockquote')) {
 					intro.push(el);
+				} else if (!el.classList.contains('ufficiale')) {
+					intro.stop = true;
 				}
 			});
 			if (!cur || !intro.length || !small) return;

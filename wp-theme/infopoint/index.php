@@ -12,7 +12,7 @@ if ( is_search() ) {
 	$title = wp_strip_all_tags( get_the_archive_title() );
 }
 ?>
-<header class="phead">
+<header class="phead phead-band">
 	<div class="wrap narrow">
 		<?php ip_breadcrumbs(); ?>
 		<h1><?php echo esc_html( $title ); ?></h1>

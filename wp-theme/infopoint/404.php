@@ -2,7 +2,7 @@
 defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
-<header class="phead">
+<header class="phead phead-band">
 	<div class="wrap narrow">
 		<p class="eyebrow">Errore 404</p>
 		<h1>Questa pagina non esiste più</h1>
