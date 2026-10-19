@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 2.7.6
+Version: 2.7.7
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -670,16 +670,25 @@ a.contact:hover { color: var(--brand); }
 .hero-photo h1, .hero-photo .hero-lead, .hero-photo .hero-kicker, .hero-photo .hero-price { text-shadow: 0 1px 3px rgba(0, 0, 0, .45); }
 .hero-photo .hero-lead { color: #fff; font-size: 1.08rem; }
 .hero-photo .hero-kicker { color: #e9f1ec; line-height: 1.6; }
-.hero-badge { display: inline-block; margin-right: 6px; padding: 2px 10px; border-radius: 999px; background: var(--accent-dark); color: #fff; font-weight: 700; text-shadow: none; }
+:root { --accent-light: #f36f3f; } /* Arancione della palette, schiarito per i fondi scuri. */
+.hero-badge { display: inline-block; margin-right: 6px; padding: 2px 10px; border-radius: 999px; background: var(--accent-light); color: var(--brand-deep); font-weight: 700; text-shadow: none; }
 .hl { color: var(--accent); }
-.hero-photo h1 .hl { color: var(--accent-dark); text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
-.hero-photo .hero-lead .hl { color: #fff; font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent-dark); text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.hero-photo .hl { color: var(--accent-light); }
+.hero-photo .hero-lead .hl { font-weight: 600; }
+.hero-photo .hero-actions .btn-accent { background: var(--accent-light); border-color: var(--accent-light); color: var(--brand-deep); }
+.hero-photo .hero-actions .btn-accent:hover { background: #fff; border-color: #fff; color: var(--brand-deep); }
 .hero-photo .hero-price { color: #e9f1ec; }
 .hero-photo .hero-price strong { color: #fff; }
 .hero-photo .hero-price small { opacity: 1; color: #e9f1ec; }
 .hero-photo .btn-line-light { background: rgba(0, 0, 0, .28); border-color: #fff; }
 @media (max-width: 960px) {
 	.hero-photo::before { background: rgba(9, 28, 21, .9); }
-	.hero-photo .hero-lead { font-size: 1rem; }
+	.hero-photo .hero-in { gap: 32px; padding-top: 36px; padding-bottom: 40px; }
+	.hero-photo .hero-kicker { margin-bottom: 1.1em; line-height: 1.75; }
+	.hero-photo h1 { margin-bottom: .6em; line-height: 1.2; }
+	.hero-photo .hero-lead { margin-bottom: 0; font-size: 1rem; line-height: 1.6; }
+	.hero-photo .hero-actions { margin-top: 1.5em; gap: 10px; }
+	.hero-photo .hero-price { margin-top: 1.4em; line-height: 1.6; }
+	.hero-photo .hero-price small { margin-top: 8px; }
 }
 
