@@ -52,6 +52,19 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.7.0', '<' ) ) {
+		// Versione essenziale da infopoint: si mostra ciò che serve per contattarci,
+		// gli approfondimenti diventano inviti; brochure su richiesta.
+		$vis = get_option( 'ip_visibility' );
+		if ( is_array( $vis ) && ! empty( $vis['smart'] ) && is_array( $vis['smart'] ) ) {
+			$vis['smart']['drop']  = array_keys( ip_smart_groups() );
+			$vis['smart']['paras'] = 1;
+			$vis['smart']['items'] = 4;
+			$vis['smart']['docs']  = 0;
+			unset( $vis['smart']['groups'] );
+			update_option( 'ip_visibility', $vis, true );
+		}
+	}
 	if ( version_compare( $v, '3.6.2', '<' ) ) {
 		// Versione essenziale: non si scelgono più le sezioni da tenere ma solo quelle
 		// accessorie da togliere; le domande frequenti tornano visibili.

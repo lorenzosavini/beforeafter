@@ -416,8 +416,8 @@ function ip_vis_tab_smart() {
 		<input type="hidden" name="smart_form" value="1">
 	</section>
 	<section class="ipa-card">
-		<h3>Sezioni accessorie da togliere</h3>
-		<p class="ipa-card-d">Presentazione, obiettivi, destinatari e requisiti, programma, sbocchi, stage, titolo, durata e costi restano <strong>sempre</strong>, al massimo accorciati. Acceso = la sezione accessoria viene tolta; il tema la riconosce dal titolo, anche in inglese.</p>
+		<h3>Da approfondire dopo il contatto</h3>
+		<p class="ipa-card-d">Cosa serve per decidere di contattarvi resta <strong>sempre</strong>, in breve: presentazione e obiettivo, a chi è rivolto e requisiti, nomi dei moduli, sbocchi, titolo, durata e costo. Gli argomenti accesi qui sotto vengono tolti dal testo e diventano pulsanti nel riquadro «Da approfondire con un orientatore», che aprono il modulo con il messaggio già scritto. Il tema li riconosce dal titolo della sezione, anche in inglese. Nelle pagine informative non si toglie mai l’argomento della pagina stessa.</p>
 		<div class="ipv-list">
 			<?php foreach ( ip_smart_groups() as $k => $g ) : ?>
 				<?php ip_vis_switch( 'smart_drop', $k, in_array( $k, (array) $s['drop'], true ), $g[0] ); ?>
@@ -427,9 +427,9 @@ function ip_vis_tab_smart() {
 	<section class="ipa-card">
 		<h3>Quanto testo per sezione</h3>
 		<table class="form-table" role="presentation">
-			<tr><th><label for="ipv-paras">Paragrafi per sezione</label></th><td><input type="number" id="ipv-paras" name="smart_paras" min="1" max="6" value="<?php echo (int) $s['paras']; ?>" class="small-text"> <span class="description">Un elenco o una tabella contano come un paragrafo.</span></td></tr>
-			<tr><th><label for="ipv-items">Voci per elenco</label></th><td><input type="number" id="ipv-items" name="smart_items" min="2" max="20" value="<?php echo (int) $s['items']; ?>" class="small-text"> <span class="description">Anche le righe delle tabelle.</span></td></tr>
-			<tr><th><label for="ipv-docs">Documenti da mostrare</label></th><td><input type="number" id="ipv-docs" name="smart_docs" min="0" max="10" value="<?php echo (int) $s['docs']; ?>" class="small-text"> <span class="description">I primi della lista, di solito brochure e «il corso in breve». 0 = nessuno.</span></td></tr>
+			<tr><th><label for="ipv-paras">Paragrafi per sezione</label></th><td><input type="number" id="ipv-paras" name="smart_paras" min="1" max="6" value="<?php echo (int) $s['paras']; ?>" class="small-text"> <span class="description">Per presentazione e obiettivi; le altre sezioni ne mostrano uno. Un elenco conta come un paragrafo.</span></td></tr>
+			<tr><th><label for="ipv-items">Voci per elenco</label></th><td><input type="number" id="ipv-items" name="smart_items" min="2" max="20" value="<?php echo (int) $s['items']; ?>" class="small-text"> <span class="description">Sbocchi, requisiti, obiettivi. Nel programma restano solo i nomi dei moduli.</span></td></tr>
+			<tr><th><label for="ipv-docs">Documenti da mostrare</label></th><td><input type="number" id="ipv-docs" name="smart_docs" min="0" max="10" value="<?php echo (int) $s['docs']; ?>" class="small-text"> <span class="description">0 = brochure su richiesta: al posto dei PDF compare «Ricevi la brochure e il piano di studi».</span></td></tr>
 		</table>
 	</section>
 	<?php

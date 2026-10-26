@@ -369,7 +369,7 @@
 	var small = window.matchMedia && window.matchMedia('(max-width: 960px)').matches;
 	(function () {
 		var first = true;
-		var widgets = 'form, div.lead, .clist, .agev, .atable-wrap, .contacts, .sedi, .whois, .steps';
+		var widgets = 'form, div.lead, .clist, .agev, .atable-wrap, .contacts, .sedi, .whois, .steps, .smart-box, .smart-docs';
 		var fold = function (box) {
 			var kids = Array.prototype.slice.call(box.children), cur = null, intro = [];
 			kids.forEach(function (el) {

@@ -128,6 +128,7 @@ while ( have_posts() ) :
 						<?php endforeach; ?>
 					</ul>
 				<?php endif; ?>
+				<?php echo function_exists( 'ip_smart_docs_cta' ) ? ip_smart_docs_cta( $id ) : ''; // phpcs:ignore ?>
 
 
 				<?php $faq = ip_part_on( 'faq', $id ) ? ip_meta_rows( 'faq', $id ) : array(); ?>

@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 3.6.2
+Version: 3.7.0
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -1044,3 +1044,14 @@ details[open] > :not(summary) { animation: ip-fade .35s ease both; }
 .smart-more a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; background: var(--brand-tint); color: var(--brand-dark); font-weight: 600; font-size: .92rem; text-decoration: none; }
 .smart-more a::after { content: "→"; }
 .smart-more a:hover { background: var(--brand); color: #fff; }
+.smart-docs { margin: 1.4em 0 0; }
+.smart-box { margin: 2em 0 0; padding: 20px 22px; border: 1px solid var(--line); border-left: 4px solid var(--brand); border-radius: 14px; background: var(--brand-tint); }
+.smart-box-t { margin: 0 0 12px; }
+.smart-box-t strong { display: block; font-size: 1.08rem; color: var(--brand-deep); }
+.smart-box-t span { display: block; margin-top: 2px; font-size: .94rem; color: var(--brand-dark); }
+.smart-box ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.smart-box li { margin: 0; padding: 0; }
+.smart-box li::before { display: none; }
+.smart-box a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; background: #fff; border: 1px solid var(--brand-soft); color: var(--brand-dark); font-weight: 600; font-size: .92rem; text-decoration: none; }
+.smart-box a::after { content: "→"; }
+.smart-box a:hover { background: var(--brand); border-color: var(--brand); color: #fff; }
