@@ -184,7 +184,7 @@ function ip_lead_emails( $id, $type, $data, $files ) {
 		if ( $wa && '3' === substr( $wa, 2, 1 ) ) {
 			$buttons[] = array( 'WhatsApp', 'https://wa.me/' . $wa, '#1fa855' );
 		}
-		$buttons[] = array( 'Apri nel pannello', admin_url( 'post.php?action=edit&post=' . $id ), '#0e261d' );
+		$buttons[] = array( 'Apri nel pannello', admin_url( 'admin.php?page=ip-leads&lead=' . $id ), '#0e261d' );
 
 		$groups = array(
 			'Contatto'   => array(

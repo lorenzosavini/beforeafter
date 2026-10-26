@@ -252,7 +252,7 @@ add_filter( 'submenu_file', function ( $file, $parent ) {
 // Ordine del menu: prima ciò che si usa ogni giorno.
 add_filter( 'custom_menu_order', '__return_true' );
 add_filter( 'menu_order', function ( $order ) {
-	$first = array( 'index.php', 'edit.php?post_type=ip_lead', 'ip-settings', 'separator1', 'edit.php?post_type=corso', 'edit.php?post_type=ip_landing', 'edit.php?post_type=page', 'upload.php' );
+	$first = array( 'index.php', 'ip-leads', 'ip-settings', 'separator1', 'edit.php?post_type=corso', 'edit.php?post_type=ip_landing', 'edit.php?post_type=page', 'upload.php' );
 	$head  = array_values( array_intersect( $first, $order ) );
 	return array_merge( $head, array_values( array_diff( $order, $head ) ) );
 } );
@@ -459,7 +459,7 @@ function ip_dashboard_page() {
 	$states = ip_lead_states();
 	$upd    = function_exists( 'ip_sync_open_count' ) ? ip_sync_open_count() : 0;
 	$maint  = function_exists( 'ipm_opt' ) && ipm_opt( 'on' );
-	$leads  = admin_url( 'edit.php?post_type=ip_lead' );
+	$leads  = ip_leads_url();
 	?>
 	<div class="wrap ip-admin ipa">
 		<?php
@@ -481,7 +481,7 @@ function ip_dashboard_page() {
 		<?php endif; ?>
 
 		<div class="ipa-kpis">
-			<a class="ipa-kpi ipa-kpi-hl" href="<?php echo esc_url( add_query_arg( 'ip_stato', 'nuovo', $leads ) ); ?>"><span>Da contattare</span><strong><?php echo (int) $new; ?></strong><small>Apri l’elenco</small></a>
+			<a class="ipa-kpi ipa-kpi-hl" href="<?php echo esc_url( add_query_arg( 'stato', 'nuovo', $leads ) ); ?>"><span>Da contattare</span><strong><?php echo (int) $new; ?></strong><small>Apri l’elenco</small></a>
 			<div class="ipa-kpi"><span>Oggi</span><strong><?php echo (int) $today; ?></strong><small>richieste</small></div>
 			<div class="ipa-kpi"><span>Ultimi 7 giorni</span><strong><?php echo (int) $week; ?></strong><small>richieste</small></div>
 			<div class="ipa-kpi"><span>Ultimi 30 giorni</span><strong><?php echo (int) $month; ?></strong>
@@ -505,7 +505,7 @@ function ip_dashboard_page() {
 								$can = get_post_meta( $l->ID, '_lead_canale', true );
 								?>
 								<tr>
-									<td><a class="ipa-strong" href="<?php echo esc_url( get_edit_post_link( $l->ID ) ); ?>"><?php echo esc_html( get_the_title( $l ) ); ?></a><br><small><?php echo esc_html( human_time_diff( get_post_time( 'U', true, $l ), time() ) ); ?> fa<?php echo $can ? ' · ' . esc_html( $can ) : ''; ?></small></td>
+									<td><a class="ipa-strong" href="<?php echo esc_url( ip_leads_url( array( 'lead' => $l->ID ) ) ); ?>"><?php echo esc_html( get_the_title( $l ) ); ?></a><br><small><?php echo esc_html( human_time_diff( get_post_time( 'U', true, $l ), time() ) ); ?> fa<?php echo $can ? ' · ' . esc_html( $can ) : ''; ?></small></td>
 									<td><span class="ip-st ip-st-<?php echo esc_attr( $st ); ?>"><?php echo esc_html( isset( $states[ $st ] ) ? $states[ $st ] : $st ); ?></span></td>
 									<td class="ipa-r"><?php if ( $tel ) : ?><a class="ipa-btn ipa-btn-sm" href="<?php echo esc_attr( ip_tel_href( $tel ) ); ?>"><span class="dashicons dashicons-phone"></span> <?php echo esc_html( $tel ); ?></a><?php endif; ?></td>
 								</tr>
@@ -524,7 +524,7 @@ function ip_dashboard_page() {
 					<?php $max = max( array_map( function ( $r ) { return (int) $r->n; }, $ch ) ); ?>
 					<ul class="ipa-bars">
 						<?php foreach ( $ch as $r ) : ?>
-							<li><a href="<?php echo esc_url( add_query_arg( 'ip_canale', rawurlencode( $r->v ), $leads ) ); ?>"><span><?php echo esc_html( $r->v ); ?></span><b><?php echo (int) $r->n; ?></b></a><i style="width:<?php echo (int) round( 100 * $r->n / $max ); ?>%"></i></li>
+							<li><a href="<?php echo esc_url( add_query_arg( 'canale', rawurlencode( $r->v ), $leads ) ); ?>"><span><?php echo esc_html( $r->v ); ?></span><b><?php echo (int) $r->n; ?></b></a><i style="width:<?php echo (int) round( 100 * $r->n / $max ); ?>%"></i></li>
 						<?php endforeach; ?>
 					</ul>
 				<?php endif; ?>
@@ -583,7 +583,7 @@ add_action( 'wp_dashboard_setup', function () {
 			'<p style="font-size:14px"><strong style="font-size:28px;display:block;color:#0e261d">%d</strong>da contattare · %d negli ultimi 7 giorni</p><p><a class="button button-primary" href="%s">Apri le richieste</a> <a class="button" href="%s">Bacheca Infopoint</a></p>',
 			(int) $new_q->found_posts,
 			(int) ip_leads_between( '6 days ago midnight' ),
-			esc_url( admin_url( 'edit.php?post_type=ip_lead' ) ),
+			esc_url( ip_leads_url() ),
 			esc_url( admin_url( 'admin.php?page=ip-settings' ) )
 		);
 	} );
@@ -714,6 +714,7 @@ add_action( 'edit_form_after_title', function ( $post ) {
 	$name = trim( $m( 'nome' ) . ' ' . $m( 'cognome' ) );
 	$what = $m( 'corso' ) ? $m( 'corso' ) : $m( 'interesse' );
 	?>
+	<p class="ipl-back"><a href="<?php echo esc_url( ip_leads_url() ); ?>">← Tutte le richieste</a></p>
 	<div class="ipa-lead-h">
 		<div>
 			<p class="ipa-kicker"><?php echo esc_html( get_the_date( 'j F Y, H:i', $post ) ); ?> · <?php echo esc_html( human_time_diff( get_post_time( 'U', true, $post ), time() ) ); ?> fa<?php echo $m( 'canale' ) ? ' · ' . esc_html( $m( 'canale' ) ) : ''; ?></p>

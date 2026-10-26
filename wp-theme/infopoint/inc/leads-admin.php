@@ -27,6 +27,7 @@ add_action( 'init', function () {
 		),
 		'public'              => false,
 		'show_ui'             => true,
+		'show_in_menu'        => false,
 		'show_in_rest'        => false,
 		'exclude_from_search' => true,
 		'menu_icon'           => 'dashicons-email-alt',
@@ -38,30 +39,6 @@ add_action( 'init', function () {
 	) );
 } );
 
-// Contatore delle richieste da gestire accanto alla voce di menu.
-add_action( 'admin_menu', function () {
-	global $menu;
-	$n = get_transient( 'ip_new_leads' );
-	if ( false === $n ) {
-		$q = new WP_Query( array(
-			'post_type'      => 'ip_lead',
-			'posts_per_page' => 1,
-			'fields'         => 'ids',
-			'meta_key'       => '_lead_stato',
-			'meta_value'     => 'nuovo',
-		) );
-		$n = (int) $q->found_posts;
-		set_transient( 'ip_new_leads', $n, 5 * MINUTE_IN_SECONDS );
-	}
-	if ( ! $n ) {
-		return;
-	}
-	foreach ( $menu as $i => $item ) {
-		if ( 'edit.php?post_type=ip_lead' === $item[2] ) {
-			$menu[ $i ][0] .= ' <span class="awaiting-mod"><span class="pending-count">' . (int) $n . '</span></span>';
-		}
-	}
-}, 99 );
 add_action( 'added_post_meta', 'ip_flush_lead_count' );
 add_action( 'updated_post_meta', 'ip_flush_lead_count' );
 function ip_flush_lead_count() {
@@ -277,26 +254,9 @@ add_action( 'admin_post_ip_export_leads', function () {
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_die( 'Non autorizzato.' );
 	}
-	$keys = array_merge( array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'citta', 'fascia', 'messaggio', 'marketing', 'tipo', 'stato', 'note', 'landing', 'pagina' ), array_keys( ip_lead_attr_keys() ), array( 'origine', 'invio' ) );
-	nocache_headers();
-	header( 'Content-Type: text/csv; charset=UTF-8' );
-	header( 'Content-Disposition: attachment; filename="richieste-' . gmdate( 'Y-m-d' ) . '.csv"' );
-	$out = fopen( 'php://output', 'w' );
-	fwrite( $out, "\xEF\xBB\xBF" ); // BOM: Excel legge correttamente gli accenti.
-	fputcsv( $out, array_merge( array( 'data' ), $keys ), ';' );
-	$paged = 1;
-	do {
-		$ids = get_posts( array( 'post_type' => 'ip_lead', 'posts_per_page' => 500, 'paged' => $paged++, 'fields' => 'ids' ) );
-		foreach ( $ids as $id ) {
-			$row = array( get_the_date( 'Y-m-d H:i', $id ) );
-			foreach ( $keys as $k ) {
-				$v = (string) get_post_meta( $id, '_lead_' . $k, true );
-				// Evita che Excel interpreti i valori come formule.
-				$row[] = preg_match( '/^[=+\-@]/', $v ) ? "'" . $v : $v;
-			}
-			fputcsv( $out, $row, ';' );
-		}
-	} while ( count( $ids ) === 500 );
-	fclose( $out );
-	exit;
+	// Esporta ciò che si sta guardando: stessi filtri della pagina Richieste.
+	$f          = ip_leads_filters();
+	$f['paged'] = 1;
+	$args       = array_merge( ip_leads_query_args( $f ), array( 'posts_per_page' => -1, 'fields' => 'ids', 'paged' => 1 ) );
+	ip_leads_export( get_posts( $args ) );
 } );
