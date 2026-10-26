@@ -99,10 +99,12 @@ function ip_gtm_container() {
 		$t( 'template', 'phone_number', $dl( 'user_data.phone_number' ) ),
 		$t( 'template', 'first_name', $dl( 'user_data.address.first_name' ) ),
 		$t( 'template', 'last_name', $dl( 'user_data.address.last_name' ) ),
+		$t( 'template', 'street', $dl( 'user_data.address.street' ) ),
 		$t( 'template', 'city', $dl( 'user_data.address.city' ) ),
 		$t( 'template', 'region', $dl( 'user_data.address.region' ) ),
+		$t( 'template', 'postal_code', $dl( 'user_data.address.postal_code' ) ),
 		$t( 'template', 'country', $dl( 'user_data.address.country' ) ),
-	) );
+	) ); // Tag Manager vuole tutti i campi dell'indirizzo: via e CAP restano vuoti (il modulo non li chiede).
 
 	// Valore della conversione: quello della richiesta o, se manca, la costante.
 	$lead_value = $dl( 'value' );
@@ -152,6 +154,10 @@ function ip_gtm_container() {
 	/* Tag ---------------------------------------------------------------- */
 	$tags = array();
 	$tag  = function ( $name, $type, $params, $firing, $extra = array() ) use ( &$tags, $next, $base ) {
+		// Tag Manager rifiuta i campi presenti ma vuoti: si scrivono solo quelli con un valore.
+		$params = array_values( array_filter( $params, function ( $p ) {
+			return ! isset( $p['value'] ) || '' !== $p['value'];
+		} ) );
 		$tags[] = array_merge( $base, array(
 			'tagId'            => $next( 'tag' ),
 			'name'             => $name,
