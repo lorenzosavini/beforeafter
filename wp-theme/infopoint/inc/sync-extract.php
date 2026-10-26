@@ -515,8 +515,19 @@ function ip_src_course( $url, $html, $piano_urls = array() ) {
 			}
 		}
 	}
+	$paras = $note;
 	$note  = implode( ' ', $note );
 	$evid  = mb_strlen( $note ) < 200 ? trim( $note, '() ' ) : '';
+	// Testo introduttivo lungo (di solito obiettivi e descrizione del corso):
+	// diventa la sezione «Presentazione», se non c'è già nel testo.
+	// Solo testo che descrive il corso: via avvisi, scadenze, open day e contatti dell'Ateneo.
+	$paras = array_values( array_filter( $paras, function ( $t ) {
+		return mb_strlen( $t ) > 60 && ! ip_src_dropped( '<p>' . esc_html( $t ) . '</p>' )
+			&& ! preg_match( '/contatt|whatsapp|@|scrivi a|chiam[ai]|telefon|registrat[iy]|guarda (la|una)|vai alla|scopri di pi[uù]|open day|iscrizioni (aperte|chiuse)|sono aperte le iscrizioni|bando chiuso|scadenza|candidatura|^sigla:/iu', $t );
+	} ) );
+	if ( ! $evid && $paras && ! preg_match( '#<h2>(Presentazione|Descrizione|Description)</h2>#iu', implode( '', $parts ) ) ) {
+		array_unshift( $parts, '<h2>Presentazione</h2><p>' . implode( '</p><p>', array_map( 'esc_html', $paras ) ) . '</p>' );
+	}
 	$stato = preg_match( '/iscrizioni chiuse|bandi sono attualmente chiusi/iu', $evid . ' ' . $note . ' ' . $quota ) ? 'chiuse' : '';
 	if ( preg_match( '/^(iscrizioni chiuse|da un.idea di)$/iu', $evid ) ) {
 		$evid = '';

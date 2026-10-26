@@ -52,6 +52,21 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.6.2', '<' ) ) {
+		// Versione essenziale: non si scelgono più le sezioni da tenere ma solo quelle
+		// accessorie da togliere; le domande frequenti tornano visibili.
+		$vis = get_option( 'ip_visibility' );
+		if ( is_array( $vis ) && ! empty( $vis['smart'] ) && is_array( $vis['smart'] ) ) {
+			unset( $vis['smart']['groups'] );
+			$vis['smart']['parts'] = array_values( array_diff( (array) ( $vis['smart']['parts'] ?? array() ), array( 'faq' ) ) );
+			update_option( 'ip_visibility', $vis, true );
+		}
+		// Le presentazioni dei corsi (testo introduttivo ufficiale) prima non venivano
+		// importate: un controllo completo le recupera, rispettando la modalità scelta.
+		if ( ip_opt( 'sync_enabled' ) && ! wp_next_scheduled( 'ip_sync_full_once' ) ) {
+			wp_schedule_single_event( time() + 60, 'ip_sync_full_once' );
+		}
+	}
 	if ( version_compare( $v, '3.4.2', '<' ) ) {
 		// Visibilità: home, privacy, cookie e ringraziamento non possono essere nascoste
 		// (un salvataggio della scheda Pagine le segnava come spente: reindirizzamento infinito).

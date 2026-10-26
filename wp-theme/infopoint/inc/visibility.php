@@ -406,7 +406,7 @@ function ip_vis_tab_smart() {
 	?>
 	<section class="ipa-card ipv-smart<?php echo ( $s['on'] || $s['pages_on'] ) ? ' is-on' : ''; ?>">
 		<label class="ipv-row ipv-big">
-			<span class="ipv-t"><strong>Versione essenziale dei corsi</strong><small>Ogni corso e percorso mostra solo le sezioni scelte qui sotto, accorciate, sempre a tendina, con l’invito a chiedere il dettaglio completo. Il testo intero resta salvato e continua ad aggiornarsi dal sito ufficiale: spegnendo l’interruttore torna tutto com’era.</small></span>
+			<span class="ipv-t"><strong>Versione essenziale dei corsi</strong><small>Ogni corso e percorso mostra tutte le sezioni importanti, accorciate e sempre a tendina, senza quelle accessorie scelte qui sotto, con l’invito a chiedere il dettaglio completo. Il testo intero resta salvato e continua ad aggiornarsi dal sito ufficiale: spegnendo l’interruttore torna tutto com’era.</small></span>
 			<input type="checkbox" class="ipv-sw" name="smart_on" value="1" <?php checked( $s['on'] ); ?>>
 		</label>
 		<label class="ipv-row ipv-big">
@@ -416,11 +416,11 @@ function ip_vis_tab_smart() {
 		<input type="hidden" name="smart_form" value="1">
 	</section>
 	<section class="ipa-card">
-		<h3>Sezioni da tenere</h3>
-		<p class="ipa-card-d">Il tema riconosce l’argomento dal titolo: «Destinatari», «A chi è rivolto», «Requisiti di ammissione» finiscono tutti in «A chi è rivolto e requisiti». Di ogni argomento resta solo la prima sezione.</p>
+		<h3>Sezioni accessorie da togliere</h3>
+		<p class="ipa-card-d">Presentazione, obiettivi, destinatari e requisiti, programma, sbocchi, stage, titolo, durata e costi restano <strong>sempre</strong>, al massimo accorciati. Acceso = la sezione accessoria viene tolta; il tema la riconosce dal titolo, anche in inglese.</p>
 		<div class="ipv-list">
 			<?php foreach ( ip_smart_groups() as $k => $g ) : ?>
-				<?php ip_vis_switch( 'smart_groups', $k, in_array( $k, (array) $s['groups'], true ), $g[0] ); ?>
+				<?php ip_vis_switch( 'smart_drop', $k, in_array( $k, (array) $s['drop'], true ), $g[0] ); ?>
 			<?php endforeach; ?>
 		</div>
 	</section>
@@ -629,7 +629,7 @@ add_action( 'admin_post_ip_vis_save', function () {
 	if ( isset( $in['smart_form'] ) ) {
 		$v['smart'] = array(
 			'on'     => empty( $in['smart_on'] ) ? '' : '1',
-			'groups' => array_values( array_intersect( $on( 'smart_groups' ), array_keys( ip_smart_groups() ) ) ),
+			'drop'   => array_values( array_intersect( $on( 'smart_drop' ), array_keys( ip_smart_groups() ) ) ),
 			'paras'  => max( 1, min( 6, (int) ( $in['smart_paras'] ?? 2 ) ) ),
 			'items'  => max( 2, min( 20, (int) ( $in['smart_items'] ?? 6 ) ) ),
 			'docs'   => max( 0, min( 10, (int) ( $in['smart_docs'] ?? 2 ) ) ),

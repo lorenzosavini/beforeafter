@@ -1,33 +1,35 @@
 <?php
 /**
- * Versione essenziale dei corsi: solo le sezioni che servono a decidere,
- * ciascuna accorciata, con l'invito a chiedere il dettaglio completo.
+ * Versione essenziale dei corsi: tutte le sezioni che servono a decidere,
+ * ciascuna accorciata, senza le parti accessorie, con l'invito a chiedere
+ * il dettaglio completo.
  * Il testo completo resta salvato e continua ad aggiornarsi dal sito ufficiale.
  */
 
 defined( 'ABSPATH' ) || exit;
 
-/** Gruppi di sezioni riconosciuti dal titolo. */
+/**
+ * Sezioni accessorie che la versione essenziale può togliere, riconosciute dal
+ * titolo. Tutto il resto (presentazione, obiettivi, destinatari, programma,
+ * sbocchi, titolo, durata, costi…) resta sempre, al massimo accorciato.
+ */
 function ip_smart_groups() {
 	return array(
-		'presentazione' => array( 'Presentazione', '/presentazione|in breve|cosa offre|perch[eéè] scegliere|contesto di riferimento|il corso\b/u' ),
-		'destinatari'   => array( 'A chi è rivolto e requisiti', '/destinatari|a chi [eè] rivolt|requisit|ammission|modalit[aà] di accesso|accesso al corso|titolo di accesso|classe di concorso/u' ),
-		'programma'     => array( 'Programma', '/programma|piano di stud|insegnament|articolazione|attivit[aà] formative|struttura del corso/u' ),
-		'sbocchi'       => array( 'Sbocchi professionali', '/sbocch|profili professional|opportunit[aà]|mondo del lavoro/u' ),
-		'costi'         => array( 'Costi e iscrizione', '/cost|quota|retta|tasse|iscrizion/u' ),
-		'obiettivi'     => array( 'Obiettivi', '/obiettiv|focus|punti chiave|competenze/u' ),
-		'frequenza'     => array( 'Durata e frequenza', '/frequenza|durata|calendario|erogazione|cicli attivi/u' ),
-		'titolo'        => array( 'Titolo rilasciato', '/conseguimento|titolo rilasciato|prova finale|attestato/u' ),
+		'persone'   => array( 'Direttori, docenti e faculty', '/direttor|faculty|docent|teachers|comitato|coordinat|scientific director|tutor/u' ),
+		'pagamenti' => array( 'Modalità di pagamento e finanziamenti', '/modalit[aà] di pagamento|pagamento|payment|financing|sepa|directpay|prestito|loan|pa 110|pagopa|rateizz/u' ),
+		'partner'   => array( 'Collaborazioni e partner', '/collaborazion|partner|convenzion|con il contributo/u' ),
+		'avvio'     => array( 'Scegli come iniziare', '/scegli come|choose how|come iniziare/u' ),
+		'valutazione' => array( 'Criteri di valutazione', '/criteri di valutazione|assessment|valutazione/u' ),
 	);
 }
 
 function ip_smart_defaults() {
 	return array(
 		'on'     => '',
-		'groups' => array( 'presentazione', 'destinatari', 'programma', 'sbocchi', 'costi' ),
+		'drop'   => array( 'persone', 'pagamenti', 'partner', 'avvio' ),
 		'paras'  => 2,
 		'items'  => 6,
-		'parts'  => array( 'faq', 'steps', 'related' ),
+		'parts'  => array( 'steps', 'related' ),
 		'docs'   => 2,
 		'pages_on'   => '',
 		'pages_full' => array(),
@@ -59,10 +61,47 @@ function ip_smart_group_of( $title ) {
 }
 
 /**
- * Accorcia un blocco di HTML: al massimo $paras paragrafi (o tabelle),
- * elenchi fino a $items voci. Restituisce [html, accorciato?].
+ * Un blocco porta un dato essenziale (importo, data, durata, CFU, scadenza)?
+ * Con $short > 0 contano come essenziali anche le righe fino a quella lunghezza.
+ * I blocchi essenziali non si tolgono mai: si accorcia solo il testo descrittivo.
  */
-function ip_smart_trim( $html, $paras, $items ) {
+function ip_smart_essential( $node, $short = 0 ) {
+	$t = trim( preg_replace( '/\s+/u', ' ', $node->textContent ) );
+	if ( '' === $t ) {
+		return false;
+	}
+	if ( $short && mb_strlen( $t ) <= $short ) {
+		return true;
+	}
+	return (bool) preg_match( '/€|\beur\b|\d+([.,]\d+)?\s?(%|cfu|ects|mesi|anni|ore|giorni|gg|settimane|rate)\b|\b\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4}\b|\b\d{1,2} (gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\b|scadenz/iu', $t );
+}
+
+/**
+ * Accorcia un elenco: oltre $items voci restano solo quelle con dati essenziali.
+ * Restituisce true se ha tolto qualcosa.
+ */
+function ip_smart_trim_list( $list, $items, $from = null ) {
+	$cut = false;
+	$i   = 0;
+	foreach ( iterator_to_array( $list->childNodes ) as $c ) {
+		if ( XML_ELEMENT_NODE !== $c->nodeType || 'li' !== strtolower( $c->nodeName ) ) {
+			continue;
+		}
+		$i++;
+		if ( $i > ( null === $from ? $items : $from ) && ! ip_smart_essential( $c ) ) {
+			$list->removeChild( $c );
+			$cut = true;
+		}
+	}
+	return $cut;
+}
+
+/**
+ * Accorcia un blocco di HTML: oltre $paras paragrafi resta solo ciò che porta
+ * dati essenziali; elenchi fino a $items voci (più quelle con dati); tabelle
+ * intere. Restituisce [html, accorciato?].
+ */
+function ip_smart_trim( $html, $paras, $items, $short = 0 ) {
 	if ( '' === trim( $html ) ) {
 		return array( $html, false );
 	}
@@ -76,6 +115,7 @@ function ip_smart_trim( $html, $paras, $items ) {
 	}
 	$cut   = false;
 	$count = 0;
+	$head  = null; // Sottotitolo in attesa: resta solo se resta qualcosa sotto.
 	foreach ( iterator_to_array( $root->childNodes ) as $n ) {
 		if ( XML_ELEMENT_NODE !== $n->nodeType ) {
 			if ( $count >= $paras && trim( $n->textContent ) !== '' ) {
@@ -84,40 +124,41 @@ function ip_smart_trim( $html, $paras, $items ) {
 			continue;
 		}
 		$tag = strtolower( $n->nodeName );
-		if ( $count >= $paras ) {
-			$root->removeChild( $n );
-			$cut = true;
+		if ( in_array( $tag, array( 'h3', 'h4', 'h5', 'h6' ), true ) ) {
+			if ( $head ) {
+				$root->removeChild( $head );
+				$cut = true;
+			}
+			$head = $count >= $paras ? $n : null;
 			continue;
 		}
-		if ( in_array( $tag, array( 'ul', 'ol' ), true ) ) {
-			$li = array();
-			foreach ( $n->childNodes as $c ) {
-				if ( XML_ELEMENT_NODE === $c->nodeType && 'li' === strtolower( $c->nodeName ) ) {
-					$li[] = $c;
-				}
-			}
-			foreach ( array_slice( $li, $items ) as $c ) {
-				$n->removeChild( $c );
+		$list = in_array( $tag, array( 'ul', 'ol' ), true );
+		if ( $count < $paras ) {
+			if ( $list && ip_smart_trim_list( $n, $items ) ) {
 				$cut = true;
 			}
-			$count++;
-		} elseif ( 'table' === $tag ) {
-			$rows = $n->getElementsByTagName( 'tr' );
-			for ( $i = $rows->length - 1; $i >= $items + 1; $i-- ) {
-				$r = $rows->item( $i );
-				$r->parentNode->removeChild( $r );
-				$cut = true;
+			if ( 'table' !== $tag ) {
+				$count++;
 			}
-			$count++;
-		} elseif ( in_array( $tag, array( 'h3', 'h4', 'h5' ), true ) ) {
-			continue; // I sottotitoli non contano, ma seguono il loro testo.
+			continue;
+		}
+		// Oltre il limite: restano tabelle, blocchi con dati, voci con dati.
+		$keep = 'table' === $tag;
+		if ( $list ) {
+			$cut  = ip_smart_trim_list( $n, $items, 0 ) || $cut;
+			$keep = (bool) $n->getElementsByTagName( 'li' )->length;
+		} elseif ( ! $keep ) {
+			$keep = ip_smart_essential( $n, $short );
+		}
+		if ( $keep ) {
+			$head = null;
 		} else {
-			$count++;
+			$root->removeChild( $n );
+			$cut = true;
 		}
 	}
-	// Un sottotitolo rimasto in fondo senza testo non serve.
-	while ( $root->lastChild && XML_ELEMENT_NODE === $root->lastChild->nodeType && preg_match( '/^h[3-5]$/i', $root->lastChild->nodeName ) ) {
-		$root->removeChild( $root->lastChild );
+	if ( $head ) {
+		$root->removeChild( $head );
 		$cut = true;
 	}
 	$out = '';
@@ -133,33 +174,26 @@ add_filter( 'the_content', function ( $html ) {
 		return $html;
 	}
 	$s    = ip_smart();
-	$keep = (array) $s['groups'];
+	$drop = (array) $s['drop'];
 	$p    = max( 1, (int) $s['paras'] );
 	$it   = max( 2, (int) $s['items'] );
 	$more = '<p class="smart-more"><a href="#richiedi" data-scroll-form>Vuoi il dettaglio completo? Te lo inviamo noi</a></p>';
 	if ( ! preg_match_all( '#<h2\b[^>]*>(.*?)</h2>#is', $html, $m, PREG_OFFSET_CAPTURE ) ) {
-		list( $t, $cut ) = ip_smart_trim( $html, $p + 1, $it );
+		list( $t, $cut ) = ip_smart_trim( $html, $p + 1, $it, 100 );
 		return $t . ( $cut ? $more : '' );
 	}
-	// Testo prima del primo titolo: un breve «in breve».
-	list( $out ) = ip_smart_trim( substr( $html, 0, $m[0][0][1] ), 1, $it );
-	$seen   = array();
-	$n      = count( $m[0] );
-	$groups = array_map( 'ip_smart_group_of', wp_list_pluck( $m[1], 0 ) );
-	// Senza una «Presentazione», la prima sezione presenta il corso (spesso «Obiettivi»).
-	if ( in_array( 'presentazione', $keep, true ) && ! in_array( 'presentazione', $groups, true ) && ( '' === $groups[0] || ! in_array( $groups[0], $keep, true ) ) ) {
-		$groups[0] = 'presentazione';
-	}
+	// Testo prima del primo titolo (la presentazione): accorciato come le sezioni.
+	list( $out, $cut ) = ip_smart_trim( substr( $html, 0, $m[0][0][1] ), $p, $it, 100 );
+	$out .= $cut ? $more : '';
+	$n    = count( $m[0] );
 	for ( $i = 0; $i < $n; $i++ ) {
-		$g = $groups[ $i ];
-		if ( ! $g || ! in_array( $g, $keep, true ) || isset( $seen[ $g ] ) ) {
-			continue; // Sezione non essenziale, o secondo titolo dello stesso argomento.
+		if ( in_array( ip_smart_group_of( $m[1][ $i ][0] ), $drop, true ) ) {
+			continue; // Sezione accessoria.
 		}
-		$seen[ $g ] = true;
-		$start      = $m[0][ $i ][1] + strlen( $m[0][ $i ][0] );
-		$end        = $i + 1 < $n ? $m[0][ $i + 1 ][1] : strlen( $html );
-		list( $body, $cut ) = ip_smart_trim( substr( $html, $start, $end - $start ), $p, $it );
-		$out       .= $m[0][ $i ][0] . $body . ( $cut ? $more : '' );
+		$start = $m[0][ $i ][1] + strlen( $m[0][ $i ][0] );
+		$end   = $i + 1 < $n ? $m[0][ $i + 1 ][1] : strlen( $html );
+		list( $body, $cut ) = ip_smart_trim( substr( $html, $start, $end - $start ), $p, $it, 100 );
+		$out  .= $m[0][ $i ][0] . $body . ( $cut ? $more : '' );
 	}
 	return $out;
 }, 21 );
@@ -255,41 +289,34 @@ function ip_smart_trim_page( $html, $paras, $items, $more ) {
 				$walk( $n );
 				continue;
 			}
-			if ( in_array( $tag, array( 'h3', 'h4', 'h5' ), true ) ) {
-				if ( $state['count'] >= $paras ) {
-					$parent->removeChild( $n );
+			if ( in_array( $tag, array( 'h3', 'h4', 'h5', 'h6' ), true ) ) {
+				continue; // I sottotitoli restano: introducono dati che restano.
+			}
+			if ( ! in_array( $tag, $text, true ) || 'table' === $tag ) {
+				continue; // Moduli, schede, elenchi dei corsi, contatti, tabelle: intatti.
+			}
+			$list = in_array( $tag, array( 'ul', 'ol' ), true );
+			if ( $state['count'] < $paras ) {
+				if ( $list && ip_smart_trim_list( $n, $items ) ) {
 					$state['cut'] = true;
 				}
+				$state['count']++;
 				continue;
 			}
-			if ( ! in_array( $tag, $text, true ) ) {
-				continue; // Moduli, schede, elenchi dei corsi, contatti: intatti.
-			}
-			if ( $state['count'] >= $paras ) {
-				$parent->removeChild( $n );
-				$state['cut'] = true;
+			// Oltre il limite: restano le righe brevi e tutto ciò che porta dati.
+			if ( $list ) {
+				if ( ip_smart_trim_list( $n, $items, 0 ) ) {
+					$state['cut'] = true;
+				}
+				if ( $n->getElementsByTagName( 'li' )->length ) {
+					continue;
+				}
+			} elseif ( ip_smart_essential( $n, 160 ) ) {
 				continue;
 			}
-			if ( in_array( $tag, array( 'ul', 'ol' ), true ) ) {
-				$li = array();
-				foreach ( $n->childNodes as $c ) {
-					if ( XML_ELEMENT_NODE === $c->nodeType && 'li' === strtolower( $c->nodeName ) ) {
-						$li[] = $c;
-					}
-				}
-				foreach ( array_slice( $li, $items ) as $c ) {
-					$n->removeChild( $c );
-					$state['cut'] = true;
-				}
-			} elseif ( 'table' === $tag ) {
-				$rows = $n->getElementsByTagName( 'tr' );
-				for ( $i = $rows->length - 1; $i >= $items + 1; $i-- ) {
-					$r = $rows->item( $i );
-					$r->parentNode->removeChild( $r );
-					$state['cut'] = true;
-				}
-			}
-			$state['count']++;
+			$parent->removeChild( $n );
+			$state['cut'] = true;
+			continue;
 		}
 		// Fine del contenitore: l'invito va in fondo alla sezione.
 		if ( 'ipw' === $parent->getAttribute( 'id' ) || false !== strpos( ' ' . $parent->getAttribute( 'class' ) . ' ', ' ufficiale ' ) ) {

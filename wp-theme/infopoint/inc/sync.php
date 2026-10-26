@@ -145,6 +145,10 @@ function ip_sync_sitemaps() {
  *
  * @param bool $full Rilegge tutti i corsi, non solo quelli cambiati.
  */
+add_action( 'ip_sync_full_once', function () {
+	ip_sync_check( true );
+} );
+
 function ip_sync_check( $full = false ) {
 	$state = ip_sync_state();
 	$maps  = ip_sync_sitemaps();
