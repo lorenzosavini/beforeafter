@@ -393,10 +393,14 @@ function ip_vis_tools( $placeholder ) {
 function ip_vis_tab_smart() {
 	$s = ip_smart();
 	?>
-	<section class="ipa-card ipv-smart<?php echo $s['on'] ? ' is-on' : ''; ?>">
+	<section class="ipa-card ipv-smart<?php echo ( $s['on'] || $s['pages_on'] ) ? ' is-on' : ''; ?>">
 		<label class="ipv-row ipv-big">
 			<span class="ipv-t"><strong>Versione essenziale dei corsi</strong><small>Ogni corso e percorso mostra solo le sezioni scelte qui sotto, accorciate, sempre a tendina, con l’invito a chiedere il dettaglio completo. Il testo intero resta salvato e continua ad aggiornarsi dal sito ufficiale: spegnendo l’interruttore torna tutto com’era.</small></span>
 			<input type="checkbox" class="ipv-sw" name="smart_on" value="1" <?php checked( $s['on'] ); ?>>
+		</label>
+		<label class="ipv-row ipv-big">
+			<span class="ipv-t"><strong>Versione essenziale delle pagine informative</strong><small>Tasse, corsi singoli, riconoscimento CFU, studenti stranieri e le altre pagine: ogni sezione resta, accorciata con gli stessi limiti dei corsi, e finisce con l’invito a chiedere il dettaglio. Moduli, schede delle agevolazioni ed elenchi dei corsi restano interi. Privacy, cookie, contatti, ringraziamento e home non vengono mai accorciate.</small></span>
+			<input type="checkbox" class="ipv-sw" name="smart_pages_on" value="1" <?php checked( $s['pages_on'] ); ?>>
 		</label>
 		<input type="hidden" name="smart_form" value="1">
 	</section>
@@ -416,6 +420,23 @@ function ip_vis_tab_smart() {
 			<tr><th><label for="ipv-items">Voci per elenco</label></th><td><input type="number" id="ipv-items" name="smart_items" min="2" max="20" value="<?php echo (int) $s['items']; ?>" class="small-text"> <span class="description">Anche le righe delle tabelle.</span></td></tr>
 			<tr><th><label for="ipv-docs">Documenti da mostrare</label></th><td><input type="number" id="ipv-docs" name="smart_docs" min="0" max="10" value="<?php echo (int) $s['docs']; ?>" class="small-text"> <span class="description">I primi della lista, di solito brochure e «il corso in breve». 0 = nessuno.</span></td></tr>
 		</table>
+	</section>
+	<?php
+	$locked = ip_smart_locked_pages();
+	$pages  = get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC', 'post__not_in' => $locked ?: array( 0 ), 'ip_all' => 1, 'suppress_filters' => false ) );
+	$pages  = array_filter( $pages, function ( $p ) {
+		return 'page-templates/landing.php' !== get_page_template_slug( $p );
+	} );
+	?>
+	<section class="ipa-card">
+		<h3>Pagine da accorciare</h3>
+		<p class="ipa-card-d">Acceso = la pagina segue la versione essenziale. Spegni le pagine che vuoi lasciare sempre complete.</p>
+		<input type="hidden" name="all_smart_page" value="<?php echo esc_attr( implode( ',', wp_list_pluck( $pages, 'ID' ) ) ); ?>">
+		<div class="ipv-list">
+			<?php foreach ( $pages as $p ) : ?>
+				<?php ip_vis_switch( 'smart_page', $p->ID, ! in_array( (int) $p->ID, array_map( 'intval', (array) $s['pages_full'] ), true ), get_the_title( $p ), '', '/' . get_page_uri( $p ) ); ?>
+			<?php endforeach; ?>
+		</div>
 	</section>
 	<section class="ipa-card">
 		<h3>Parti della scheda da togliere nella versione essenziale</h3>
@@ -602,6 +623,8 @@ add_action( 'admin_post_ip_vis_save', function () {
 			'items'  => max( 2, min( 20, (int) ( $in['smart_items'] ?? 6 ) ) ),
 			'docs'   => max( 0, min( 10, (int) ( $in['smart_docs'] ?? 2 ) ) ),
 			'parts'  => array_values( array_diff( array_keys( ip_vis_parts() ), $on( 'smart_keep' ) ) ),
+			'pages_on'   => empty( $in['smart_pages_on'] ) ? '' : '1',
+			'pages_full' => array_values( array_diff( wp_parse_id_list( $in['all_smart_page'] ?? '' ), array_map( 'intval', $on( 'smart_page' ) ) ) ),
 		);
 	}
 	if ( isset( $in['all_tip'] ) ) {

@@ -29,6 +29,8 @@ function ip_smart_defaults() {
 		'items'  => 6,
 		'parts'  => array( 'faq', 'steps', 'related' ),
 		'docs'   => 2,
+		'pages_on'   => '',
+		'pages_full' => array(),
 	);
 }
 
@@ -184,3 +186,129 @@ add_filter( 'body_class', function ( $c ) {
 	}
 	return $c;
 } );
+
+/* ---------------------------------------------------------------------
+ * Pagine informative
+ * ------------------------------------------------------------------- */
+
+/** Pagine che non si accorciano mai: legali, contatti, ringraziamento, home. */
+function ip_smart_locked_pages() {
+	$ids = array( (int) get_option( 'page_on_front' ), (int) ip_opt( 'privacy_page' ), (int) ip_opt( 'cookie_page' ), (int) ip_opt( 'thanks_page' ) );
+	foreach ( array( 'contatti', 'grazie' ) as $slug ) {
+		$p = get_page_by_path( $slug );
+		if ( $p ) {
+			$ids[] = (int) $p->ID;
+		}
+	}
+	return array_values( array_filter( $ids ) );
+}
+
+function ip_smart_page_on( $id ) {
+	$s = ip_smart();
+	return ! empty( $s['pages_on'] ) && ! in_array( (int) $id, ip_smart_locked_pages(), true ) && ! in_array( (int) $id, array_map( 'intval', (array) $s['pages_full'] ), true ) && ! get_post_meta( $id, '_ip_full', true ) && ! is_page_template( 'page-templates/landing.php' );
+}
+
+/**
+ * Accorcia ogni sezione (testo tra due titoli h2) lasciando intatti moduli,
+ * schede, elenchi dei corsi e ogni altro blocco del tema. Lavora sulla
+ * struttura della pagina, anche quando i titoli sono dentro un contenitore.
+ */
+function ip_smart_trim_page( $html, $paras, $items, $more ) {
+	if ( '' === trim( $html ) ) {
+		return $html;
+	}
+	$doc = new DOMDocument();
+	libxml_use_internal_errors( true );
+	$doc->loadHTML( '<?xml encoding="utf-8"?><div id="ipw">' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	libxml_clear_errors();
+	$root = $doc->getElementById( 'ipw' );
+	if ( ! $root ) {
+		return $html;
+	}
+	$text  = array( 'p', 'ul', 'ol', 'table', 'blockquote', 'pre', 'figure' );
+	$state = array( 'count' => 0, 'cut' => false );
+	$tpl   = new DOMDocument();
+	$tpl->loadHTML( '<?xml encoding="utf-8"?><div>' . $more . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	$tpl   = $tpl->getElementsByTagName( 'div' )->item( 0 )->firstChild;
+	$cta   = function ( $before, $parent ) use ( $doc, $tpl, &$state ) {
+		if ( ! $state['cut'] ) {
+			return;
+		}
+		$node = $doc->importNode( $tpl, true );
+		$before ? $parent->insertBefore( $node, $before ) : $parent->appendChild( $node );
+		$state['cut'] = false;
+	};
+	$walk = function ( $parent ) use ( &$walk, &$state, $text, $paras, $items, $cta ) {
+		foreach ( iterator_to_array( $parent->childNodes ) as $n ) {
+			if ( XML_ELEMENT_NODE !== $n->nodeType ) {
+				continue;
+			}
+			$tag   = strtolower( $n->nodeName );
+			$class = ' ' . $n->getAttribute( 'class' ) . ' ';
+			if ( 'h2' === $tag ) {
+				$cta( $n, $parent );
+				$state['count'] = 0;
+				continue;
+			}
+			// Contenitore dei testi ufficiali: si entra e si continua a contare.
+			if ( 'div' === $tag && false !== strpos( $class, ' ufficiale ' ) ) {
+				$walk( $n );
+				continue;
+			}
+			if ( in_array( $tag, array( 'h3', 'h4', 'h5' ), true ) ) {
+				if ( $state['count'] >= $paras ) {
+					$parent->removeChild( $n );
+					$state['cut'] = true;
+				}
+				continue;
+			}
+			if ( ! in_array( $tag, $text, true ) ) {
+				continue; // Moduli, schede, elenchi dei corsi, contatti: intatti.
+			}
+			if ( $state['count'] >= $paras ) {
+				$parent->removeChild( $n );
+				$state['cut'] = true;
+				continue;
+			}
+			if ( in_array( $tag, array( 'ul', 'ol' ), true ) ) {
+				$li = array();
+				foreach ( $n->childNodes as $c ) {
+					if ( XML_ELEMENT_NODE === $c->nodeType && 'li' === strtolower( $c->nodeName ) ) {
+						$li[] = $c;
+					}
+				}
+				foreach ( array_slice( $li, $items ) as $c ) {
+					$n->removeChild( $c );
+					$state['cut'] = true;
+				}
+			} elseif ( 'table' === $tag ) {
+				$rows = $n->getElementsByTagName( 'tr' );
+				for ( $i = $rows->length - 1; $i >= $items + 1; $i-- ) {
+					$r = $rows->item( $i );
+					$r->parentNode->removeChild( $r );
+					$state['cut'] = true;
+				}
+			}
+			$state['count']++;
+		}
+		// Fine del contenitore: l'invito va in fondo alla sezione.
+		if ( 'ipw' === $parent->getAttribute( 'id' ) || false !== strpos( ' ' . $parent->getAttribute( 'class' ) . ' ', ' ufficiale ' ) ) {
+			$cta( null, $parent );
+		}
+	};
+	$walk( $root );
+	$out = '';
+	foreach ( $root->childNodes as $c ) {
+		$out .= $doc->saveHTML( $c );
+	}
+	return $out;
+}
+
+add_filter( 'the_content', function ( $html ) {
+	if ( ! ip_vis_front() || ! is_page() || ! in_the_loop() || ! is_main_query() || ! ip_smart_page_on( get_the_ID() ) ) {
+		return $html;
+	}
+	$s   = ip_smart();
+	$msg = 'Vorrei ricevere il dettaglio completo su: ' . get_the_title();
+	return ip_smart_trim_page( $html, max( 1, (int) $s['paras'] ), max( 2, (int) $s['items'] ), '<p class="smart-more"><a href="#richiedi" data-scroll-form data-msg="' . esc_attr( $msg ) . '">Vuoi il dettaglio completo? Te lo inviamo noi</a></p>' );
+}, 21 );
