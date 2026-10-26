@@ -208,9 +208,20 @@ add_filter( 'get_pages', function ( $pages ) {
 	} ) );
 } );
 
+// Sitemap: via le tipologie nascoste e ogni categoria rimasta senza corsi visibili.
 add_filter( 'wp_sitemaps_taxonomies_query_args', function ( $args, $tax ) {
-	if ( 'tipologia' === $tax && ip_vis()['tipologie'] ) {
-		$args['exclude'] = array_map( 'intval', ip_vis()['tipologie'] );
+	$skip = 'tipologia' === $tax ? array_map( 'intval', ip_vis()['tipologie'] ) : array();
+	$hide = ip_hidden_posts();
+	if ( $hide && in_array( $tax, array( 'tipologia', 'area', 'dipartimento' ), true ) ) {
+		foreach ( get_terms( array( 'taxonomy' => $tax, 'hide_empty' => true, 'include' => array() ) ) as $t ) {
+			$left = get_posts( array( 'post_type' => 'corso', 'post_status' => 'publish', 'numberposts' => 1, 'fields' => 'ids', 'ip_all' => 1, 'post__not_in' => $hide, 'tax_query' => array( array( 'taxonomy' => $tax, 'terms' => $t->term_id ) ) ) );
+			if ( ! $left ) {
+				$skip[] = (int) $t->term_id;
+			}
+		}
+	}
+	if ( $skip ) {
+		$args['exclude'] = array_values( array_unique( array_merge( wp_parse_id_list( $args['exclude'] ?? array() ), $skip ) ) );
 	}
 	return $args;
 }, 10, 2 );

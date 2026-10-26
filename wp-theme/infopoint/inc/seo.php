@@ -17,6 +17,28 @@ add_filter( 'wp_sitemaps_add_provider', function ( $provider, $name ) {
 	return 'users' === $name ? false : $provider;
 }, 10, 2 );
 
+// Nella sitemap solo ciò che si vuole indicizzato: via le pagine segnate
+// «non mostrare nei motori», il ringraziamento e le landing delle campagne.
+add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $type ) {
+	$skip = get_posts( array(
+		'post_type'   => $type,
+		'post_status' => 'publish',
+		'numberposts' => -1,
+		'fields'      => 'ids',
+		'ip_all'      => 1,
+		'meta_query'  => 'ip_landing' === $type
+			? array( 'relation' => 'OR', array( 'key' => '_lp_indicizza', 'compare' => 'NOT EXISTS' ), array( 'key' => '_lp_indicizza', 'value' => '' ) )
+			: array( array( 'key' => '_ip_seo_noindex', 'value' => '1' ) ),
+	) );
+	if ( 'page' === $type && ip_opt( 'thanks_page' ) ) {
+		$skip[] = (int) ip_opt( 'thanks_page' );
+	}
+	if ( $skip ) {
+		$args['post__not_in'] = array_merge( (array) ( $args['post__not_in'] ?? array() ), $skip );
+	}
+	return $args;
+}, 10, 2 );
+
 add_action( 'add_meta_boxes', function () {
 	if ( ! ip_seo_enabled() ) {
 		return;
