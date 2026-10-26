@@ -78,4 +78,66 @@
 			if (code) code.textContent = e.target.value;
 		}
 	});
+
+	/* Impostazioni: campi che compaiono solo quando servono */
+	function syncIf() {
+		document.querySelectorAll('[data-ipa-if]').forEach(function (row) {
+			var el = document.querySelector('[name="ip_settings[' + row.getAttribute('data-ipa-if') + ']"]');
+			if (!el) return;
+			row.hidden = el.type === 'checkbox' ? !el.checked : !el.value.trim();
+		});
+	}
+	syncIf();
+	document.addEventListener('change', syncIf);
+	document.addEventListener('input', function (e) { if (e.target.closest('.ipa-form')) syncIf(); });
+
+	/* Avviso se si lascia la pagina con modifiche non salvate */
+	var form = document.querySelector('.ipa-form');
+	if (form) {
+		var dirty = false, label = form.querySelector('[data-ipa-dirty]');
+		var mark = function () { if (!dirty) { dirty = true; if (label) label.hidden = false; } };
+		form.addEventListener('input', mark);
+		form.addEventListener('change', mark);
+		form.addEventListener('click', function (e) { if (e.target.closest('[data-ip-add],[data-ip-del],[data-ip-up],[data-ip-down],[data-ip-image],[data-ip-palette]')) mark(); });
+		form.addEventListener('submit', function () { dirty = false; });
+		window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+	}
+
+	/* Richieste: stato modificabile dall'elenco */
+	var A = window.ipAdmin || {};
+	document.querySelectorAll('select.ipa-state').forEach(function (sel) {
+		sel.setAttribute('data-state', sel.value);
+		sel.addEventListener('change', function () {
+			var f = new FormData();
+			f.append('action', 'ip_lead_state'); f.append('_ajax_nonce', A.nonce); f.append('lead', sel.getAttribute('data-lead')); f.append('state', sel.value);
+			sel.disabled = true;
+			fetch(A.ajax, { method: 'POST', body: f, credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (res) {
+				sel.disabled = false;
+				if (res.success) {
+					sel.setAttribute('data-state', sel.value);
+					sel.classList.add('is-saved');
+					setTimeout(function () { sel.classList.remove('is-saved'); }, 1200);
+				} else { alert('Non sono riuscito a salvare lo stato. Ricarica la pagina e riprova.'); }
+			}).catch(function () { sel.disabled = false; });
+		});
+	});
+
+	/* Guide brevi: chiuse una volta, non tornano */
+	document.addEventListener('click', function (e) {
+		var x = e.target.closest('.ipa-tip .notice-dismiss');
+		if (!x || !A.ajax) return;
+		var f = new FormData();
+		f.append('action', 'ip_tip_hide'); f.append('_ajax_nonce', A.nonce); f.append('tip', x.closest('.ipa-tip').getAttribute('data-ipa-tip'));
+		fetch(A.ajax, { method: 'POST', body: f, credentials: 'same-origin' });
+	});
+
+	/* Copia negli appunti (indirizzi delle landing) */
+	document.addEventListener('click', function (e) {
+		var b = e.target.closest('[data-ipa-copy]');
+		if (!b) return;
+		var t = b.getAttribute('data-ipa-copy'), old = b.textContent;
+		var done = function () { b.textContent = 'Copiato ✓'; setTimeout(function () { b.textContent = old; }, 1500); };
+		if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, function () { prompt('Copia l’indirizzo:', t); });
+		else prompt('Copia l’indirizzo:', t);
+	});
 })();

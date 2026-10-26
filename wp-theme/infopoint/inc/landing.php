@@ -51,7 +51,7 @@ function ip_lp_sections() {
 		'costi'      => 'Costi e agevolazioni',
 		'sedi'       => 'Mappa delle sedi d’esame',
 		'passi'      => 'Come funziona con noi',
-		'team'       => 'Chi ti segue (testi e foto in Infopoint → Impostazioni → Landing)',
+		'team'       => 'Chi ti segue (testi e foto in Infopoint → Impostazioni → Landing e sedi)',
 		'recensioni' => 'Recensioni',
 		'faq'        => 'Domande frequenti',
 		'finale'     => 'Modulo finale «ti richiamiamo»',
@@ -446,14 +446,14 @@ add_action( 'admin_menu', function () {
 function ip_lp_generator() {
 	$tips = ip_tipologie();
 	?>
-	<div class="wrap ip-admin">
-		<h1>Crea landing</h1>
+	<div class="wrap ip-admin ipa">
+		<?php ip_admin_header( 'Crea una landing', 'Una pagina per le campagne: scegli di cosa parla, il resto (testi, costi, agevolazioni, modulo) lo compone il tema. Poi puoi riscrivere ogni testo.', array( array( 'Tutte le landing', admin_url( 'edit.php?post_type=ip_landing' ), 'ipa-btn-line' ) ) ); ?>
 		<?php if ( ! empty( $_GET['ip_msg'] ) ) : ?>
 			<div class="notice notice-success"><p><?php echo esc_html( wp_unslash( $_GET['ip_msg'] ) ); ?></p></div>
 		<?php endif; ?>
-		<p>La landing prende titolo, dati, costi e testi dal corso, dalla tipologia o dall’agevolazione scelta e li tiene aggiornati con il sito ufficiale. Dopo la creazione puoi riscrivere ogni testo.</p>
-
-		<h2>Una landing</h2>
+		<section class="ipa-card">
+		<h3>Una landing</h3>
+		<p class="ipa-card-d">Titolo, dati, costi e testi arrivano dal corso, dalla tipologia o dall’agevolazione scelta e restano aggiornati con il sito ufficiale.</p>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<?php wp_nonce_field( 'ip_lp_new' ); ?>
 			<input type="hidden" name="action" value="ip_lp_new">
@@ -461,10 +461,13 @@ function ip_lp_generator() {
 				<tr><th>Argomento</th><td><?php ip_lp_source_select( 'fonte', 'generica', 0 ); ?></td></tr>
 				<tr><th>Modulo</th><td><select name="modulo"><option value="info">Richiesta informazioni</option><option value="callback">Ti richiamiamo (solo nome e telefono)</option><option value="cfu">Prevalutazione CFU</option></select></td></tr>
 			</table>
-			<p><button class="button button-primary">Crea e modifica</button></p>
+			<p><button class="button button-primary button-large">Crea e modifica</button></p>
 		</form>
+		</section>
 
-		<h2>Tante landing in un colpo</h2>
+		<section class="ipa-card">
+		<h3>Tante landing in un colpo</h3>
+		<p class="ipa-card-d">Utile per avere un gruppo di annunci per ogni corso, agevolazione o tipologia. Quelle che esistono già vengono saltate.</p>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<?php wp_nonce_field( 'ip_lp_bulk' ); ?>
 			<input type="hidden" name="action" value="ip_lp_bulk">
@@ -477,7 +480,6 @@ function ip_lp_generator() {
 				</select>
 				<button class="button">Crea</button>
 			</p>
-			<p class="description">I corsi che hanno già una landing vengono saltati. Utile per avere un gruppo di annunci per corso.</p>
 		</form>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<?php wp_nonce_field( 'ip_lp_bulk' ); ?>
@@ -491,6 +493,7 @@ function ip_lp_generator() {
 			<input type="hidden" name="all" value="tipologie">
 			<p>Una landing per ogni tipologia di corso <button class="button">Crea</button></p>
 		</form>
+		</section>
 	</div>
 	<?php
 }
@@ -590,7 +593,7 @@ add_action( 'manage_ip_landing_posts_custom_column', function ( $col, $id ) {
 			echo '<br><strong style="color:#b42318">Argomento non più disponibile: mostra la versione generica</strong>';
 		}
 	} elseif ( 'lp_url' === $col && 'publish' === get_post_status( $id ) ) {
-		printf( '<a href="%1$s" target="_blank">%2$s</a>', esc_url( get_permalink( $id ) ), esc_html( wp_parse_url( get_permalink( $id ), PHP_URL_PATH ) ) );
+		printf( '<a href="%1$s" target="_blank">%2$s</a><br><button type="button" class="button button-small" data-ipa-copy="%1$s">Copia l’indirizzo per gli annunci</button>', esc_url( get_permalink( $id ) ), esc_html( wp_parse_url( get_permalink( $id ), PHP_URL_PATH ) ) );
 	} elseif ( 'lp_leads' === $col ) {
 		echo (int) get_post_meta( $id, '_lp_leads', true );
 	}

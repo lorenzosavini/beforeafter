@@ -41,8 +41,8 @@ function ip_import_page() {
 	}
 	$tips = ip_import_tipologie();
 	?>
-	<div class="wrap ip-admin">
-		<h1>Contenuti ufficiali UniMarconi</h1>
+	<div class="wrap ip-admin ipa">
+		<?php ip_admin_header( 'Contenuti ufficiali', 'Corsi, piani di studio, agevolazioni e pagine importati da unimarconi.it. Di norma non serve fare nulla qui: gli aggiornamenti sono automatici.', array( array( 'Aggiornamenti', admin_url( 'admin.php?page=ip-sync' ), 'ipa-btn-line' ) ) ); ?>
 		<?php if ( $done ) : ?>
 			<div class="notice notice-success"><p><?php echo esc_html( implode( ' · ', $done ) ); ?></p></div>
 		<?php endif; ?>

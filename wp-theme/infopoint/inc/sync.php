@@ -937,8 +937,8 @@ function ip_sync_page_render() {
 	$open  = get_posts( array( 'post_type' => 'ip_update', 'posts_per_page' => 200, 'meta_key' => '_state', 'meta_value' => 'aperta', 'orderby' => 'modified' ) );
 	$done  = get_posts( array( 'post_type' => 'ip_update', 'posts_per_page' => 30, 'meta_key' => '_state', 'meta_value' => array( 'applicata', 'automatica', 'ignorata' ), 'meta_compare' => 'IN', 'orderby' => 'modified' ) );
 	?>
-	<div class="wrap ip-admin">
-		<h1>Aggiornamenti dall’offerta ufficiale UniMarconi</h1>
+	<div class="wrap ip-admin ipa">
+		<?php ip_admin_header( 'Aggiornamenti dei corsi', 'Il sito controlla l’offerta ufficiale e applica le novità, escludendo i testi che non devono comparire. Qui rivedi quelle che aspettano una tua decisione.', array( array( 'Impostazioni degli aggiornamenti', admin_url( 'admin.php?page=ip-settings&tab=sync' ), 'ipa-btn-line' ) ) ); ?>
 		<?php if ( ! empty( $_GET['ip_msg'] ) ) : ?>
 			<div class="notice notice-success"><p><?php echo esc_html( wp_unslash( $_GET['ip_msg'] ) ); ?></p></div>
 		<?php endif; ?>

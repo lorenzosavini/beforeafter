@@ -187,7 +187,7 @@ function ip_settings_fields() {
 				'mail_note'         => array( 'Come funziona', 'note', '', 'A ogni richiesta partono due email: la <strong>notifica</strong> a voi, con tutti i dati, la pagina e la provenienza (UTM), e la <strong>conferma</strong> alla persona che ha scritto. L’esito di ogni invio è salvato nella richiesta. Molti hosting non consegnano le email senza un server SMTP: compila la sezione SMTP qui sotto (i dati li trovi nel pannello della casella email) e usa «Invia un’email di prova».' ),
 				'lead_to'           => array( 'Email che ricevono le richieste', 'text', '', 'Più indirizzi separati da virgola. Vuoto = email dell’amministratore.' ),
 				'notify_admin'      => array( 'Notifica a ogni richiesta', 'checkbox', '1' ),
-				'mail_from'         => array( 'Mittente: indirizzo', 'text', '', 'Vuoto = email pubblica (Identità → Contatti). Deve essere una casella del vostro dominio, la stessa usata per l’SMTP, altrimenti le email finiscono in spam.' ),
+				'mail_from'         => array( 'Mittente: indirizzo', 'text', '', 'Vuoto = email pubblica (Azienda e contatti). Deve essere una casella del vostro dominio, la stessa usata per l’SMTP, altrimenti le email finiscono in spam.' ),
 				'mail_from_name'    => array( 'Mittente: nome', 'text', '', 'Vuoto = nome del marchio.' ),
 				'autoreply_on'      => array( 'Conferma alla persona che scrive', 'checkbox', '1', 'Parte solo se ha lasciato l’email (il modulo di richiamata chiede solo il telefono).' ),
 				'autoreply_subject' => array( 'Conferma: oggetto', 'text', 'Abbiamo ricevuto la tua richiesta' ),
@@ -367,11 +367,6 @@ function ip_section_on( $s ) {
 	return is_array( $v ) && in_array( $s, $v, true );
 }
 
-add_action( 'admin_menu', function () {
-	add_menu_page( 'Infopoint', 'Infopoint', 'manage_options', 'ip-settings', 'ip_settings_page', 'dashicons-location-alt', 59 );
-	add_submenu_page( 'ip-settings', 'Impostazioni', 'Impostazioni', 'manage_options', 'ip-settings', 'ip_settings_page' );
-} );
-
 add_action( 'admin_init', function () {
 	register_setting( 'ip_settings', 'ip_settings', array( 'sanitize_callback' => 'ip_sanitize_settings' ) );
 } );
@@ -383,11 +378,16 @@ function ip_sanitize_settings( $in ) {
 	$saved  = get_option( 'ip_settings', array() );
 	$out    = is_array( $saved ) ? $saved : array();
 	$fields = ip_settings_fields();
-	$tab    = isset( $in['_tab'] ) && isset( $fields[ $in['_tab'] ] ) ? $in['_tab'] : null;
-	if ( ! $tab ) {
+	$list   = array();
+	if ( isset( $in['_group'] ) && function_exists( 'ip_settings_group_fields' ) ) {
+		$list = ip_settings_group_fields( sanitize_key( $in['_group'] ) ); // Gruppo della nuova schermata.
+	} elseif ( isset( $in['_tab'] ) && isset( $fields[ $in['_tab'] ] ) ) {
+		$list = $fields[ $in['_tab'] ]['fields'];
+	}
+	if ( ! $list ) {
 		return $out; // Salvataggi da altre fonti (es. importatore) passano da update_option diretto.
 	}
-	foreach ( $fields[ $tab ]['fields'] as $k => $f ) {
+	foreach ( $list as $k => $f ) {
 		if ( 'note' === $f[1] ) {
 			continue;
 		}
@@ -441,40 +441,6 @@ function ip_sanitize_field( $f, $v ) {
 		default:
 			return sanitize_text_field( (string) $v );
 	}
-}
-
-function ip_settings_page() {
-	$fields = ip_settings_fields();
-	$tab    = isset( $_GET['tab'] ) && isset( $fields[ $_GET['tab'] ] ) ? sanitize_key( $_GET['tab'] ) : 'identita';
-	?>
-	<div class="wrap ip-admin">
-		<h1>Infopoint — impostazioni</h1>
-		<nav class="nav-tab-wrapper">
-			<?php foreach ( $fields as $id => $s ) : ?>
-				<a class="nav-tab <?php echo $id === $tab ? 'nav-tab-active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=ip-settings&tab=' . $id ) ); ?>"><?php echo esc_html( $s['title'] ); ?></a>
-			<?php endforeach; ?>
-		</nav>
-		<form method="post" action="options.php">
-			<?php settings_fields( 'ip_settings' ); ?>
-			<input type="hidden" name="ip_settings[_tab]" value="<?php echo esc_attr( $tab ); ?>">
-			<table class="form-table" role="presentation">
-				<?php foreach ( $fields[ $tab ]['fields'] as $k => $f ) : ?>
-					<tr>
-						<th scope="row"><label for="ip-<?php echo esc_attr( $k ); ?>"><?php echo wp_kses_post( $f[0] ); ?></label></th>
-						<td>
-							<?php ip_settings_field( $k, $f ); ?>
-							<?php if ( ! empty( $f[3] ) ) : ?>
-								<p class="description"><?php echo wp_kses_post( $f[3] ); ?></p>
-							<?php endif; ?>
-						</td>
-					</tr>
-				<?php endforeach; ?>
-			</table>
-			<?php submit_button(); ?>
-		</form>
-		<?php do_action( 'ip_settings_after', $tab ); ?>
-	</div>
-	<?php
 }
 
 /**

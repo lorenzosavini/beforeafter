@@ -103,11 +103,6 @@ add_action( 'manage_ip_lead_posts_custom_column', function ( $col, $id ) {
 				echo ' <span class="dashicons dashicons-paperclip" title="Con allegati"></span>';
 			}
 			break;
-		case 'ip_stato':
-			$s = ip_lead_states();
-			$v = $m( 'stato' ) ? $m( 'stato' ) : 'nuovo';
-			printf( '<span class="ip-st ip-st-%s">%s</span>', esc_attr( $v ), esc_html( isset( $s[ $v ] ) ? $s[ $v ] : $v ) );
-			break;
 		case 'ip_page':
 			$p = $m( 'pagina' );
 			echo $p ? '<a href="' . esc_url( $p ) . '" target="_blank">' . esc_html( ip_lead_short_url( $p ) ) . '</a>' : '—';
@@ -135,24 +130,16 @@ add_action( 'manage_ip_lead_posts_custom_column', function ( $col, $id ) {
 	}
 }, 10, 2 );
 
-add_action( 'admin_head-edit.php', function () {
-	if ( 'ip_lead' !== get_current_screen()->post_type ) {
-		return;
-	}
-	echo '<style>.ip-st{display:inline-block;padding:2px 8px;border-radius:2px;background:#f0f0f1;font-size:12px}.ip-st-nuovo{background:#fcf0e3;color:#8a3a00;font-weight:600}.ip-st-iscritto{background:#e6f4ea;color:#1e6b34}.ip-st-richiamare{background:#fff8c5}.column-ip_tipo{width:130px}.column-ip_stato{width:130px}.ip-ch{display:inline-block;padding:1px 7px;border-radius:2px;background:#eef2f0;font-size:12px;font-weight:600}.ip-ch-google-ads{background:#e8f0fe;color:#174ea6}.ip-ch-meta-ads,.ip-ch-social{background:#eef0fb;color:#3b4a9e}.ip-ch-ricerca-organica{background:#e6f4ea;color:#1e6b34}</style>';
-} );
+
 
 // Filtro per stato sopra l'elenco.
 add_action( 'restrict_manage_posts', function ( $pt ) {
 	if ( 'ip_lead' !== $pt ) {
 		return;
 	}
-	$cur = isset( $_GET['ip_stato'] ) ? sanitize_key( $_GET['ip_stato'] ) : '';
-	echo '<select name="ip_stato"><option value="">Tutti gli stati</option>';
-	foreach ( ip_lead_states() as $k => $l ) {
-		printf( '<option value="%s" %s>%s</option>', esc_attr( $k ), selected( $cur, $k, false ), esc_html( $l ) );
+	if ( ! empty( $_GET['ip_stato'] ) ) {
+		printf( '<input type="hidden" name="ip_stato" value="%s">', esc_attr( sanitize_key( $_GET['ip_stato'] ) ) );
 	}
-	echo '</select>';
 	$ch = isset( $_GET['ip_canale'] ) ? sanitize_text_field( wp_unslash( $_GET['ip_canale'] ) ) : '';
 	echo '<select name="ip_canale"><option value="">Tutti i canali</option>';
 	foreach ( array( 'Google Ads', 'Meta Ads', 'Microsoft Ads', 'Altra pubblicità', 'Ricerca organica', 'Social', 'Email', 'Campagna', 'Sito esterno', 'Diretto' ) as $c ) {
@@ -259,12 +246,7 @@ add_action( 'save_post_ip_lead', function ( $id ) {
 	update_post_meta( $id, '_lead_note', sanitize_textarea_field( wp_unslash( $_POST['ip_lead_note'] ?? '' ) ) );
 } );
 
-// Il titolo è generato: non va modificato a mano.
-add_action( 'admin_head-post.php', function () {
-	if ( 'ip_lead' === get_current_screen()->post_type ) {
-		echo '<style>#titlediv #title{background:transparent;border:0;box-shadow:none;font-weight:600;pointer-events:none}#post-body-content{margin-bottom:0}</style>';
-	}
-} );
+
 
 add_action( 'admin_post_ip_lead_file', function () {
 	check_admin_referer( 'ip_file' );

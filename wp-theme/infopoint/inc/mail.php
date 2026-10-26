@@ -294,14 +294,15 @@ add_action( 'ip_settings_after', function ( $tab ) {
 	$to = array_filter( array_map( 'trim', explode( ',', (string) ip_opt( 'lead_to' ) ) ), 'is_email' );
 	$to = $to ? implode( ', ', $to ) : get_option( 'admin_email' );
 	?>
-	<hr>
-	<h2>Prova l’invio</h2>
-	<p>Salva prima le impostazioni, poi invia una notifica e una conferma di prova a <strong><?php echo esc_html( $to ); ?></strong>. Se non arrivano entro qualche minuto, controlla lo spam e i dati SMTP.</p>
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-		<input type="hidden" name="action" value="ip_mail_test">
-		<?php wp_nonce_field( 'ip_mail_test' ); ?>
-		<?php submit_button( 'Invia un’email di prova', 'secondary', 'submit', false ); ?>
-	</form>
+	<section class="ipa-card">
+		<h3>Prova l’invio</h3>
+		<p class="ipa-card-d">Salva prima le impostazioni, poi invia un’email di prova a <strong><?php echo esc_html( $to ); ?></strong>. Se non arriva entro qualche minuto, controlla lo spam e i dati SMTP.</p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="ip_mail_test">
+			<?php wp_nonce_field( 'ip_mail_test' ); ?>
+			<?php submit_button( 'Invia un’email di prova', 'secondary', 'submit', false ); ?>
+		</form>
+	</section>
 	<?php
 } );
 

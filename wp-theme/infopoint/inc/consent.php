@@ -245,9 +245,8 @@ function ip_consent_page() {
 	$count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM $t" ); // phpcs:ignore
 	$label = array( 'accept' => 'Accetta tutti', 'reject' => 'Rifiuta', 'save' => 'Scelte personalizzate' );
 	?>
-	<div class="wrap">
-		<h1 class="wp-heading-inline">Registro consensi</h1>
-		<a class="page-title-action" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=ip_consent_export' ), 'ip_consent_export' ) ); ?>">Esporta CSV</a>
+	<div class="wrap ipa">
+		<?php ip_admin_header( 'Registro consensi', 'Le scelte fatte nel banner dei cookie: servono a dimostrare il consenso.', array( array( 'Esporta CSV', wp_nonce_url( admin_url( 'admin-post.php?action=ip_consent_export' ), 'ip_consent_export' ), 'ipa-btn-line' ), array( 'Impostazioni del banner', admin_url( 'admin.php?page=ip-settings&tab=tracking#ipa-sec-2' ), 'ipa-btn-line' ) ) ); ?>
 		<p>Ogni scelta fatta nel banner cookie, con data, versione della cookie policy e un codice anonimo che il browser conserva insieme alla scelta. L’indirizzo IP non viene salvato: solo un’impronta non reversibile. Le righe più vecchie di 24 mesi vengono cancellate.</p>
 		<?php if ( ! ip_consent_on() ) : ?>
 			<div class="notice notice-warning inline"><p>Il banner non è attivo: inserisci almeno un tag (GTM, GA4 o Google Ads) in <a href="<?php echo esc_url( admin_url( 'admin.php?page=ip-settings&tab=tracking' ) ); ?>">Privacy, cookie e tracciamento</a>.</p></div>

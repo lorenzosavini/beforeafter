@@ -121,6 +121,14 @@ ogni 15 minuti su `https://tuodominio.it/wp-cron.php`.
 - Titoli in *Source Serif 4* (OFL, `assets/fonts/`), testi in Montserrat.
 - Confini regionali: [openpolis/geojson-italy](https://github.com/openpolis/geojson-italy) (CC BY 4.0), semplificati con `tools/map.py`; coordinate delle città da OpenStreetMap/Nominatim (ODbL), con `tools/geo.py`.
 
+## Il pannello
+
+- **Infopoint → Bacheca**: richieste da contattare, di oggi, degli ultimi 7 e 30 giorni, ultime richieste con il pulsante per chiamare, canali e pagine che portano più contatti, lista «Da completare» (email, logo, dati legali, privacy, tag) e scorciatoie.
+- **Infopoint → Impostazioni**: dieci gruppi (Azienda e contatti, Home page, Moduli e testi, Email e notifiche, Tracciamento e cookie, Privacy, Landing e sedi, Colori e font, Aggiornamenti corsi, Avanzate) divisi in schede; i campi secondari compaiono solo quando servono (es. i dati SMTP dopo aver attivato l’SMTP) e la pagina avvisa se si esce senza salvare.
+- **Richieste**: schede per stato con i conteggi, stato modificabile dall’elenco, Chiama / WhatsApp / Email sotto ogni nome, azioni di gruppo «Segna come…», filtro per canale; la scheda della richiesta si apre con i pulsanti per contattare la persona.
+- **Corsi** con l’editor classico, così scheda, piani di studio, documenti e FAQ restano sempre in vista; filtro per tipologia.
+- **Landing**: si creano solo dal generatore; nell’elenco c’è il pulsante per copiare l’indirizzo da usare negli annunci.
+
 ## Shortcode
 
 ```
