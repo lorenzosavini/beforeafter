@@ -101,9 +101,19 @@ function ip_hidden_courses() {
 	return $ids = array_values( array_unique( $ids ) );
 }
 
+/** Home, privacy, cookie policy e ringraziamento: sempre visibili. */
+function ip_vis_locked_pages() {
+	return array_values( array_filter( array( (int) get_option( 'page_on_front' ), (int) get_option( 'page_for_posts' ), (int) ip_opt( 'privacy_page' ), (int) ip_opt( 'cookie_page' ), (int) ip_opt( 'thanks_page' ) ) ) );
+}
+
 function ip_hidden_posts() {
-	$v = ip_vis();
-	return array_values( array_unique( array_merge( ip_hidden_courses(), array_map( 'intval', $v['agev'] ), array_map( 'intval', $v['pages'] ) ) ) );
+	static $ids = null;
+	if ( null === $ids ) {
+		$v     = ip_vis();
+		$pages = array_diff( array_map( 'intval', $v['pages'] ), ip_vis_locked_pages() );
+		$ids   = array_values( array_unique( array_merge( ip_hidden_courses(), array_map( 'intval', $v['agev'] ), $pages ) ) );
+	}
+	return $ids;
 }
 
 add_action( 'save_post_corso', function () {
@@ -157,8 +167,11 @@ add_action( 'template_redirect', function () {
 			$tip = function_exists( 'ip_course_tipologia' ) ? ip_course_tipologia() : null;
 			$to  = $tip && ! in_array( (int) $tip->term_id, array_map( 'intval', $v['tipologie'] ), true ) ? get_term_link( $tip ) : ( get_post_type_archive_link( 'corso' ) ? get_post_type_archive_link( 'corso' ) : home_url( '/' ) );
 		}
-		wp_safe_redirect( is_wp_error( $to ) ? home_url( '/' ) : $to, 302 );
-		exit;
+		$to = is_wp_error( $to ) ? home_url( '/' ) : $to;
+		if ( ! is_front_page() ) { // La home non rimanda mai a se stessa.
+			wp_safe_redirect( $to, 302 );
+			exit;
+		}
 	}
 	if ( is_tax( 'tipologia' ) && in_array( get_queried_object_id(), array_map( 'intval', $v['tipologie'] ), true ) ) {
 		wp_safe_redirect( get_post_type_archive_link( 'corso' ) ? get_post_type_archive_link( 'corso' ) : home_url( '/' ), 302 );
@@ -390,6 +403,7 @@ function ip_vis_tab_corsi( $v ) {
 		<h3>Corsi</h3>
 		<p class="ipa-card-d">Un corso spento sparisce da elenchi, ricerca, menu, landing e mappa del sito; chi apre il suo indirizzo arriva alla pagina della tipologia. Si aggiorna comunque dal sito ufficiale.</p>
 		<?php ip_vis_tools( 'Cerca un corso…' ); ?>
+		<?php $shown = array(); ?>
 		<?php foreach ( $tips as $t ) : ?>
 			<?php $ids = get_posts( array( 'post_type' => 'corso', 'post_status' => 'publish', 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC', 'ip_all' => true, 'tax_query' => array( array( 'taxonomy' => 'tipologia', 'terms' => $t->term_id ) ) ) ); ?>
 			<?php if ( ! $ids ) { continue; } ?>
@@ -397,12 +411,18 @@ function ip_vis_tab_corsi( $v ) {
 				<summary><?php echo esc_html( $t->name ); ?> <span><?php echo count( $ids ); ?></span><em data-ipv-off></em></summary>
 				<div class="ipv-list">
 					<?php foreach ( $ids as $p ) : ?>
+						<?php
+						if ( in_array( (int) $p->ID, $shown, true ) ) {
+							continue; // Corso con più tipologie: un solo interruttore.
+						}
+						$shown[] = (int) $p->ID;
+						?>
 						<?php ip_vis_switch( 'show_course', $p->ID, ! in_array( (int) $p->ID, array_map( 'intval', $v['courses'] ), true ), html_entity_decode( get_the_title( $p ), ENT_QUOTES, 'UTF-8' ), '<a href="' . esc_url( get_permalink( $p ) ) . '" target="_blank">vedi</a> · <a href="' . esc_url( get_edit_post_link( $p ) ) . '">modifica</a>' ); ?>
 					<?php endforeach; ?>
 				</div>
 			</details>
 		<?php endforeach; ?>
-		<input type="hidden" name="all_course" value="1">
+		<input type="hidden" name="all_course" value="<?php echo esc_attr( implode( ',', $shown ) ); ?>">
 	</section>
 	<?php
 }
@@ -461,26 +481,32 @@ function ip_vis_tab_agev( $v ) {
 				?>
 			<?php endforeach; ?>
 		</div>
-		<input type="hidden" name="all_agev" value="1">
+		<input type="hidden" name="all_agev" value="<?php echo esc_attr( implode( ',', wp_list_pluck( $ag, 'ID' ) ) ); ?>">
 	</section>
 	<?php
 }
 
 function ip_vis_tab_pagine( $v ) {
 	$pages = get_pages( array( 'post_status' => 'publish', 'sort_column' => 'menu_order,post_title' ) );
-	$lock  = array_filter( array( (int) get_option( 'page_on_front' ), (int) ip_opt( 'privacy_page' ), (int) ip_opt( 'cookie_page' ), (int) ip_opt( 'thanks_page' ) ) );
+	$lock  = ip_vis_locked_pages();
 	?>
 	<section class="ipa-card">
 		<h3>Pagine</h3>
 		<p class="ipa-card-d">Una pagina spenta sparisce da menu, ricerca e mappa del sito; chi apre il suo indirizzo arriva alla home. Home, privacy, cookie policy e ringraziamento non si possono spegnere: servono al sito e alla legge.</p>
 		<?php ip_vis_tools( 'Cerca una pagina…' ); ?>
 		<div class="ipv-list">
+			<?php $listed = array(); ?>
 			<?php foreach ( $pages as $p ) : ?>
-				<?php if ( in_array( (int) $p->ID, $lock, true ) ) { continue; } ?>
+				<?php
+				if ( in_array( (int) $p->ID, $lock, true ) ) {
+					continue;
+				}
+				$listed[] = (int) $p->ID;
+				?>
 				<?php ip_vis_switch( 'show_page', $p->ID, ! in_array( (int) $p->ID, array_map( 'intval', $v['pages'] ), true ), ( $p->post_parent ? '— ' : '' ) . html_entity_decode( get_the_title( $p ), ENT_QUOTES, 'UTF-8' ), '<a href="' . esc_url( get_permalink( $p ) ) . '" target="_blank">' . esc_html( wp_parse_url( get_permalink( $p ), PHP_URL_PATH ) ) . '</a>' ); ?>
 			<?php endforeach; ?>
 		</div>
-		<input type="hidden" name="all_page" value="1">
+		<input type="hidden" name="all_page" value="<?php echo esc_attr( implode( ',', $listed ) ); ?>">
 	</section>
 	<?php
 }
@@ -531,8 +557,9 @@ add_action( 'admin_post_ip_vis_save', function () {
 		delete_transient( 'ip_vis_tipcourses' );
 	}
 	if ( isset( $in['all_course'] ) ) {
-		$all          = get_posts( array( 'post_type' => 'corso', 'post_status' => 'publish', 'posts_per_page' => -1, 'fields' => 'ids', 'ip_all' => true ) );
-		$v['courses'] = array_values( array_diff( array_map( 'intval', $all ), array_map( 'intval', $on( 'show_course' ) ) ) );
+		$all          = wp_parse_id_list( $in['all_course'] ); // Solo i corsi elencati nella scheda.
+		$keep         = array_diff( array_map( 'intval', $v['courses'] ), $all );
+		$v['courses'] = array_values( array_unique( array_merge( $keep, array_diff( $all, array_map( 'intval', $on( 'show_course' ) ) ) ) ) );
 	}
 	if ( isset( $in['all_sec'] ) ) {
 		$all           = (array) json_decode( (string) $in['all_sec'], true );
@@ -542,12 +569,12 @@ add_action( 'admin_post_ip_vis_save', function () {
 		$v['parts'] = array_values( array_diff( array_keys( ip_vis_parts() ), $on( 'show_part' ) ) );
 	}
 	if ( isset( $in['all_agev'] ) ) {
-		$all       = get_posts( array( 'post_type' => 'agevolazione', 'post_status' => 'publish', 'posts_per_page' => -1, 'fields' => 'ids', 'ip_all' => true ) );
+		$all       = wp_parse_id_list( $in['all_agev'] );
 		$v['agev'] = array_values( array_diff( array_map( 'intval', $all ), array_map( 'intval', $on( 'show_agev' ) ) ) );
 	}
 	if ( isset( $in['all_page'] ) ) {
-		$all        = get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'posts_per_page' => -1, 'fields' => 'ids', 'ip_all' => true ) );
-		$v['pages'] = array_values( array_diff( array_map( 'intval', $all ), array_map( 'intval', $on( 'show_page' ) ) ) );
+		$all        = array_diff( wp_parse_id_list( $in['all_page'] ), ip_vis_locked_pages() );
+		$v['pages'] = array_values( array_diff( $all, array_map( 'intval', $on( 'show_page' ) ) ) );
 	}
 	if ( isset( $in['all_site'] ) ) {
 		$shown     = $on( 'show_site' );

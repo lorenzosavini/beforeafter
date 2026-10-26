@@ -52,6 +52,15 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.4.2', '<' ) ) {
+		// Visibilità: home, privacy, cookie e ringraziamento non possono essere nascoste
+		// (un salvataggio della scheda Pagine le segnava come spente: reindirizzamento infinito).
+		$vis = get_option( 'ip_visibility' );
+		if ( is_array( $vis ) && ! empty( $vis['pages'] ) ) {
+			$vis['pages'] = array_values( array_diff( array_map( 'intval', $vis['pages'] ), ip_vis_locked_pages() ) );
+			update_option( 'ip_visibility', $vis, true );
+		}
+	}
 	if ( version_compare( $v, '3.4.1', '<' ) ) {
 		// Enti convenzionati: al posto dell'elenco di decine di enti, un invito a chiedere.
 		foreach ( get_posts( array( 'post_type' => 'agevolazione', 'post_status' => 'any', 'posts_per_page' => -1, 'fields' => 'ids', 'meta_key' => '_ip_fonte', 'meta_value' => 'enti-convenzionati', 'ip_all' => true ) ) as $id ) {
