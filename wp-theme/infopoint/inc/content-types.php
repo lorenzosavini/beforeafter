@@ -215,7 +215,8 @@ function ip_agev_fields() {
 		'retta' => array( 'Retta annua (€, solo numero)', 'text' ),
 		'rata'  => array( 'Rata mensile (€, solo numero)', 'text' ),
 		'cond'  => array( 'Condizioni (una per riga)', 'textarea' ),
-		'det'   => array( 'Dettagli aggiuntivi (es. elenco enti)', 'textarea' ),
+		'det'   => array( 'Dettagli aggiuntivi', 'textarea', 'Compaiono sotto «Tutte le condizioni». Vuoto = nessun dettaglio.' ),
+		'det_own' => array( 'Dettagli scritti da voi', 'checkbox', 'Spuntato, il testo dei dettagli non viene più sostituito da quello del sito ufficiale (importi e condizioni continuano ad aggiornarsi).' ),
 		'sync'  => array( 'Aggiornamento automatico', 'select', 'Importi e condizioni arrivano dalla pagina ufficiale delle agevolazioni.', array( '' => 'Aggiorna tutto', 'dati' => 'Solo importi e condizioni (non titolo e destinatari)', 'no' => 'Non aggiornare' ) ),
 	);
 }
@@ -228,6 +229,8 @@ function ip_agev_box( $post ) {
 		echo '<tr><th><label for="ip-' . esc_attr( $k ) . '">' . esc_html( $f[0] ) . '</label></th><td>';
 		if ( 'textarea' === $f[1] ) {
 			printf( '<textarea id="ip-%1$s" name="ip[%1$s]" rows="6" class="large-text">%2$s</textarea>', esc_attr( $k ), esc_textarea( $v ) );
+		} elseif ( 'checkbox' === $f[1] ) {
+			printf( '<label><input type="checkbox" id="ip-%1$s" name="ip[%1$s]" value="1" %2$s> Sì</label>', esc_attr( $k ), checked( $v, '1', false ) );
 		} elseif ( 'select' === $f[1] ) {
 			printf( '<select id="ip-%s" name="ip[%s]">', esc_attr( $k ), esc_attr( $k ) );
 			foreach ( $f[3] as $ov => $ol ) {

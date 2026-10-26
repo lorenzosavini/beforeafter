@@ -550,6 +550,9 @@ function ip_sync_agev_diff( $id, $a ) {
 		}
 	}
 	foreach ( array( 'cond' => 'condizioni aggiornate', 'det' => 'dettagli aggiornati' ) as $k => $l ) {
+		if ( 'det' === $k && ip_meta( 'det_own', $id ) ) {
+			continue; // Dettagli scritti da voi.
+		}
 		if ( ip_sync_norm( ip_meta( $k, $id ) ) === ip_sync_norm( $a[ $k ] ) ) {
 			continue;
 		}
@@ -638,6 +641,9 @@ function ip_sync_apply_agev( $list, $retire ) {
 		}
 		update_post_meta( $id, '_ip_fonte', $a['key'] );
 		$fields = 'dati' === $lock ? array( 'retta', 'rata', 'cond', 'det' ) : array( 'dest', 'retta', 'rata', 'cond', 'det' );
+		if ( ip_meta( 'det_own', $id ) ) {
+			$fields = array_diff( $fields, array( 'det' ) ); // Dettagli scritti da voi.
+		}
 		foreach ( $fields as $k ) {
 			if ( 'dest' === $k && '' === $a['dest'] ) {
 				continue; // La pagina ufficiale non lo dice: si tiene il vostro testo.

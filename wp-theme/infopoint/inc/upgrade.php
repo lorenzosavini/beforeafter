@@ -52,6 +52,17 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.4.1', '<' ) ) {
+		// Enti convenzionati: al posto dell'elenco di decine di enti, un invito a chiedere.
+		foreach ( get_posts( array( 'post_type' => 'agevolazione', 'post_status' => 'any', 'posts_per_page' => -1, 'fields' => 'ids', 'meta_key' => '_ip_fonte', 'meta_value' => 'enti-convenzionati', 'ip_all' => true ) ) as $id ) {
+			if ( get_post_meta( $id, '_ip_det_own', true ) ) {
+				continue;
+			}
+			update_post_meta( $id, '_ip_det_elenco_ufficiale', get_post_meta( $id, '_ip_det', true ) ); // Copia dell'elenco, se servisse.
+			update_post_meta( $id, '_ip_det', 'Molte aziende, ordini professionali, sindacati e associazioni hanno una convenzione con l’Ateneo, e l’elenco cambia spesso. Dicci dove lavori o a quale ente sei iscritto: verifichiamo noi se hai diritto alla retta agevolata.' );
+			update_post_meta( $id, '_ip_det_own', '1' );
+		}
+	}
 	if ( version_compare( $v, '3.1.0', '<' ) ) {
 		// Registro dei consensi cookie; testo del banner con le nuove categorie.
 		ip_consent_install();
