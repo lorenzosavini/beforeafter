@@ -134,6 +134,69 @@ ogni 15 minuti su `https://tuodominio.it/wp-cron.php`.
 - **Versione essenziale delle pagine informative** (stessa scheda, interruttore separato): le sezioni di approfondimento (certificati e more, normative, procedure, pagamenti…) diventano pulsanti nello stesso riquadro, ma mai l’argomento della pagina stessa; nelle altre sezioni si accorcia il testo descrittivo, mentre importi, date e righe brevi restano. Le sezioni che sono elenchi lunghissimi (es. il prezzo di ogni master) mostrano solo l’apertura con l’invito. Moduli, schede delle agevolazioni, elenchi dei corsi e contatti restano interi. Home, privacy, cookie, contatti, ringraziamento e landing non vengono mai toccate; nell’elenco «Pagine da accorciare» si spengono le pagine da lasciare complete.
 - **Landing**: si creano solo dal generatore; nell’elenco c’è il pulsante per copiare l’indirizzo da usare negli annunci.
 
+## Misurazione con Google Tag Manager
+
+Il sito invia a Tag Manager tutto quello che serve a GA4 e a Google Ads; il
+contenitore pronto si scarica da **Impostazioni → Tracciamento → «Scarica il
+contenitore Tag Manager pronto»**, già compilato con gli ID inseriti lì.
+Con l’ID di Tag Manager impostato il tema non carica più GA4 e Google Ads da
+solo: tutto passa dal contenitore e niente viene contato due volte.
+
+**Contesto di ogni pagina** (scritto prima di GTM): `page_type`, `content_group`,
+e sui corsi `course_id`, `course_name`, `course_tipologia`, `course_area`,
+`course_dipartimento`, `course_price`, `course_cfu`, `course_durata`,
+`course_lingua`, `course_stato`; sulle landing `landing_id`, `landing_name`;
+`versione_essenziale`.
+
+**Eventi**
+
+| Evento | Quando | Parametri principali |
+|---|---|---|
+| `view_item` | scheda corso aperta | ecommerce: corso, tipologia, area, prezzo |
+| `view_item_list` / `select_item` | elenchi di corsi visti / corso scelto | ecommerce |
+| `form_view` | modulo visibile | `form_id`, `form_type`, `form_location`, `form_course` |
+| `form_start` | primo campo toccato | `first_field` |
+| `form_field_complete` | ogni campo compilato (una volta) | `field_name`, `field_position`, `form_progress` |
+| `form_progress` | 25, 50, 75, 100% dei campi obbligatori | `progress_step` |
+| `form_field_error` | campo mancante o non valido | `field_name`, `error_type` |
+| `form_submit_attempt` / `form_submit_error` | invio / errore di invio | |
+| `form_abandon` | modulo iniziato e pagina lasciata | `last_field`, `time_spent` |
+| `form_file_added` | allegati per i CFU | `file_count`, `file_types` |
+| `generate_lead` | richiesta inviata | `lead_type`, `transaction_id`, `form_location`, `lead_course`, `time_to_submit`, `newsletter_optin`, `traffic_source`, `value`, `user_data`* |
+| `contact_click` | telefono, WhatsApp, email | `contact_method`, `link_location` |
+| `cta_click` | inviti al modulo (anche «Da approfondire») | `cta_type`, `cta_topic`, `cta_location` |
+| `file_download`, `menu_click`, `outbound_click` | download, menu, link esterni | |
+| `section_open` | tendina aperta dal visitatore | `section_name`, `section_type` |
+| `scroll_depth`, `engaged_time` | 25/50/75/90% e 30 s / 2 min | |
+| `search`, `course_filter` | ricerca nel sito o nell’elenco corsi, filtri | `search_term`, `filter_value` |
+| `exit_intent_shown` / `exit_intent_close` | popup d’uscita | `exit_trigger`, `exit_converted` |
+| `lead_thank_you`, `ip_consent_ready`, `ip_consent_update`, `page_not_found` | | |
+
+\* `user_data` (email, telefono in formato +39, nome, cognome, città, regione,
+paese) è normalizzato come chiede Google per le **conversioni avanzate** e parte
+**solo con il consenso marketing**; dei campi del modulo non viene mai inviato il
+contenuto, solo quali sono stati compilati.
+
+**Contenitore**: tag Google di GA4 (con i parametri della pagina su ogni evento),
+eventi GA4 a gruppi (modulo, contatti, interazioni, ecommerce dei corsi,
+`generate_lead`), tag Google di Google Ads, linker delle conversioni, conversione
+**Richiesta** con dati forniti dall’utente (ID richiesta come ID transazione, per
+evitare doppioni), **Chiamata**, **WhatsApp**, e due conversioni secondarie in
+pausa (inizio compilazione, modulo completo) da attivare con un’etichetta propria.
+
+**Dopo l’importazione**
+1. Tag Manager → Amministrazione → Importa contenitore → file scaricato, area di
+   lavoro esistente, **Unisci** (rinomina i conflitti).
+2. In Google Ads: crea le azioni di conversione «Richiesta» (principale),
+   «Chiamata» e «WhatsApp», attiva le **conversioni avanzate** (metodo Tag
+   Manager) e, se importi i contratti, le conversioni avanzate per i lead.
+3. In GA4: segna `generate_lead` come **evento chiave**; crea le dimensioni
+   personalizzate che ti servono (es. `page_type`, `course_name`,
+   `course_tipologia`, `form_location`, `field_name`, `lead_type`, `cta_type`,
+   `contact_method`); collega GA4 a Google Ads.
+4. Anteprima di Tag Manager: invia un modulo di prova e controlla che
+   partano «GA4 - generate_lead» e «Google Ads - Conversione Richiesta», poi pubblica.
+
 ## Shortcode
 
 ```

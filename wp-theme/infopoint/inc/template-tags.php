@@ -142,7 +142,7 @@ function ip_course_row( $id = null ) {
 	$stato = ip_meta( 'stato', $id );
 	$hay   = strtolower( remove_accents( get_the_title( $id ) . ' ' . ip_meta( 'short', $id ) . ' ' . ip_meta( 'code', $id ) ) );
 	?>
-	<li class="crow" data-tip="<?php echo esc_attr( $tip ? $tip->slug : '' ); ?>" data-s="<?php echo esc_attr( $hay ); ?>">
+	<li class="crow" data-tip="<?php echo esc_attr( $tip ? $tip->slug : '' ); ?>" data-s="<?php echo esc_attr( $hay ); ?>" data-item-id="<?php echo esc_attr( get_post_field( 'post_name', $id ) ); ?>" data-item-name="<?php echo esc_attr( ip_course_name( $id ) ); ?>" data-item-cat="<?php echo esc_attr( $tip ? html_entity_decode( $tip->name, ENT_QUOTES, 'UTF-8' ) : '' ); ?>" data-item-price="<?php echo esc_attr( function_exists( 'ip_dl_price' ) ? ip_dl_price( $id ) : 0 ); ?>">
 		<a class="crow-img" href="<?php echo esc_url( get_permalink( $id ) ); ?>" tabindex="-1" aria-hidden="true"><?php echo has_post_thumbnail( $id ) ? get_the_post_thumbnail( $id, 'thumbnail', array( 'loading' => 'lazy', 'alt' => '' ) ) : ''; // phpcs:ignore ?></a>
 		<div class="crow-main">
 			<a class="crow-title" href="<?php echo esc_url( get_permalink( $id ) ); ?>"><?php echo esc_html( ip_course_name( $id ) ); ?><?php if ( ip_meta( 'code', $id ) ) : ?> <span class="crow-code"><?php echo esc_html( ip_meta( 'code', $id ) ); ?></span><?php endif; ?></a>
@@ -457,7 +457,7 @@ function ip_course_card( $id = null ) {
 	$stato = ip_meta( 'stato', $id ) ? ip_meta( 'stato', $id ) : 'aperte';
 	$meta  = array_filter( array( ip_meta( 'cfu', $id ) ? ip_meta( 'cfu', $id ) . ' CFU' : '', ip_meta( 'durata', $id ) ) );
 	?>
-	<article class="ccard">
+	<article class="ccard" data-item-id="<?php echo esc_attr( get_post_field( 'post_name', $id ) ); ?>" data-item-name="<?php echo esc_attr( ip_course_name( $id ) ); ?>" data-item-cat="<?php echo esc_attr( $tip ? html_entity_decode( $tip->name, ENT_QUOTES, 'UTF-8' ) : '' ); ?>" data-item-price="<?php echo esc_attr( function_exists( 'ip_dl_price' ) ? ip_dl_price( $id ) : 0 ); ?>">
 		<a class="ccard-img" href="<?php echo esc_url( get_permalink( $id ) ); ?>" tabindex="-1" aria-hidden="true">
 			<?php if ( has_post_thumbnail( $id ) ) : ?>
 				<?php echo get_the_post_thumbnail( $id, 'ip-card', array( 'loading' => 'lazy', 'alt' => '' ) ); ?>

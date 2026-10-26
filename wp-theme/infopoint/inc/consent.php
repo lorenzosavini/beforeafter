@@ -43,8 +43,10 @@ function ip_consent_days() {
 
 add_action( 'wp_head', function () {
 	$gtm = ip_gtm_id();
-	$ga4 = ip_ga4_id();
-	$ads = ip_ads_id();
+	// Con Tag Manager i tag di GA4 e Google Ads stanno nel contenitore: il tema non
+	// li carica e non invia eventi diretti, così nessuna misura viene contata due volte.
+	$ga4 = $gtm ? '' : ip_ga4_id();
+	$ads = $gtm ? '' : ip_ads_id();
 	if ( $gtm || $ga4 || $ads || ip_consent_on() ) {
 		$cfg = array(
 			'v'    => ip_consent_version(),
@@ -58,10 +60,17 @@ add_action( 'wp_head', function () {
 			'call'  => trim( (string) ip_opt( 'ads_call_label' ) ),
 			'enh'   => ip_opt( 'ads_enhanced' ) ? 1 : 0,
 			'value' => (float) str_replace( ',', '.', (string) ip_opt( 'ads_value' ) ),
+			'gtm'   => $gtm ? 1 : 0,
 		);
+		// Con Tag Manager le conversioni avanzate sono decise nel contenitore: i dati
+		// partono sempre (solo con il consenso marketing), il contenitore li usa o no.
+		if ( $gtm ) {
+			$track['enh'] = 1;
+		}
 		?>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.ipTrack=<?php echo wp_json_encode( $track ); ?>;(function(o){var c=null,a=false,m=false;try{c=JSON.parse(localStorage.getItem('ip_consent'))}catch(e){}var ok=!!(c&&typeof c==='object'&&c.v===o.v&&Date.now()-c.t<o.days*864e5);if(ok){a=!!c.a;m=!!c.m}var g=function(x){return x?'granted':'denied'};if(!o.ext){gtag('consent','default',{ad_storage:g(m),ad_user_data:g(m),ad_personalization:g(m),analytics_storage:g(a),functionality_storage:'granted',security_storage:'granted',wait_for_update:500})}gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);window.ipConsent={ok:ok,a:a,m:m,v:o.v,days:o.days,id:c&&c.id};dataLayer.push({event:'ip_consent_ready',consent_analytics:g(a),consent_marketing:g(m)})})(<?php echo wp_json_encode( $cfg ); ?>);</script>
 		<?php
+		ip_dl_print();
 		if ( $gtm ) {
 			?>
 <script>(function(w,d,s,l,i){w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i;f.parentNode.insertBefore(j,f)})(window,document,'script','dataLayer','<?php echo esc_js( $gtm ); ?>');</script>

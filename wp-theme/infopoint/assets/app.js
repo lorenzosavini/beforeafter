@@ -143,6 +143,241 @@
 		['dragleave', 'drop'].forEach(function (t) { box.addEventListener(t, function () { box.classList.remove('is-over'); }); });
 	});
 
+	/* Misurazione per Tag Manager (poi GA4 e Google Ads): ogni interazione utile
+	   diventa un evento nel dataLayer. Nessun dato personale: dei campi si misura
+	   solo quali vengono compilati, mai cosa c'è scritto. */
+	function track(name, data) {
+		var o = { event: name };
+		Object.keys(data || {}).forEach(function (k) { if (data[k] !== undefined && data[k] !== null && data[k] !== '') o[k] = data[k]; });
+		dl.push(o);
+	}
+	function where(el) {
+		if (el.closest('dialog')) return 'popup_uscita';
+		if (el.closest('.hdr')) return 'testata';
+		if (el.closest('.mbar')) return 'barra_mobile';
+		if (el.closest('.ftr, footer')) return 'piede';
+		if (el.closest('.band')) return 'banda_contatti';
+		if (el.closest('.aside')) return 'colonna_laterale';
+		if (el.closest('.smart-box')) return 'riquadro_approfondimenti';
+		if (el.closest('.phead, .lp-hero, .hero')) return 'testata_pagina';
+		if (d.body.classList.contains('lp') || d.body.classList.contains('is-landing')) return 'landing';
+		return 'contenuto';
+	}
+	var fieldNames = { nome: 'nome', cognome: 'cognome', telefono: 'telefono', email: 'email', citta: 'citta', regione: 'regione', nascita: 'anno_nascita', corso_sel: 'corso', fascia: 'fascia_oraria', messaggio: 'messaggio', privacy: 'privacy', marketing: 'newsletter', 'files[]': 'allegati' };
+	function fieldName(el) {
+		var n = String(el.name || '').replace(/^ip_/, '');
+		return fieldNames[n] || '';
+	}
+	function fields(form) {
+		return [].filter.call(form.elements, function (el) { return fieldName(el) && el.type !== 'hidden'; });
+	}
+	function filled(el) {
+		if (el.type === 'checkbox') return el.checked;
+		if (el.type === 'file') return el.files && el.files.length > 0;
+		return String(el.value || '').trim() !== '' && el.checkValidity();
+	}
+	function progress(form) {
+		var req = fields(form).filter(function (el) { return el.required; });
+		if (!req.length) return 100;
+		return Math.round(100 * req.filter(filled).length / req.length);
+	}
+	var forms = [];
+	function formState(form) {
+		var i = forms.indexOf(form);
+		if (i === -1) { forms.push(form); form._ip = { done: [], t0: 0, sent: false, last: '', marks: {}, viewed: false }; }
+		return form._ip;
+	}
+	function formInfo(form) {
+		var box = form.closest('.lead');
+		var idx = forms.indexOf(form) + 1;
+		var sel = form.ip_corso_sel, intr = form.ip_interesse;
+		var course = sel && sel.value ? (sel.options[sel.selectedIndex] || {}).text : (intr && intr.value ? intr.value : (window.ipPage && window.ipPage.course_name) || '');
+		return {
+			form_id: (box && box.id) || ('modulo_' + (idx || 1)),
+			form_type: form.ip_type ? form.ip_type.value : '',
+			form_location: where(form),
+			form_name: box && box.querySelector('.lead-title') ? box.querySelector('.lead-title').textContent.trim().slice(0, 80) : '',
+			form_course: course ? String(course).slice(0, 120) : ''
+		};
+	}
+	function formEvent(name, form, extra) {
+		var st = formState(form), info = formInfo(form), o = {};
+		['form_id', 'form_type', 'form_location', 'form_name', 'form_course'].forEach(function (k) { o[k] = info[k]; });
+		o.form_progress = progress(form);
+		o.fields_completed = st.done.length;
+		Object.keys(extra || {}).forEach(function (k) { o[k] = extra[k]; });
+		track(name, o);
+	}
+	(window.dataLayer || []).forEach(function (x) { if (x && x.page_type && !x.event) window.ipPage = x; });
+
+	d.querySelectorAll('[data-ip-form]').forEach(function (form) {
+		var st = formState(form);
+		// Modulo visto (almeno metà sullo schermo).
+		if ('IntersectionObserver' in window) {
+			var io = new IntersectionObserver(function (en) {
+				en.forEach(function (x) {
+					if (x.isIntersecting && !st.viewed && !form.closest('dialog:not([open])')) { st.viewed = true; formEvent('form_view', form); io.disconnect(); }
+				});
+			}, { threshold: 0.5 });
+			io.observe(form);
+		}
+		// Inizio compilazione: il primo campo toccato.
+		var start = function (e) {
+			var n = fieldName(e.target);
+			if (!n || st.t0) return;
+			st.t0 = Date.now();
+			formEvent('form_start', form, { first_field: n });
+		};
+		form.addEventListener('focusin', start);
+		form.addEventListener('input', start);
+		// Campo completato (una volta per campo) e soglie di avanzamento.
+		var complete = function (e) {
+			var el = e.target, n = fieldName(el);
+			if (!n) return;
+			st.last = n;
+			if (!filled(el) || st.done.indexOf(n) !== -1) return;
+			st.done.push(n);
+			var extra = { field_name: n, field_position: st.done.length, field_required: el.required ? 'si' : 'no' };
+			if (n === 'corso' && el.options) extra.selected_course = (el.options[el.selectedIndex] || {}).text;
+			if (n === 'fascia_oraria') extra.selected_option = el.value;
+			if (n === 'newsletter') extra.newsletter_optin = 'si';
+			formEvent('form_field_complete', form, extra);
+			var pr = progress(form);
+			[25, 50, 75, 100].forEach(function (m) {
+				if (pr >= m && !st.marks[m]) { st.marks[m] = 1; formEvent('form_progress', form, { progress_step: m }); }
+			});
+		};
+		form.addEventListener('change', complete);
+		form.addEventListener('focusout', complete);
+		// Errori di compilazione (campo obbligatorio vuoto, email non valida…).
+		form.addEventListener('invalid', function (e) {
+			var el = e.target, n = fieldName(el), v = el.validity || {};
+			if (!n) return;
+			formEvent('form_field_error', form, { field_name: n, error_type: v.valueMissing ? 'mancante' : (v.typeMismatch ? 'formato' : (v.patternMismatch ? 'formato' : 'non_valido')) });
+		}, true);
+		if (form['ip_files[]']) {
+			form['ip_files[]'].addEventListener('change', function () {
+				var f = form['ip_files[]'].files || [];
+				if (f.length) formEvent('form_file_added', form, { file_count: f.length, file_types: [].map.call(f, function (x) { return (x.name.split('.').pop() || '').toLowerCase(); }).join(',') });
+			});
+		}
+	});
+	// Abbandono: chi ha iniziato un modulo e lascia la pagina senza inviarlo.
+	var abandon = function () {
+		forms.forEach(function (form) {
+			var st = form._ip;
+			if (st && st.t0 && !st.sent && !st.left) {
+				st.left = true;
+				formEvent('form_abandon', form, { last_field: st.last, time_spent: Math.round((Date.now() - st.t0) / 1000) });
+			}
+		});
+	};
+	window.addEventListener('pagehide', abandon);
+	d.addEventListener('visibilitychange', function () { if (d.visibilityState === 'hidden') abandon(); });
+
+	// Clic: inviti al modulo, corsi, download, menu, link esterni.
+	d.addEventListener('click', function (e) {
+		var a = e.target.closest('a, button');
+		if (!a) return;
+		var text = (a.textContent || a.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 100);
+		var href = a.getAttribute('href') || '';
+		if (a.hasAttribute('data-scroll-form')) {
+			var type = a.closest('.smart-box') ? 'approfondimento' : (a.closest('.smart-docs') ? 'brochure' : (a.closest('.smart-more') ? 'dettaglio_sezione' : (a.closest('.mbar') ? 'barra_mobile' : 'invito_modulo')));
+			track('cta_click', { cta_text: text, cta_type: type, cta_location: where(a), cta_topic: (a.getAttribute('data-msg') || '').replace(/^Vorrei (ricevere |informazioni su: )?/, '').slice(0, 120) });
+			return;
+		}
+		var card = a.closest('[data-item-id]');
+		if (card) {
+			dl.push({ ecommerce: null });
+			dl.push({ event: 'select_item', ecommerce: { item_list_name: listName(card), items: [cardItem(card, cardIndex(card))] } });
+			return;
+		}
+		if (a.getAttribute('data-track') === 'document' || /\.(pdf|docx?|xlsx?|zip)(\?|$)/i.test(href)) {
+			var file = href.split('?')[0].split('/').pop();
+			track('file_download', { file_name: file, file_extension: (file.split('.').pop() || '').toLowerCase(), link_text: text, link_url: href });
+			return;
+		}
+		if (a.closest('#nav') && href && !a.hasAttribute('data-track')) {
+			track('menu_click', { menu_item: text, link_url: href });
+			return;
+		}
+		if (/^https?:/i.test(href) && a.hostname && a.hostname !== location.hostname && !/wa\.me|whatsapp/i.test(href)) {
+			track('outbound_click', { link_domain: a.hostname, link_url: href, link_text: text, link_location: where(a) });
+		}
+	}, true);
+
+	// Elenchi di corsi visti (view_item_list) e scelta di un corso (select_item).
+	function listName(card) {
+		var sec = card.closest('.cgroup, [data-clist], .ccards, section');
+		var h = sec && sec.querySelector('h2');
+		return (h ? (h.firstChild ? h.firstChild.textContent : h.textContent).trim() : '') || (window.ipPage && window.ipPage.content_group) || 'Corsi';
+	}
+	function cardIndex(card) { return [].indexOf.call(d.querySelectorAll('[data-item-id]'), card); }
+	function cardItem(card, i) {
+		return { item_id: card.getAttribute('data-item-id'), item_name: card.getAttribute('data-item-name'), item_brand: 'Università Guglielmo Marconi', item_category: card.getAttribute('data-item-cat') || undefined, price: parseFloat(card.getAttribute('data-item-price')) || 0, index: i, quantity: 1 };
+	}
+	(function () {
+		var cards = [].slice.call(d.querySelectorAll('[data-item-id]'), 0, 40);
+		if (!cards.length) return;
+		dl.push({ ecommerce: null });
+		dl.push({ event: 'view_item_list', ecommerce: { item_list_name: listName(cards[0]), items: cards.map(cardItem) } });
+	})();
+
+	// Ricerca e filtri dell'elenco corsi.
+	d.querySelectorAll('[data-cf-q]').forEach(function (q) {
+		var t = null;
+		q.addEventListener('input', function () {
+			clearTimeout(t);
+			t = setTimeout(function () { var v = q.value.trim(); if (v.length > 2) track('search', { search_term: v.slice(0, 80), search_type: 'elenco_corsi' }); }, 1200);
+		});
+	});
+	d.addEventListener('click', function (e) {
+		var c = e.target.closest('[data-cf-t]');
+		if (c) track('course_filter', { filter_type: 'tipologia', filter_value: c.getAttribute('data-cf-t') || 'tutti' });
+	});
+
+	// Tendine aperte dall'utente (non quelle che il sito apre da solo):
+	// sezioni dei corsi, curricula, domande frequenti.
+	d.addEventListener('click', function (e) {
+		var sm = e.target.closest('summary');
+		if (sm && sm.parentNode) sm.parentNode._ipUser = true;
+	}, true);
+	d.addEventListener('toggle', function (e) {
+		var det = e.target;
+		if (!det.open || det.tagName !== 'DETAILS' || !det._ipUser || det._ipSeen || det.hasAttribute('data-region')) return;
+		det._ipSeen = true;
+		var sum = det.querySelector('summary');
+		var kind = det.closest('.faq') ? 'faq' : (det.closest('.curricula') ? 'curriculum' : (det.classList.contains('more') ? 'campo_messaggio' : 'sezione'));
+		if (kind === 'campo_messaggio') return;
+		track('section_open', { section_name: sum ? sum.textContent.replace(/\s+/g, ' ').trim().slice(0, 100) : '', section_type: kind });
+	}, true);
+
+	// Profondità di lettura: 25, 50, 75 e 90 per cento della pagina.
+	(function () {
+		var marks = {}, tick = false;
+		window.addEventListener('scroll', function () {
+			if (tick) return;
+			tick = true;
+			requestAnimationFrame(function () {
+				tick = false;
+				var h = d.documentElement.scrollHeight - window.innerHeight;
+				var p = h > 0 ? Math.round(100 * window.scrollY / h) : 100;
+				[25, 50, 75, 90].forEach(function (m) { if (p >= m && !marks[m]) { marks[m] = 1; track('scroll_depth', { percent_scrolled: m }); } });
+			});
+		}, { passive: true });
+	})();
+
+	// Tempo di lettura: 30 secondi e 2 minuti con la pagina in primo piano.
+	(function () {
+		var spent = 0, last = Date.now(), done = {};
+		setInterval(function () {
+			var now = Date.now();
+			if (d.visibilityState === 'visible') spent += now - last;
+			last = now;
+			[30, 120].forEach(function (s) { if (spent >= s * 1000 && !done[s]) { done[s] = 1; track('engaged_time', { engaged_seconds: s }); } });
+		}, 5000);
+	})();
+
 	/* Moduli: invio senza ricaricare la pagina, con ripiego sull'invio classico */
 	d.querySelectorAll('[data-ip-form]').forEach(function (form) {
 		var msg = form.querySelector('.form-msg');
@@ -165,7 +400,8 @@
 				if (bad) bad.focus();
 				return;
 			}
-			if (!window.fetch || !window.FormData) return;
+			formEvent('form_submit_attempt', form);
+			if (!window.fetch || !window.FormData) { formState(form).sent = true; return; }
 			e.preventDefault();
 			btn.disabled = true;
 			var label = btn.textContent;
@@ -184,12 +420,13 @@
 						leadConversion(form, res.id, go);
 						setTimeout(go, 900);
 					} else {
+						formEvent('form_submit_error', form, { error_type: 'risposta_server' });
 						show(res.message);
 						btn.disabled = false;
 						btn.textContent = label;
 					}
 				})
-				.catch(function () { form.submit(); });
+				.catch(function () { formEvent('form_submit_error', form, { error_type: 'rete_invio_classico' }); formState(form).sent = true; form.submit(); });
 		});
 	});
 
@@ -201,29 +438,66 @@
 		if (n.charAt(0) !== '+') n = '+39' + n;
 		return n;
 	}
+	/* Dati per le conversioni avanzate di Google Ads (e i dati forniti dall'utente
+	   di GA4): normalizzati come chiede Google, che li cifra prima di riceverli.
+	   Partono solo con la richiesta inviata e solo con il consenso marketing. */
+	function userData(form) {
+		var v = function (n) { return form[n] && form[n].value ? String(form[n].value).trim() : ''; };
+		var clean = function (x) { return x.toLowerCase().replace(/\s+/g, ' ').trim(); };
+		var ud = {}, ad = {};
+		if (v('ip_email')) ud.email = v('ip_email').toLowerCase();
+		if (v('ip_telefono')) ud.phone_number = phoneE164(v('ip_telefono'));
+		if (v('ip_nome')) ad.first_name = clean(v('ip_nome'));
+		if (v('ip_cognome')) ad.last_name = clean(v('ip_cognome'));
+		if (v('ip_citta')) ad.city = clean(v('ip_citta'));
+		if (v('ip_regione')) ad.region = clean(v('ip_regione'));
+		ad.country = 'IT';
+		if (ad.first_name || ad.last_name || ad.city) ud.address = ad;
+		return ud;
+	}
+
 	function leadConversion(form, id, cb) {
 		var T = window.ipTrack || {}, C = window.ipConsent || {};
+		var st = formState(form);
 		var type = form.ip_type.value;
-		var email = form.ip_email ? form.ip_email.value.trim().toLowerCase() : '';
-		var phone = form.ip_telefono ? phoneE164(form.ip_telefono.value) : '';
-		var ev = { event: 'generate_lead', lead_type: type, lead_id: String(id || ''), form_id: form.id || '', page_path: location.pathname };
-		if (T.value) { ev.value = T.value; ev.currency = 'EUR'; }
+		var info = formInfo(form);
+		var ev = {
+			event: 'generate_lead',
+			lead_type: type,
+			lead_id: String(id || ''),
+			transaction_id: String(id || ''),
+			form_id: info.form_id,
+			form_type: info.form_type,
+			form_location: info.form_location,
+			lead_course: info.form_course,
+			fields_completed: st.done.length,
+			fields_list: st.done.join(','),
+			form_progress: progress(form),
+			time_to_submit: st.t0 ? Math.round((Date.now() - st.t0) / 1000) : 0,
+			newsletter_optin: form.ip_marketing && form.ip_marketing.checked ? 'si' : 'no',
+			has_message: form.ip_messaggio && form.ip_messaggio.value.trim() ? 'si' : 'no',
+			has_files: form['ip_files[]'] && form['ip_files[]'].files && form['ip_files[]'].files.length ? 'si' : 'no',
+			callback_time: form.ip_fascia && form.ip_fascia.value ? form.ip_fascia.value : undefined,
+			traffic_source: attr.lt && attr.lt.utm_source ? attr.lt.utm_source : (attr.lt && attr.lt.gclid ? 'google_ads' : undefined),
+			value: T.value || 1,
+			currency: 'EUR'
+		};
+		st.sent = true;
 		if (T.enh && C.m) {
-			ev.user_data = {};
-			if (email) ev.user_data.email = email;
-			if (phone) ev.user_data.phone_number = phone;
+			ev.user_data = userData(form);
 		}
+		Object.keys(ev).forEach(function (k) { if (ev[k] === undefined || ev[k] === '') delete ev[k]; });
 		dl.push(ev);
+		// Il prossimo evento non deve ereditare i dati personali.
+		if (ev.user_data) dl.push({ user_data: undefined });
 		if (typeof window.gtag !== 'function' || (!T.ga4 && !T.ads)) return;
 		if (T.ga4) {
-			gtag('event', 'generate_lead', { send_to: T.ga4, lead_type: type, value: T.value || undefined, currency: T.value ? 'EUR' : undefined });
+			gtag('event', 'generate_lead', { send_to: T.ga4, lead_type: type, form_location: info.form_location, value: T.value || undefined, currency: T.value ? 'EUR' : undefined });
 		}
 		if (T.ads && T.lead) {
-			if (T.enh && C.m && (email || phone)) {
-				var ud = {};
-				if (email) ud.email = email;
-				if (phone) ud.phone_number = phone;
-				gtag('set', 'user_data', ud);
+			if (T.enh && C.m) {
+				var ud = userData(form);
+				if (ud.email || ud.phone_number) gtag('set', 'user_data', ud);
 			}
 			gtag('event', 'conversion', { send_to: T.ads + '/' + T.lead, value: T.value || 1, currency: 'EUR', transaction_id: String(id || ''), event_callback: cb });
 		}
@@ -326,6 +600,10 @@
 			var f = d.activeElement;
 			if (f && f.closest && f.closest('form') && /INPUT|SELECT|TEXTAREA/.test(f.tagName)) return;
 			ss.set('ip_exit'); exitDlg.showModal(); dl.push({ event: 'exit_intent_shown', exit_trigger: how });
+			exitDlg.addEventListener('close', function () {
+				var f = exitDlg.querySelector('[data-ip-form]');
+				dl.push({ event: 'exit_intent_close', exit_converted: f && f._ip && f._ip.sent ? 'si' : 'no' });
+			}, { once: true });
 		};
 		if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
 			if (!test) setTimeout(function () { armed = true; }, 8000);
@@ -348,9 +626,9 @@
 	/* Misurazione dei contatti diretti */
 	d.addEventListener('click', function (e) {
 		var a = e.target.closest('[data-track]');
-		if (a) {
+		if (a && a.getAttribute('data-track') !== 'document') {
 			var method = a.getAttribute('data-track');
-			dl.push({ event: 'contact_click', contact_method: method, link_url: a.href });
+			dl.push({ event: 'contact_click', contact_method: method, link_url: a.href, link_location: where(a), link_text: (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80) });
 			var T = window.ipTrack || {};
 			if (typeof window.gtag === 'function') {
 				if (T.ga4) gtag('event', 'contact_click', { send_to: T.ga4, contact_method: method });
