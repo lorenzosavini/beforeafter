@@ -88,14 +88,20 @@ function ip_form( $a = array() ) {
 				</div>
 				<?php if ( 'cfu' === $type ) : ?>
 					<div class="row2">
-						<?php ip_field( $uid, 'nascita', 'Data di nascita', 'date', true ); ?>
+						<?php
+						$y = (int) wp_date( 'Y' );
+						ip_select( $uid, 'nascita', 'Anno di nascita', array_map( 'strval', range( $y - 16, $y - 80 ) ), true );
+						?>
 						<?php ip_select( $uid, 'regione', 'Regione di residenza', ip_regions(), true ); ?>
 					</div>
 					<?php ip_select( $uid, 'corso_sel', 'Corso a cui vuoi iscriverti', ip_course_options( $course ), true ); ?>
 					<div class="field">
 						<label for="<?php echo esc_attr( $uid ); ?>-files">Documenti <span class="opt">PDF, JPG, PNG o Word · max 3 file da 5 MB</span></label>
-						<input id="<?php echo esc_attr( $uid ); ?>-files" type="file" name="ip_files[]" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-						<small>Piano di studi, certificato o autocertificazione degli esami, eventuali titoli professionali.</small>
+						<div class="file-drop" data-file-drop>
+							<input id="<?php echo esc_attr( $uid ); ?>-files" type="file" name="ip_files[]" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+							<span class="file-drop-ico" aria-hidden="true"><?php echo ip_icon( 'doc', 22 ); // phpcs:ignore ?></span>
+							<span class="file-drop-t"><strong>Scegli i file</strong> o trascinali qui<small data-file-names>Piano di studi, certificato o autocertificazione degli esami, eventuali titoli professionali.</small></span>
+						</div>
 					</div>
 					<?php ip_textarea( $uid, 'messaggio', 'Note', false, 'Esami sostenuti, università di provenienza, anno di iscrizione…' ); ?>
 				<?php else : ?>

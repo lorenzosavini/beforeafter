@@ -131,6 +131,18 @@
 		} };
 	})();
 
+	/* Allegati: nomi dei file scelti e evidenza durante il trascinamento */
+	d.querySelectorAll('[data-file-drop]').forEach(function (box) {
+		var input = box.querySelector('input[type=file]'), out = box.querySelector('[data-file-names]'), def = out.textContent;
+		input.addEventListener('change', function () {
+			var names = [].map.call(input.files, function (f) { return f.name; });
+			out.textContent = names.length ? names.length + (names.length === 1 ? ' file: ' : ' file: ') + names.join(', ') : def;
+			box.classList.toggle('has-files', names.length > 0);
+		});
+		['dragenter', 'dragover'].forEach(function (t) { box.addEventListener(t, function () { box.classList.add('is-over'); }); });
+		['dragleave', 'drop'].forEach(function (t) { box.addEventListener(t, function () { box.classList.remove('is-over'); }); });
+	});
+
 	/* Moduli: invio senza ricaricare la pagina, con ripiego sull'invio classico */
 	d.querySelectorAll('[data-ip-form]').forEach(function (form) {
 		var msg = form.querySelector('.form-msg');
