@@ -81,7 +81,7 @@ function ip_wa_href( $text = '' ) {
 	if ( ! $text ) {
 		$text = ip_opt( 'wa_text' );
 	}
-	return 'https://wa.me/' . $n . '?text=' . rawurlencode( $text );
+	return apply_filters( 'ip_wa_href', 'https://wa.me/' . $n . '?text=' . rawurlencode( $text ) );
 }
 
 function ip_phone_link( $which = 'phone1', $class = '' ) {
@@ -154,7 +154,7 @@ function ip_course_row( $id = null ) {
 }
 
 function ip_breadcrumbs() {
-	if ( is_front_page() ) {
+	if ( is_front_page() || ! ip_site_on( 'breadcrumbs' ) ) {
 		return;
 	}
 	$items = array( array( home_url( '/' ), 'Home' ) );
@@ -206,6 +206,9 @@ function ip_breadcrumbs() {
  * Fascia finale di contatto, ripetuta in fondo a ogni pagina di contenuto.
  */
 function ip_cta_band( $title = '' ) {
+	if ( ! ip_site_on( 'cta' ) ) {
+		return;
+	}
 	if ( ! $title ) {
 		$title = ip_opt( 'cta_title' );
 	}
@@ -304,13 +307,17 @@ function ip_fees() {
 	$num = function ( $v ) {
 		return (float) str_replace( ',', '.', str_replace( '.', '', (string) $v ) );
 	};
-	foreach ( get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => -1, 'orderby' => 'menu_order', 'order' => 'ASC' ) ) as $p ) {
+	$hidden = function_exists( 'ip_vis' ) ? array_map( 'intval', ip_vis()['agev'] ) : array();
+	foreach ( get_posts( array( 'post_type' => 'agevolazione', 'posts_per_page' => -1, 'orderby' => 'menu_order', 'order' => 'ASC', 'ip_all' => true ) ) as $p ) {
 		$retta = ip_meta( 'retta', $p->ID );
 		$rata  = ip_meta( 'rata', $p->ID );
 		$key   = get_post_meta( $p->ID, '_ip_fonte', true );
 		if ( 'retta-standard' === ( $key ? $key : $p->post_name ) ) {
 			$f['std_retta'] = $retta;
 			$f['std_rata']  = $rata;
+		}
+		if ( in_array( (int) $p->ID, $hidden, true ) ) {
+			continue; // Agevolazione nascosta: non entra nel «da … al mese».
 		}
 		if ( $num( $rata ) > 0 && ( '' === $f['min_rata'] || $num( $rata ) < $num( $f['min_rata'] ) ) ) {
 			$f['min_rata'] = $rata;
@@ -401,7 +408,10 @@ function ip_menu_fallback() {
 
 function ip_page_url( $slug ) {
 	$p = get_page_by_path( $slug );
-	return $p ? get_permalink( $p ) : '';
+	if ( ! $p || 'publish' !== $p->post_status || ( function_exists( 'ip_vis_front' ) && ip_vis_front() && in_array( (int) $p->ID, array_map( 'intval', ip_vis()['pages'] ), true ) ) ) {
+		return ''; // Pagina mancante o nascosta: nessun link verso di lei.
+	}
+	return get_permalink( $p );
 }
 
 /**

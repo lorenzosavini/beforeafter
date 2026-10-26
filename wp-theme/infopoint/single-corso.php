@@ -18,6 +18,9 @@ while ( have_posts() ) :
 	) );
 	// Scheda dati della testata: al massimo cinque voci, la retta sempre.
 	$price = ip_meta( 'retta' ) ? ip_meta( 'retta' ) : ( $is_degree && ip_price_from() ? 'da ' . ip_price_from() . '/mese' : '' );
+	$price = ip_part_on( 'price', $id ) ? $price : '';
+	$facts = ip_part_on( 'facts', $id ) ? $facts : array();
+	$photo = has_post_thumbnail() && ip_part_on( 'photo', $id );
 	foreach ( array( 'Modalità', 'Lingua' ) as $drop ) {
 		if ( count( $facts ) + ( $price ? 1 : 0 ) > 5 ) {
 			unset( $facts[ $drop ] );
@@ -40,13 +43,13 @@ while ( have_posts() ) :
 	}
 	?>
 	<article class="course">
-		<header class="phead phead-course<?php echo has_post_thumbnail() ? ' has-img' : ''; ?>">
+		<header class="phead phead-course<?php echo $photo ? ' has-img' : ''; ?>">
 			<div class="wrap phead-grid">
 				<div class="phead-main">
 				<?php ip_breadcrumbs(); ?>
 				<p class="eyebrow">
 					<?php echo $t_pre ? '' : esc_html( $tip ? $tip->name : 'Corso' ); ?>
-					<span class="status status-<?php echo esc_attr( $stato ); ?>"><?php echo esc_html( ip_status_label( $stato ) ); ?></span>
+					<?php if ( ip_part_on( 'status', $id ) ) : ?><span class="status status-<?php echo esc_attr( $stato ); ?>"><?php echo esc_html( ip_status_label( $stato ) ); ?></span><?php endif; ?>
 				</p>
 				<h1<?php echo mb_strlen( $t_main ) > 38 ? ' class="h1-long"' : ''; ?>>
 					<?php if ( $t_pre ) : ?><span class="h1-pre"><?php echo esc_html( $t_pre ); ?></span><?php endif; ?>
@@ -72,6 +75,7 @@ while ( have_posts() ) :
 					<a class="btn btn-accent" href="#richiedi" data-scroll-form>Ricevi costi e piano di studi</a>
 					<?php echo ip_phone_link( 'phone1', 'btn btn-white' ); // phpcs:ignore ?>
 				</div>
+				<?php if ( $facts || $price ) : ?>
 				<dl class="facts-dl">
 					<?php foreach ( $facts as $k => $v ) : ?>
 						<div><dt><?php echo esc_html( $k ); ?></dt><dd><?php echo esc_html( $v ); ?></dd></div>
@@ -80,8 +84,9 @@ while ( have_posts() ) :
 						<div class="facts-price"><dt><?php echo ip_meta( 'retta' ) ? 'Costo' : 'Retta'; ?></dt><dd><?php echo esc_html( $price ); ?></dd></div>
 					<?php endif; ?>
 				</dl>
+				<?php endif; ?>
 				</div>
-				<?php if ( has_post_thumbnail() ) : ?>
+				<?php if ( $photo ) : ?>
 					<figure class="phead-img"><?php the_post_thumbnail( 'medium_large', array( 'loading' => 'eager', 'fetchpriority' => 'high', 'alt' => '' ) ); ?></figure>
 				<?php endif; ?>
 			</div>
@@ -98,7 +103,7 @@ while ( have_posts() ) :
 					<p><?php echo esc_html( ip_opt( 'course_empty' ) ); ?></p>
 				<?php endif; ?>
 
-				<?php $curricula = ip_course_curricula( $id ); ?>
+				<?php $curricula = ip_part_on( 'curricula', $id ) ? ip_course_curricula( $id ) : array(); ?>
 				<?php if ( $curricula ) : ?>
 					<h2 id="piani-di-studio">Piani di studio</h2>
 					<div class="curricula">
@@ -113,7 +118,7 @@ while ( have_posts() ) :
 					</div>
 				<?php endif; ?>
 
-				<?php $docs = ip_meta_rows( 'docs', $id ); ?>
+				<?php $docs = ip_part_on( 'docs', $id ) ? ip_meta_rows( 'docs', $id ) : array(); ?>
 				<?php if ( $docs ) : ?>
 					<h2>Documenti</h2>
 					<ul class="docs">
@@ -125,13 +130,13 @@ while ( have_posts() ) :
 				<?php endif; ?>
 
 
-				<?php $faq = ip_meta_rows( 'faq', $id ); ?>
+				<?php $faq = ip_part_on( 'faq', $id ) ? ip_meta_rows( 'faq', $id ) : array(); ?>
 				<?php if ( $faq ) : ?>
 					<h2>Domande frequenti</h2>
 					<?php ip_faq_list( $faq ); ?>
 				<?php endif; ?>
 
-				<?php if ( ip_rows( 'steps' ) ) : ?>
+				<?php if ( ip_rows( 'steps' ) && ip_part_on( 'steps', $id ) ) : ?>
 					<h2>Come iscriversi con noi</h2>
 					<?php ip_steps(); ?>
 				<?php endif; ?>
@@ -141,7 +146,7 @@ while ( have_posts() ) :
 				<div class="aside-sticky">
 					<?php
 					$cost = ip_meta( 'retta' );
-					if ( $cost || ( $is_degree && ip_price_from() ) ) :
+					if ( ip_part_on( 'price', $id ) && ( $cost || ( $is_degree && ip_price_from() ) ) ) :
 						?>
 						<div class="costbox">
 							<?php if ( $cost ) : ?>
@@ -165,7 +170,7 @@ while ( have_posts() ) :
 		</div>
 
 		<?php
-		if ( $tip ) :
+		if ( $tip && ip_part_on( 'related', $id ) ) :
 			$rel = new WP_Query( array(
 				'post_type'      => 'corso',
 				'posts_per_page' => 4,

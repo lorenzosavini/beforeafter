@@ -344,3 +344,40 @@ body.ipl-locked { overflow: hidden; }
 	.ipl-filters { grid-template-columns: 1fr 1fr; }
 	.ipl-search kbd { display: none; }
 }
+
+/* ==========================================================================
+   Visibilità
+   ========================================================================== */
+.ipv-badge { padding: 0 7px; border-radius: 999px; background: #fdeee7; color: #8a2a0c; font-size: 11px; font-weight: 700; }
+.ipa-side-a.is-on .ipv-badge { background: rgba(255, 255, 255, .2); color: #fff; }
+.ipv-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 12px; }
+.ipv-tools input[type=search] { flex: 1 1 260px; height: 38px; padding: 0 12px; border-radius: 8px; border-color: #c9d3ce; }
+.ipv-tools .button { border-radius: 999px; }
+.ipv-only { margin-left: 4px; color: var(--ipa-muted); }
+.ipv-list { display: grid; gap: 0; }
+.ipv-cols { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); column-gap: 24px; }
+.ipv-row { display: flex; align-items: center; gap: 12px; padding: 10px 2px; border-top: 1px solid #eef2f0; cursor: pointer; }
+.ipv-row[hidden] { display: none; }
+.ipv-t { flex: 1; min-width: 0; }
+.ipv-t strong { display: block; font-weight: 600; color: var(--ipa-ink); }
+.ipv-t small { display: block; color: var(--ipa-muted); }
+.ipv-t small a { text-decoration: none; }
+.ipv-meta { flex: none; padding: 1px 8px; border-radius: 999px; background: var(--ipa-soft); color: var(--ipa-muted); font-size: 12px; white-space: nowrap; }
+.ipv-row.is-off .ipv-t strong { color: var(--ipa-muted); text-decoration: line-through; text-decoration-color: rgba(0, 0, 0, .25); }
+.ipv-sw { flex: none; position: relative; width: 44px !important; height: 24px !important; margin: 0 !important; border: 0 !important; border-radius: 999px !important; background: #c9d3ce !important; appearance: none; -webkit-appearance: none; cursor: pointer; transition: background .15s; box-shadow: none !important; }
+.ipv-sw::before { content: "" !important; position: absolute; left: 3px; top: 3px; width: 18px !important; height: 18px !important; margin: 0 !important; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .2); transition: transform .15s; }
+.ipv-sw:checked { background: var(--ipa-brand) !important; }
+.ipv-sw:checked::before { transform: translateX(20px); }
+.ipv-sw:focus-visible { outline: 2px solid var(--ipa-brand); outline-offset: 2px; }
+.ipv-group { margin: 0 0 8px; border: 1px solid var(--ipa-line); border-radius: 10px; }
+.ipv-group[hidden] { display: none; }
+.ipv-group > summary { display: flex; align-items: center; gap: 8px; padding: 12px 14px; cursor: pointer; font-weight: 700; color: var(--ipa-deep); list-style: none; }
+.ipv-group > summary::-webkit-details-marker { display: none; }
+.ipv-group > summary::before { content: "▸"; color: var(--ipa-muted); transition: transform .15s; }
+.ipv-group[open] > summary::before { transform: rotate(90deg); }
+.ipv-group > summary span { padding: 0 7px; border-radius: 999px; background: var(--ipa-soft); color: var(--ipa-muted); font-size: 12px; font-weight: 600; }
+.ipv-group > summary em { margin-left: auto; color: var(--ipa-accent); font-style: normal; font-size: 12px; font-weight: 600; }
+.ipv-group .ipv-list { padding: 0 14px 6px; }
+#ip-vis .ipv-box-h { margin: 14px 0 6px; font-weight: 700; }
+#ip-vis .ipv-box-r { display: block; margin: 0 0 5px; }
+#ip-vis em { color: var(--ipa-muted); font-size: 12px; }

@@ -3,7 +3,7 @@ defined( 'ABSPATH' ) || exit;
 $landing = is_page_template( 'page-templates/landing.php' );
 
 // Ogni pagina finisce con un modulo: se il contenuto non ne aveva uno, lo aggiungiamo qui.
-if ( empty( $GLOBALS['ip_has_form'] ) && ! is_404() && ! ( (int) ip_opt( 'thanks_page' ) && is_page( (int) ip_opt( 'thanks_page' ) ) ) ) :
+if ( empty( $GLOBALS['ip_has_form'] ) && ip_site_on( 'endform' ) && ! is_404() && ! ( (int) ip_opt( 'thanks_page' ) && is_page( (int) ip_opt( 'thanks_page' ) ) ) ) :
 	?>
 	<section class="endform">
 		<div class="wrap endform-in">
@@ -107,6 +107,7 @@ endif;
 	</div>
 </footer>
 
+<?php if ( ip_site_on( 'mbar' ) ) : ?>
 <nav class="mbar" aria-label="Contatto rapido">
 	<?php if ( ip_opt( 'phone1' ) ) : ?>
 		<a href="<?php echo esc_attr( ip_tel_href( ip_opt( 'phone1' ) ) ); ?>" data-track="call"><?php echo ip_icon( 'phone', 20 ); // phpcs:ignore ?><span>Chiama</span></a>
@@ -116,6 +117,7 @@ endif;
 	<?php endif; ?>
 	<a class="mbar-main" href="#richiedi" data-scroll-form><?php echo ip_icon( 'doc', 20 ); // phpcs:ignore ?><span>Richiedi info</span></a>
 </nav>
+<?php endif; ?>
 
 <?php ip_exit_banner(); ?>
 

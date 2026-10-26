@@ -53,8 +53,8 @@ $wa      = ip_wa_href();
 					'fallback_cb'    => 'ip_menu_fallback',
 				) );
 				?>
-				<?php echo ip_phone_link( 'phone1', 'nav-phone' ); // phpcs:ignore ?>
-				<a class="btn btn-accent nav-cta" href="#richiedi" data-scroll-form><?php echo esc_html( ip_opt( 'nav_cta' ) ); ?></a>
+				<?php if ( ip_site_on( 'nav_phone' ) ) : ?><?php echo ip_phone_link( 'phone1', 'nav-phone' ); // phpcs:ignore ?><?php endif; ?>
+				<?php if ( ip_site_on( 'nav_cta' ) ) : ?><a class="btn btn-accent nav-cta" href="#richiedi" data-scroll-form><?php echo esc_html( ip_opt( 'nav_cta' ) ); ?></a><?php endif; ?>
 			</nav>
 		<?php endif; ?>
 	</div>

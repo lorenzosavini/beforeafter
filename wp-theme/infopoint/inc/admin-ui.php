@@ -567,6 +567,7 @@ function ip_dashboard_page() {
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ip-sync' ) ); ?>"><span class="dashicons dashicons-update"></span>Aggiornamenti<?php echo $upd ? ' <em>' . (int) $upd . '</em>' : ''; ?></a>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ip-settings&tab=home' ) ); ?>"><span class="dashicons dashicons-admin-home"></span>Home page</a>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ip-consents' ) ); ?>"><span class="dashicons dashicons-shield"></span>Consensi cookie</a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ip-visibility' ) ); ?>"><span class="dashicons dashicons-visibility"></span>Mostra / nascondi</a>
 				</div>
 			</section>
 			</div>

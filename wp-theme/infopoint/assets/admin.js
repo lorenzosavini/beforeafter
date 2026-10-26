@@ -258,4 +258,43 @@
 		if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, function () { prompt('Copia l’indirizzo:', t); });
 		else prompt('Copia l’indirizzo:', t);
 	});
+
+	/* Visibilità: ricerca nelle liste, mostra/nascondi tutto, solo i nascosti */
+	var ipv = document.querySelector('[data-ipv]');
+	if (ipv) {
+		var refresh = function () {
+			ipv.querySelectorAll('[data-ipv-group]').forEach(function (g) {
+				var off = g.querySelectorAll('.ipv-sw:not(:checked)').length, em = g.querySelector('[data-ipv-off]');
+				if (em) em.textContent = off ? off + ' nascosti' : '';
+			});
+			ipv.querySelectorAll('.ipv-row').forEach(function (r) { r.classList.toggle('is-off', !r.querySelector('.ipv-sw').checked); });
+		};
+		var apply = function (card) {
+			var q = (card.querySelector('[data-ipv-filter]') || {}).value || '', only = (card.querySelector('[data-ipv-only]') || {}).checked;
+			q = q.trim().toLowerCase();
+			card.querySelectorAll('.ipv-row').forEach(function (r) {
+				var show = (!q || r.getAttribute('data-ipv-text').indexOf(q) > -1) && (!only || !r.querySelector('.ipv-sw').checked);
+				r.hidden = !show;
+			});
+			card.querySelectorAll('[data-ipv-group]').forEach(function (g) {
+				var any = g.querySelector('.ipv-row:not([hidden])');
+				g.hidden = !any;
+				if (q || only) g.open = !!any;
+			});
+		};
+		ipv.addEventListener('input', function (e) { if (e.target.matches('[data-ipv-filter]')) apply(e.target.closest('.ipa-card')); });
+		ipv.addEventListener('change', function (e) {
+			if (e.target.matches('[data-ipv-only]')) apply(e.target.closest('.ipa-card'));
+			if (e.target.matches('.ipv-sw')) refresh();
+		});
+		ipv.addEventListener('click', function (e) {
+			var b = e.target.closest('[data-ipv-all]');
+			if (!b) return;
+			var on = b.getAttribute('data-ipv-all') === '1';
+			b.closest('.ipa-card').querySelectorAll('.ipv-row:not([hidden]) .ipv-sw').forEach(function (c) { c.checked = on; });
+			refresh();
+			ipv.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		refresh();
+	}
 })();

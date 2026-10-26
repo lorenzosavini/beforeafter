@@ -437,6 +437,7 @@ $head = function ( $title, $sub = '' ) {
 	</div>
 </footer>
 
+<?php if ( ip_site_on( 'mbar' ) ) : ?>
 <nav class="mbar" aria-label="Contatto rapido">
 	<?php if ( ip_opt( 'phone1' ) ) : ?>
 		<a href="<?php echo esc_attr( ip_tel_href( ip_opt( 'phone1' ) ) ); ?>" data-track="call"><?php echo ip_icon( 'phone', 20 ); // phpcs:ignore ?><span>Chiama</span></a>
@@ -446,6 +447,7 @@ $head = function ( $title, $sub = '' ) {
 	<?php endif; ?>
 	<a class="mbar-main" href="#richiedi" data-scroll-form><?php echo ip_icon( 'doc', 20 ); // phpcs:ignore ?><span>Richiedi info</span></a>
 </nav>
+<?php endif; ?>
 
 <template id="ip-thanks">
 	<div class="lp-thx">
