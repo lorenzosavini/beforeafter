@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Infopoint Manutenzione
  * Description: Pagina di manutenzione con logo, contatti, pulsanti per chiamare e dati legali. Gli amministratori collegati vedono il sito normalmente.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: ZDM S.r.l.
  * Requires PHP: 7.4
  * Text Domain: infopoint-manutenzione
@@ -35,6 +35,8 @@ function ipm_defaults() {
 		'legal'     => 'Via Venezia, 10, Pescara (PE)',
 		'pec'       => 'ZDMSRL@pec-legal.com',
 		'retry'     => '2',
+		'pass'      => '',
+		'pass_days' => '7',
 	);
 }
 
@@ -88,9 +90,57 @@ add_action( 'template_redirect', function () {
 	if ( ! ipm_opt( 'on' ) || current_user_can( 'edit_posts' ) || is_robots() || ( function_exists( 'is_favicon' ) && is_favicon() ) ) {
 		return;
 	}
-	ipm_render();
+	if ( ipm_has_access() ) {
+		return;
+	}
+	$err = '';
+	// Codice dal modulo della pagina o dal link condiviso (?accesso=CODICE).
+	$try = isset( $_POST['ipm_pass'] ) ? (string) wp_unslash( $_POST['ipm_pass'] ) : ( isset( $_GET['accesso'] ) ? (string) wp_unslash( $_GET['accesso'] ) : null );
+	if ( null !== $try && '' !== ipm_opt( 'pass' ) ) {
+		$ip   = substr( hash( 'sha256', ( isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '' ) . wp_salt() ), 0, 16 );
+		$hits = (int) get_transient( 'ipm_try_' . $ip );
+		if ( $hits >= 10 ) {
+			$err = 'Troppi tentativi. Riprova tra qualche minuto.';
+		} elseif ( hash_equals( (string) ipm_opt( 'pass' ), trim( $try ) ) ) {
+			ipm_grant_access();
+			wp_safe_redirect( remove_query_arg( 'accesso' ) );
+			exit;
+		} else {
+			set_transient( 'ipm_try_' . $ip, $hits + 1, 15 * MINUTE_IN_SECONDS );
+			$err = 'Codice non valido.';
+		}
+	}
+	ipm_render( $err );
 	exit;
 }, 0 );
+
+/** Impronta legata al codice: se cambi il codice, gli accessi già dati scadono. */
+function ipm_access_token() {
+	return hash_hmac( 'sha256', 'ipm|' . ipm_opt( 'pass' ), wp_salt( 'auth' ) );
+}
+
+function ipm_has_access() {
+	return '' !== ipm_opt( 'pass' ) && isset( $_COOKIE['ipm_access'] ) && hash_equals( ipm_access_token(), (string) $_COOKIE['ipm_access'] );
+}
+
+function ipm_grant_access() {
+	$days = max( 1, min( 90, (int) ipm_opt( 'pass_days' ) ) );
+	setcookie( 'ipm_access', ipm_access_token(), array(
+		'expires'  => time() + $days * DAY_IN_SECONDS,
+		'path'     => COOKIEPATH ? COOKIEPATH : '/',
+		'domain'   => COOKIE_DOMAIN,
+		'secure'   => is_ssl(),
+		'httponly' => true,
+		'samesite' => 'Lax',
+	) );
+}
+
+// Chi ha il codice vede il sito, ma con un promemoria discreto.
+add_action( 'wp_footer', function () {
+	if ( ipm_opt( 'on' ) && ! current_user_can( 'edit_posts' ) && ipm_has_access() ) {
+		echo '<div style="position:fixed;left:12px;bottom:12px;z-index:99999;padding:6px 12px;border-radius:999px;background:#a0300e;color:#fff;font:600 12px/1.4 system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.2)">Anteprima riservata: il sito è in manutenzione</div>';
+	}
+} );
 
 function ipm_icon( $name ) {
 	$p = array(
@@ -103,7 +153,7 @@ function ipm_icon( $name ) {
 	return '<svg class="ipm-i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p[ $name ] . '</svg>';
 }
 
-function ipm_render() {
+function ipm_render( $err = '' ) {
 	$hours = max( 1, (int) ipm_opt( 'retry' ) );
 	if ( ! headers_sent() ) {
 		status_header( 503 );
@@ -159,6 +209,14 @@ h1 { margin: 0 0 10px; font-size: 1.7rem; line-height: 1.2; color: var(--deep); 
 .info div { display: flex; gap: 12px; align-items: flex-start; }
 .info .ipm-i { flex: none; margin-top: 2px; color: var(--brand); }
 .info a { color: var(--deep); font-weight: 600; overflow-wrap: anywhere; }
+.access { margin: 22px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); font-size: .9rem; }
+.access summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+.access form { display: flex; gap: 8px; margin: 12px 0 0; }
+.access input { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border: 1px solid #c9d3ce; border-radius: 10px; font: inherit; }
+.access input:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+.access button { height: 44px; padding: 0 20px; border: 0; border-radius: 10px; background: var(--brand); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.access .err { margin: 8px 0 0; color: var(--accent); font-weight: 600; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 footer { padding: 18px 16px 22px; color: rgba(255,255,255,.7); text-align: center; font-size: .8rem; line-height: 1.6; }
 @media (max-width: 520px) {
 	.top { padding: 24px 20px 18px; }
@@ -201,6 +259,17 @@ footer { padding: 18px 16px 22px; color: rgba(255,255,255,.7); text-align: cente
 					<div><?php echo ipm_icon( 'pin' ); // phpcs:ignore ?><span><?php echo nl2br( esc_html( ipm_opt( 'address' ) ) ); ?></span></div>
 				<?php endif; ?>
 			</div>
+			<?php if ( '' !== ipm_opt( 'pass' ) ) : ?>
+				<details class="access"<?php echo $err ? ' open' : ''; ?>>
+					<summary>Hai un codice di accesso?</summary>
+					<form method="post">
+						<label for="ipm-pass" class="sr">Codice di accesso</label>
+						<input type="password" id="ipm-pass" name="ipm_pass" placeholder="Codice di accesso" autocomplete="current-password" required>
+						<button type="submit">Entra</button>
+					</form>
+					<?php if ( $err ) : ?><p class="err" role="alert"><?php echo esc_html( $err ); ?></p><?php endif; ?>
+				</details>
+			<?php endif; ?>
 		</div>
 	</div>
 </main>
@@ -250,6 +319,8 @@ function ipm_fields() {
 		'legal'    => array( 'Sede legale', 'text' ),
 		'pec'      => array( 'PEC', 'text' ),
 		'retry'    => array( 'Ritorno previsto tra (ore)', 'text', 'Indicato ai motori di ricerca: il sito non perde posizioni durante la manutenzione.' ),
+		'pass'     => array( 'Codice di accesso', 'text', 'Chi lo inserisce nella pagina di manutenzione (o apre il link qui sotto) vede il sito normalmente. Vuoto = nessun accesso riservato. Cambiandolo, chi aveva il vecchio codice dovrà inserire quello nuovo.' ),
+		'pass_days' => array( 'L’accesso dura (giorni)', 'text', 'Poi il codice va inserito di nuovo. Da 1 a 90.' ),
 	);
 }
 
@@ -301,6 +372,13 @@ function ipm_page() {
 			<?php endif; ?>
 			<a class="button" href="<?php echo esc_url( add_query_arg( 'ipm_anteprima', '1', home_url( '/' ) ) ); ?>" target="_blank">Anteprima della pagina</a>
 		</p>
+		<?php if ( '' !== ipm_opt( 'pass' ) ) : ?>
+			<?php $share = add_query_arg( 'accesso', rawurlencode( ipm_opt( 'pass' ) ), home_url( '/' ) ); ?>
+			<div style="max-width:760px;padding:14px 16px;background:#fff;border:1px solid #dcdcde;border-left:4px solid #225e48;border-radius:6px">
+				<p style="margin:0 0 8px"><strong>Link di accesso da condividere</strong> · chi lo apre entra subito, senza digitare il codice:</p>
+				<p style="margin:0;display:flex;gap:8px"><input type="text" readonly value="<?php echo esc_attr( $share ); ?>" class="large-text code" onclick="this.select()"> <button type="button" class="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.previousElementSibling.value);this.textContent='Copiato ✓'">Copia</button></p>
+			</div>
+		<?php endif; ?>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'ipm' ); ?>
 			<table class="form-table" role="presentation">
