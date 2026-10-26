@@ -108,6 +108,24 @@ function ip_smart_group_of( $title ) {
 	return 'dopo' === $c[0] ? $c[1] : '';
 }
 
+/**
+ * Via i titoli rimasti senza contenuto e le frasi sospese: un paragrafo che
+ * finisce con i due punti senza nulla dopo (l'elenco manca anche alla fonte o è
+ * stato tolto) perde l'ultima frase, o sparisce se è tutto lì.
+ */
+function ip_smart_drop_empty( $html ) {
+	$html = preg_replace_callback( '#(<p\b[^>]*>)((?:(?!</p>).)*?)</p>(?=\s*(?:<p class="smart-more|<h2\b|<aside class="smart-box|$))#isu', function ( $m ) {
+		if ( ! preg_match( '/:\s*(?:<[^>]+>\s*)*$/u', $m[2] ) ) {
+			return $m[0];
+		}
+		if ( preg_match( '/^(.*[.!?;])\s+[^.!?;]*:\s*(?:<[^>]+>\s*)*$/su', $m[2], $k ) ) {
+			return $m[1] . force_balance_tags( $k[1] ) . '</p>';
+		}
+		return '';
+	}, $html );
+	return preg_replace( '#<h2\b[^>]*>(?:(?!</h2>).)*</h2>\s*(?=<h2\b|$)#isu', '', $html );
+}
+
 /** Invito con il messaggio già scritto nel modulo. */
 function ip_smart_cta( $label, $subject, $class = 'smart-more', $topic = '' ) {
 	$msg = 'Vorrei informazioni su: ' . wp_strip_all_tags( $topic ? $topic : $label ) . ( $subject ? ' – ' . $subject : '' );
@@ -144,6 +162,97 @@ function ip_smart_essential( $node, $short = 0 ) {
 }
 
 /**
+ * Accorcia un paragrafo a fine frase, intorno a $max parole (almeno una frase).
+ * Tiene grassetti e corsivi. Restituisce true se ha tagliato.
+ */
+function ip_smart_cut_sentences( $node, $max ) {
+	$doc  = $node->ownerDocument;
+	$html = '';
+	foreach ( $node->childNodes as $c ) {
+		$html .= $doc->saveHTML( $c );
+	}
+	if ( preg_match( '#<(?!/?(strong|b|em|i|br|a|span)\b)[a-z]#i', $html ) ) {
+		return false; // Altri elementi dentro (immagini, elenchi): meglio non toccare.
+	}
+	preg_match_all( '/[.!?;](?:<\/(?:strong|b|em|i|a|span)>)*(?=(?:\s|<br\s*\/?>)+(?:<[^>]+>)*[A-ZÀ-ÝÈÉ«"“(\d])/u', $html, $m, PREG_OFFSET_CAPTURE );
+	$first = isset( $m[0][0] ) ? str_word_count( wp_strip_all_tags( substr( $html, 0, $m[0][0][1] ) ) ) : PHP_INT_MAX;
+	if ( $first > $max * 1.6 ) {
+		// Frase interminabile: si chiude a una virgola o a un punto e virgola, con i puntini.
+		$text = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( str_replace( array( '<br>', '<br/>', '<br />' ), ' ', $html ) ) ) );
+		$w    = preg_split( '/\s+/u', $text );
+		if ( count( $w ) <= $max * 1.3 ) {
+			return false;
+		}
+		$part = implode( ' ', array_slice( $w, 0, $max ) );
+		$pos  = max( mb_strrpos( $part, ',' ), mb_strrpos( $part, ';' ), mb_strrpos( $part, ' –' ) );
+		if ( $pos && $pos > mb_strlen( $part ) * 0.5 ) {
+			$part = mb_substr( $part, 0, $pos );
+		}
+		// Mai dentro una parentesi rimasta aperta.
+		if ( substr_count( $part, '(' ) > substr_count( $part, ')' ) ) {
+			$part = mb_substr( $part, 0, mb_strrpos( $part, '(' ) );
+		}
+		while ( $node->firstChild ) {
+			$node->removeChild( $node->firstChild );
+		}
+		$node->appendChild( $doc->createTextNode( rtrim( $part, ' ,;:–-' ) . '…' ) );
+		return true;
+	}
+	if ( empty( $m[0] ) ) {
+		return false;
+	}
+	$cut = 0;
+	foreach ( $m[0] as $b ) {
+		$end = $b[1] + strlen( $b[0] );
+		$w   = str_word_count( wp_strip_all_tags( substr( $html, 0, $end ) ), 0, 'àèéìòùÀÈÉÌÒÙ’\'' );
+		if ( ! $cut || $w <= $max ) {
+			$cut = $end;
+		}
+		if ( $w >= $max ) {
+			break;
+		}
+	}
+	if ( ! $cut || $cut >= strlen( rtrim( $html ) ) - 2 ) {
+		return false;
+	}
+	$frag = new DOMDocument();
+	libxml_use_internal_errors( true );
+	$frag->loadHTML( '<?xml encoding="utf-8"?><div>' . force_balance_tags( substr( $html, 0, $cut ) ) . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	libxml_clear_errors();
+	while ( $node->firstChild ) {
+		$node->removeChild( $node->firstChild );
+	}
+	foreach ( iterator_to_array( $frag->getElementsByTagName( 'div' )->item( 0 )->childNodes ) as $c ) {
+		$node->appendChild( $doc->importNode( $c, true ) );
+	}
+	return true;
+}
+
+function ip_smart_words( $node ) {
+	return str_word_count( trim( preg_replace( '/\s+/u', ' ', $node->textContent ) ), 0, 'àèéìòùÀÈÉÌÒÙ’\'' );
+}
+
+/** Voce di un elenco scritta come paragrafo («1. …», «– …»). */
+function ip_smart_pseudo_item( $node ) {
+	return 'p' === strtolower( $node->nodeName ) && preg_match( '/^\s*(\d{1,2}[.)]|[a-z]\)|[–\-•·])\s/u', $node->textContent );
+}
+
+/** Righe di servizio rimaste dall'importazione (link dell'Ateneo senza contesto). */
+function ip_smart_junk( $node ) {
+	return (bool) preg_match( '/^(immatricolazione|tasse e modalit[aà] di pagamento|procedure? d.iscrizione|modalit[aà] di pagamento)$/iu', trim( $node->textContent ) );
+}
+
+/** Frase che introduce un elenco («Il corso prepara a:»): non conta come paragrafo. */
+function ip_smart_lead_in( $node ) {
+	$t = trim( preg_replace( '/\s+/u', ' ', $node->textContent ) );
+	if ( 'p' !== strtolower( $node->nodeName ) ) {
+		return false;
+	}
+	// Anche un'etichetta breve senza punto finale («Struttura del corso») non conta.
+	return ( preg_match( '/:$/u', $t ) && mb_strlen( $t ) <= 220 ) || ( mb_strlen( $t ) <= 40 && ! preg_match( '/[.!?;]$/u', $t ) );
+}
+
+/**
  * Accorcia un elenco: oltre $items voci si tolgono; con $data restano quelle
  * con dati essenziali. Restituisce true se ha tolto qualcosa.
  */
@@ -158,6 +267,8 @@ function ip_smart_trim_list( $list, $items, $data = true ) {
 		if ( $i > $items && ! ( $data && ip_smart_essential( $c ) ) ) {
 			$list->removeChild( $c );
 			$cut = true;
+		} elseif ( ip_smart_words( $c ) > 28 && ip_smart_cut_sentences( $c, 18 ) ) {
+			$cut = true; // Voce lunghissima: resta la prima frase.
 		}
 	}
 	return $cut;
@@ -170,7 +281,7 @@ function ip_smart_trim_list( $list, $items, $data = true ) {
  * Con $modules gli elenchi si tolgono sempre (restano i titoli dei moduli).
  * Restituisce [html, accorciato?].
  */
-function ip_smart_trim( $html, $paras, $items, $short = 0, $modules = false, $data = false ) {
+function ip_smart_trim( $html, $paras, $items, $short = 0, $modules = false, $data = false, $words = 0 ) {
 	if ( '' === trim( $html ) ) {
 		return array( $html, false );
 	}
@@ -188,6 +299,27 @@ function ip_smart_trim( $html, $paras, $items, $short = 0, $modules = false, $da
 	// Programma senza sottotitoli: i moduli sono il primo elenco o la prima tabella.
 	$named = $modules && ! $root->getElementsByTagName( 'h3' )->length && ! $root->getElementsByTagName( 'h4' )->length;
 	$allow = $named ? 0 : PHP_INT_MAX; // Righe brevi ammesse (nei programmi: una sotto ogni modulo).
+	// Programmi con sottotitoli sia per i moduli sia per gli argomenti: restano i «Modulo …».
+	$modh3 = false;
+	$nh3   = 0;
+	if ( $modules ) {
+		foreach ( $root->getElementsByTagName( 'h3' ) as $h ) {
+			if ( preg_match( '/^\s*(modulo|module|unit[aà]|parte|sezione|area)\b/iu', $h->textContent ) ) {
+				$modh3 = true;
+				break;
+			}
+		}
+	}
+	if ( $named && ! $root->getElementsByTagName( 'li' )->length && ! $root->getElementsByTagName( 'table' )->length ) {
+		// Programma fatto di soli paragrafi: i titoli degli argomenti sono le righe brevi.
+		$named = false;
+		$allow = 12;
+		$short = min( $short ? $short : 60, 60 );
+	}
+	$extra  = 0;     // Righe con dati tenute oltre il limite (con $words: al massimo 2).
+	$wc     = 0;     // Parole già mostrate (con $words: si mostra circa quel numero di parole).
+	$lead   = false; // L'ultimo testo rimasto annuncia un elenco («…in grado di:»).
+	$pseudo = -1;    // Voci-paragrafo ancora ammesse nell'elenco in corso.
 	foreach ( iterator_to_array( $root->childNodes ) as $n ) {
 		if ( XML_ELEMENT_NODE !== $n->nodeType ) {
 			if ( $count >= $paras && trim( $n->textContent ) !== '' ) {
@@ -203,6 +335,15 @@ function ip_smart_trim( $html, $paras, $items, $short = 0, $modules = false, $da
 			$count = max( $count, $paras ); // Dopo l'elenco dei moduli non resta altro testo.
 			if ( $list ) {
 				$cut = ip_smart_trim_list( $n, 8, false ) || $cut;
+				// Solo i moduli: via gli argomenti elencati sotto ciascuno.
+				foreach ( iterator_to_array( $n->getElementsByTagName( 'li' ) ) as $li ) {
+					foreach ( iterator_to_array( $li->childNodes ) as $sub ) {
+						if ( XML_ELEMENT_NODE === $sub->nodeType && in_array( strtolower( $sub->nodeName ), array( 'ul', 'ol' ), true ) ) {
+							$li->removeChild( $sub );
+							$cut = true;
+						}
+					}
+				}
 			} else {
 				$rows = $n->getElementsByTagName( 'tr' );
 				for ( $i = $rows->length - 1; $i > 8; $i-- ) {
@@ -218,7 +359,15 @@ function ip_smart_trim( $html, $paras, $items, $short = 0, $modules = false, $da
 				$root->removeChild( $head );
 				$cut = true;
 			}
-			$head = $count >= $paras && ! $modules ? $n : null; // Nei programmi i titoli dei moduli restano.
+			$full = $words ? $wc >= $words : $count >= $paras;
+			$head = $full && ! $modules ? $n : null; // Nei programmi i titoli dei moduli restano.
+			if ( $modules && ( ( $modh3 && ! preg_match( '/^\s*(modulo|module|unit[aà]|parte|sezione|area)\b/iu', $n->textContent ) ) || ( ! $modh3 && ++$nh3 > 8 ) ) ) {
+				$root->removeChild( $n );
+				$cut   = true;
+				$count = max( $count, $paras );
+				$allow = 0;
+				continue;
+			}
 			if ( $modules ) {
 				// Sotto un «Modulo 1» resta una riga col nome; se il titolo ha già il nome, niente.
 				$count = max( $count, $paras );
@@ -226,30 +375,100 @@ function ip_smart_trim( $html, $paras, $items, $short = 0, $modules = false, $da
 			}
 			continue;
 		}
-		if ( $count < $paras && ! ( $modules && $list ) ) {
+		if ( 'p' === $tag && ip_smart_junk( $n ) ) {
+			$root->removeChild( $n );
+			continue;
+		}
+		// Voci-paragrafo («1. …») di un elenco già iniziato: fino a $items.
+		if ( $pseudo >= 0 && ip_smart_pseudo_item( $n ) ) {
+			if ( $pseudo > 0 && ( ! $words || $wc < $words * 1.8 ) ) {
+				$pseudo--;
+				if ( ip_smart_words( $n ) > 35 && ip_smart_cut_sentences( $n, 22 ) ) {
+					$cut = true;
+				}
+				$wc += ip_smart_words( $n );
+			} else {
+				$pseudo = 0;
+				$root->removeChild( $n );
+				$cut = true;
+			}
+			continue;
+		}
+		$pseudo = -1;
+		// Ciò che il testo rimasto annuncia con i due punti resta sempre, accorciato
+		// (non nei costi: il dettaglio di rate e scadenze si dà dopo il contatto).
+		if ( $lead && ! $modules && ! $data ) {
+			$lead = false;
+			$head = null;
+			if ( $list ) {
+				$cut = ip_smart_trim_list( $n, min( $items, 3 ), $data ) || $cut;
+				$wc += ip_smart_words( $n );
+				if ( $words && $wc >= $words ) {
+					$count = max( $count, $paras );
+				}
+				continue;
+			}
+			if ( 'p' === $tag ) {
+				if ( ip_smart_pseudo_item( $n ) ) {
+					$pseudo = min( $items, 3 ) - 1;
+					if ( ip_smart_words( $n ) > 35 && ip_smart_cut_sentences( $n, 22 ) ) {
+						$cut = true;
+					}
+				} else {
+					if ( $words && ip_smart_words( $n ) > 35 && ip_smart_cut_sentences( $n, 30 ) ) {
+						$cut = true;
+					}
+					$lead = (bool) preg_match( '/:\s*$/u', trim( $n->textContent ) );
+				}
+				$wc += ip_smart_words( $n );
+				if ( $words && $wc >= $words ) {
+					$count = max( $count, $paras );
+				}
+				continue;
+			}
+		}
+		$lead = false;
+		$room = $words ? $wc < $words : $count < $paras;
+		if ( $room && ! ( $modules && $list ) ) {
 			if ( $list && ip_smart_trim_list( $n, $items, $data ) ) {
 				$cut = true;
 			}
-			$count++;
+			// Paragrafo troppo lungo per lo spazio rimasto: si chiude a fine frase.
+			if ( $words && 'p' === $tag && $wc + ip_smart_words( $n ) > $words * 1.5 && ip_smart_cut_sentences( $n, max( 12, $words - $wc ) ) ) {
+				$cut = true;
+			}
+			$wc += ip_smart_words( $n );
+			if ( ! ip_smart_lead_in( $n ) ) {
+				$count++;
+			}
+			if ( $words && $wc >= $words ) {
+				$count = max( $count, $paras );
+			}
+			$lead = ! $list && (bool) preg_match( '/:\s*$/u', trim( $n->textContent ) );
 			$head = null;
 			continue;
 		}
 		$keep = false;
 		if ( 'table' === $tag ) {
-			$keep = $data;
+			$keep = $data && ( ! $words || $extra++ < 2 );
 		} elseif ( $list ) {
-			if ( $data && ! $modules ) {
+			if ( $data && ! $modules && ! $words ) {
 				$cut  = ip_smart_trim_list( $n, 0, true ) || $cut;
 				$keep = (bool) $n->getElementsByTagName( 'li' )->length;
+				$extra++;
 			}
 		} else {
 			$txt  = trim( preg_replace( '/\s+/u', ' ', $n->textContent ) );
 			$len  = mb_strlen( $txt );
 			$link = $n->getElementsByTagName( 'a' )->length && trim( preg_replace( '/\s+/u', ' ', $n->getElementsByTagName( 'a' )->item( 0 )->textContent ) ) === $txt;
-			$keep = ( $short && $len && $len <= $short && ! $link && ( ! $modules || $allow-- > 0 ) ) || ( $data && ip_smart_essential( $n ) );
+			$keep = ( $short && $len && $len <= $short && ! $link && ( ! $modules || $allow-- > 0 ) ) || ( $data && ( ! $words || $extra++ < 2 ) && ip_smart_essential( $n ) );
+		}
+		if ( $keep && $words && 'p' === $tag && ip_smart_words( $n ) > 30 && ip_smart_cut_sentences( $n, 22 ) ) {
+			$cut = true; // Riga con dati oltre il limite: resta la prima frase.
 		}
 		if ( $keep ) {
 			$head = null;
+			$lead = ! $list && (bool) preg_match( '/:\s*$/u', trim( $n->textContent ) );
 		} else {
 			$root->removeChild( $n );
 			$cut = true;
@@ -280,11 +499,12 @@ add_filter( 'the_content', function ( $html ) {
 	$name   = ip_meta( 'short', get_the_ID() ) ? ip_meta( 'short', get_the_ID() ) : get_the_title();
 	$later  = array();
 	if ( ! preg_match_all( '#<h2\b[^>]*>(.*?)</h2>#is', $html, $m, PREG_OFFSET_CAPTURE ) ) {
-		list( $t, $cut ) = ip_smart_trim( $html, $p + 1, $it, 100 );
-		return $t . ( $cut ? ip_smart_cta( $kinds['presentazione'][1], $name, 'smart-more', 'il corso' ) : '' );
+		// Testo senza titoli: nella scheda corso sono le descrizioni dei curricula.
+		list( $t, $cut ) = ip_smart_trim( $html, $p, $it, 0, false, false, 70 * $p );
+		return ip_smart_drop_empty( $t ) . ( $cut ? ip_smart_cta( $kinds['programma'][1], $name, 'smart-more', 'il piano di studi' ) : '' );
 	}
 	// Testo prima del primo titolo: la presentazione.
-	list( $out, $cut ) = ip_smart_trim( substr( $html, 0, $m[0][0][1] ), $p, $it );
+	list( $out, $cut ) = ip_smart_trim( substr( $html, 0, $m[0][0][1] ), $p, $it, 0, false, false, 80 * $p );
 	$out .= $cut ? ip_smart_cta( $kinds['presentazione'][1], $name, 'smart-more', 'il corso' ) : '';
 	$n    = count( $m[0] );
 	for ( $i = 0; $i < $n; $i++ ) {
@@ -305,18 +525,20 @@ add_filter( 'the_content', function ( $html ) {
 			case 'costi':
 			case 'titolo':
 			case 'durata':
-				list( $body, $cut ) = ip_smart_trim( $body, 1, $it, 0, false, true );
+				list( $body, $cut ) = ip_smart_trim( $body, 1, $it, 0, false, true, 45 );
 				break;
 			case 'presentazione':
+				list( $body, $cut ) = ip_smart_trim( $body, $p, $it, 0, false, false, 80 * $p );
+				break;
 			case 'obiettivi':
-				list( $body, $cut ) = ip_smart_trim( $body, $p, $it );
+				list( $body, $cut ) = ip_smart_trim( $body, $p, $it, 0, false, false, 60 * $p );
 				break;
 			default:
-				list( $body, $cut ) = ip_smart_trim( $body, 1, $it );
+				list( $body, $cut ) = ip_smart_trim( $body, 1, $it, 0, false, false, 55 );
 		}
 		$out .= $m[0][ $i ][0] . $body . ( $cut ? ip_smart_cta( $label, $name, 'smart-more', trim( wp_strip_all_tags( $m[1][ $i ][0] ) ) ) : '' );
 	}
-	return $out . ip_smart_box( $later, $name );
+	return ip_smart_drop_empty( $out ) . ip_smart_box( $later, $name );
 }, 21 );
 
 // Parti della scheda che la versione essenziale toglie.
@@ -394,7 +616,7 @@ function ip_smart_trim_page( $html, $paras, $items, $more, $title = '', $drop = 
 		return $html;
 	}
 	$text  = array( 'p', 'ul', 'ol', 'table', 'blockquote', 'pre', 'figure' );
-	$state = array( 'count' => 0, 'cut' => false, 'skip' => false, 'later' => array(), 'h2' => -1 );
+	$state = array( 'count' => 0, 'cut' => false, 'skip' => false, 'later' => array(), 'h2' => -1, 'lead' => false );
 	// Approfondimenti da rimandare al contatto: mai l'argomento della pagina stessa,
 	// e mai tutte le sezioni (la pagina resterebbe vuota).
 	$groups = ip_smart_groups();
@@ -449,6 +671,7 @@ function ip_smart_trim_page( $html, $paras, $items, $more, $title = '', $drop = 
 				$cta( $n, $parent );
 				$state['count'] = 0;
 				$state['h2']++;
+				$state['lead'] = false;
 				$state['skip'] = isset( $defer[ $state['h2'] ] );
 				if ( $state['skip'] ) {
 					$state['later'][] = $defer[ $state['h2'] ];
@@ -476,11 +699,22 @@ function ip_smart_trim_page( $html, $paras, $items, $more, $title = '', $drop = 
 				continue; // Moduli, schede, elenchi dei corsi, contatti, tabelle: intatti.
 			}
 			$list = in_array( $tag, array( 'ul', 'ol' ), true );
+			// Un elenco annunciato dal testo rimasto («segui questi passaggi:») resta, accorciato.
+			if ( $state['lead'] && $list ) {
+				$state['lead'] = false;
+				if ( ip_smart_trim_list( $n, $items ) ) {
+					$state['cut'] = true;
+				}
+				continue;
+			}
+			$state['lead'] = ! $list && preg_match( '/:\s*$/u', trim( $n->textContent ) );
 			if ( $state['count'] < $paras ) {
 				if ( $list && ip_smart_trim_list( $n, $items ) ) {
 					$state['cut'] = true;
 				}
-				$state['count']++;
+				if ( ! ip_smart_lead_in( $n ) ) {
+					$state['count']++;
+				}
 				continue;
 			}
 			// Oltre il limite: restano le righe brevi e tutto ciò che porta dati,
@@ -500,6 +734,7 @@ function ip_smart_trim_page( $html, $paras, $items, $more, $title = '', $drop = 
 			} elseif ( ip_smart_essential( $n, 160 ) ) {
 				continue;
 			}
+			$state['lead'] = false;
 			$parent->removeChild( $n );
 			$state['cut'] = true;
 			continue;
@@ -514,7 +749,7 @@ function ip_smart_trim_page( $html, $paras, $items, $more, $title = '', $drop = 
 	foreach ( $root->childNodes as $c ) {
 		$out .= $doc->saveHTML( $c );
 	}
-	return $out . ip_smart_box( $state['later'], $title );
+	return ip_smart_drop_empty( $out ) . ip_smart_box( $state['later'], $title );
 }
 
 add_filter( 'the_content', function ( $html ) {
