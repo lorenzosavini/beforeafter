@@ -51,7 +51,7 @@ function ip_legal_updated() {
 
 /** Pulsante che riapre il banner dei cookie (solo se il banner è attivo). */
 function ip_consent_button( $class = 'btn btn-line', $label = 'Modifica le preferenze sui cookie' ) {
-	if ( ! ip_gtm_id() || ! ip_opt( 'consent_banner' ) ) {
+	if ( ! ip_consent_on() ) {
 		return '';
 	}
 	return '<button type="button" class="' . esc_attr( $class ) . '" data-consent-open>' . esc_html( $label ) . '</button>';
@@ -62,7 +62,7 @@ add_shortcode( 'ip_privacy', function () {
 	$owner   = ip_legal_owner();
 	$name    = ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : $brand;
 	$cookie  = (int) ip_opt( 'cookie_page' );
-	$gtm     = (bool) ip_gtm_id();
+	$gtm     = ip_tracking_on();
 	$hook    = (bool) ip_opt( 'webhook_url' );
 	$wa      = (bool) ip_opt( 'whatsapp' );
 	$proc    = array_filter( array_map( 'trim', explode( "\n", (string) ip_opt( 'privacy_processors' ) ) ) );
@@ -123,7 +123,7 @@ add_shortcode( 'ip_privacy', function () {
 				<li>A fornitori che ci prestano servizi, nominati responsabili del trattamento (art. 28 GDPR): <?php echo esc_html( implode( '; ', $proc ) ); ?>.</li>
 			<?php endif; ?>
 			<?php if ( $gtm ) : ?>
-				<li>A Google Ireland Ltd, per i servizi di statistica e pubblicità, solo se acconsenti ai cookie.</li>
+				<li>A Google Ireland Ltd, per i servizi di statistica e pubblicità, solo se acconsenti ai cookie.<?php if ( ip_ads_id() && ip_opt( 'ads_enhanced' ) ) : ?> Se hai accettato i cookie di marketing e invii un modulo, email e telefono vengono trasmessi a Google in forma cifrata (hash) solo per misurare l’efficacia degli annunci (conversioni avanzate); Google non li usa per altri scopi.<?php endif; ?></li>
 			<?php endif; ?>
 			<li>All’Università degli Studi Guglielmo Marconi, solo quando ci chiedi di avviare per tuo conto una pratica (ad esempio la prevalutazione dei CFU o l’iscrizione) e solo i dati necessari a quella pratica.</li>
 			<li>Ad autorità e soggetti pubblici, quando lo prevede la legge.</li>
@@ -174,7 +174,7 @@ add_shortcode( 'ip_privacy', function () {
 
 add_shortcode( 'ip_cookie', function () {
 	$name    = ip_opt( 'company_name' ) ? ip_opt( 'company_name' ) : ip_opt( 'brand' );
-	$gtm     = (bool) ip_gtm_id();
+	$gtm     = ip_tracking_on();
 	$privacy = ip_privacy_url();
 	ob_start();
 	?>
@@ -190,9 +190,10 @@ add_shortcode( 'ip_cookie', function () {
 		<table class="legal-table">
 			<thead><tr><th>Nome</th><th>A cosa serve</th><th>Durata</th></tr></thead>
 			<tbody>
-				<?php if ( $gtm && ip_opt( 'consent_banner' ) ) : ?>
-					<tr><td><code>ip_consent</code> (localStorage)</td><td>Ricorda se hai accettato o rifiutato i cookie di statistica e pubblicità, per non chiedertelo a ogni pagina.</td><td>Finché non lo cancelli dal browser o non cambi scelta</td></tr>
+				<?php if ( ip_consent_on() ) : ?>
+					<tr><td><code>ip_consent</code> (localStorage)</td><td>Ricorda le tue scelte sui cookie di statistica e marketing e un codice anonimo che le collega al nostro registro dei consensi.</td><td><?php echo (int) round( ip_consent_days() / 30 ); ?> mesi, poi ti chiediamo di nuovo</td></tr>
 				<?php endif; ?>
+				<tr><td><code>ip_ft</code>, <code>ip_lt</code> (localStorage)</td><td>Ricordano da dove sei arrivato sul sito (ad esempio una campagna o un motore di ricerca) e la prima pagina vista. Restano nel tuo browser e ci arrivano solo se invii un modulo, insieme alla richiesta.</td><td>90 giorni</td></tr>
 				<tr><td><code>ip_lead_sent</code> (localStorage)</td><td>Ricorda che hai già inviato una richiesta, per non mostrarti di nuovo l’invito a contattarci.</td><td>30 giorni dall’ultima richiesta</td></tr>
 				<tr><td><code>ip_exit</code> (sessionStorage)</td><td>Evita di mostrarti più di una volta l’invito a contattarci quando stai per lasciare la pagina.</td><td>Fino alla chiusura della scheda</td></tr>
 				<tr><td><code>wordpress_*</code>, <code>wp-settings-*</code></td><td>Solo per chi accede all’area riservata del sito (personale di <?php echo esc_html( $name ); ?>): mantengono l’accesso e le preferenze del pannello.</td><td>Sessione o fino a 1 anno</td></tr>
@@ -201,13 +202,13 @@ add_shortcode( 'ip_cookie', function () {
 
 		<?php if ( $gtm ) : ?>
 			<h2>Cookie di statistica e pubblicità: solo con il tuo consenso</h2>
-			<p>Li usiamo, tramite Google Tag Manager, per contare le visite in forma aggregata e per sapere quali campagne pubblicitarie portano richieste. Finché non scegli, o se rifiuti, restano disattivati: Google riceve al massimo segnali senza cookie, che non permettono di riconoscerti (modalità di consenso di Google).</p>
+			<p>Li usiamo<?php echo ip_gtm_id() ? ', anche tramite Google Tag Manager,' : ''; ?> per contare le visite in forma aggregata (<strong>statistiche</strong>) e per sapere quali campagne pubblicitarie portano richieste (<strong>marketing</strong>). Puoi accettare una categoria e rifiutare l’altra. Finché non scegli, o se rifiuti, restano disattivati: Google riceve al massimo segnali senza cookie, che non permettono di riconoscerti (modalità di consenso di Google). Chiudere il banner con la «×» equivale a rifiutare.</p>
 			<table class="legal-table">
 				<thead><tr><th>Servizio</th><th>Cookie</th><th>A cosa serve</th><th>Durata</th></tr></thead>
 				<tbody>
-					<tr><td>Google Analytics 4 (Google Ireland Ltd)</td><td><code>_ga</code>, <code>_ga_*</code></td><td>Statistiche sulle visite: pagine viste, durata, provenienza</td><td>Fino a 2 anni</td></tr>
-					<tr><td>Google Ads (Google Ireland Ltd)</td><td><code>_gcl_au</code>, <code>_gcl_aw</code></td><td>Misurare le richieste arrivate dagli annunci</td><td>90 giorni</td></tr>
-					<tr><td>Google Ads remarketing (Google Ireland Ltd)</td><td><code>IDE</code>, <code>test_cookie</code> (dominio doubleclick.net)</td><td>Mostrare annunci pertinenti a chi ha già visitato il sito</td><td>Fino a 13 mesi</td></tr>
+					<?php if ( ip_ga4_id() || ip_gtm_id() ) : ?><tr><td>Google Analytics 4 (Google Ireland Ltd) · statistiche</td><td><code>_ga</code>, <code>_ga_*</code></td><td>Statistiche sulle visite: pagine viste, durata, provenienza</td><td>Fino a 2 anni</td></tr><?php endif; ?>
+					<?php if ( ip_ads_id() || ip_gtm_id() ) : ?><tr><td>Google Ads (Google Ireland Ltd) · marketing</td><td><code>_gcl_au</code>, <code>_gcl_aw</code></td><td>Misurare le richieste arrivate dagli annunci</td><td>90 giorni</td></tr>
+					<tr><td>Google Ads remarketing (Google Ireland Ltd) · marketing</td><td><code>IDE</code>, <code>test_cookie</code> (dominio doubleclick.net)</td><td>Mostrare annunci pertinenti a chi ha già visitato il sito</td><td>Fino a 13 mesi</td></tr><?php endif; ?>
 				</tbody>
 			</table>
 			<?php if ( ip_opt( 'cookie_extra' ) ) : ?>
@@ -223,8 +224,8 @@ add_shortcode( 'ip_cookie', function () {
 		<p>I collegamenti a WhatsApp, Google Maps e ai social network portano a siti di terzi, che usano i propri cookie secondo le proprie informative. Nessuno di questi servizi viene caricato finché non fai clic sul collegamento.</p>
 
 		<h2>Come scegliere o cambiare idea</h2>
-		<?php if ( $gtm && ip_opt( 'consent_banner' ) ) : ?>
-			<p>Alla prima visita un banner ti chiede se accettare i cookie di statistica e pubblicità: «Rifiuta» e «Accetta» hanno lo stesso peso e, se rifiuti, il sito funziona allo stesso modo. Puoi cambiare scelta in qualsiasi momento:</p>
+		<?php if ( ip_consent_on() ) : ?>
+			<p>Alla prima visita un banner ti chiede se accettare i cookie di statistica e di marketing: puoi accettarli tutti, rifiutarli o sceglierli uno per uno con «Personalizza». «Rifiuta» e «Accetta tutti» hanno lo stesso peso e, se rifiuti, il sito funziona allo stesso modo. Registriamo la tua scelta, con data e versione di questa pagina, per poter dimostrare il consenso. Puoi cambiare scelta in qualsiasi momento:</p>
 			<p><?php echo ip_consent_button(); // phpcs:ignore ?></p>
 		<?php endif; ?>
 		<p>Puoi anche cancellare o bloccare i cookie dalle impostazioni del browser: <a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">Chrome</a>, <a href="https://support.mozilla.org/it/kb/protezione-antitracciamento-avanzata-firefox-desktop" target="_blank" rel="noopener">Firefox</a>, <a href="https://support.apple.com/it-it/guide/safari/sfri11471/mac" target="_blank" rel="noopener">Safari</a>, <a href="https://support.microsoft.com/it-it/microsoft-edge/eliminare-i-cookie-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener">Edge</a>. Bloccando i cookie tecnici alcune funzioni potrebbero non funzionare.</p>

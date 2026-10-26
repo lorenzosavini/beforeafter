@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'IP_VERSION', '3.0.6' );
+define( 'IP_VERSION', '3.1.0' );
 define( 'IP_DIR', get_template_directory() );
 define( 'IP_URI', get_template_directory_uri() );
 
@@ -18,6 +18,7 @@ require IP_DIR . '/inc/setup.php';
 require IP_DIR . '/inc/content-types.php';
 require IP_DIR . '/inc/template-tags.php';
 require IP_DIR . '/inc/forms.php';
+require IP_DIR . '/inc/mail.php';
 require IP_DIR . '/inc/leads-admin.php';
 require IP_DIR . '/inc/shortcodes.php';
 require IP_DIR . '/inc/seo.php';

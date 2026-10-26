@@ -279,10 +279,12 @@ function ip_handle_lead() {
 		'fascia'    => $get( 'fascia' ),
 		'messaggio' => isset( $in['ip_messaggio'] ) ? sanitize_textarea_field( $in['ip_messaggio'] ) : '',
 		'marketing' => $get( 'marketing' ) ? 'sì' : 'no',
-		'pagina'    => esc_url_raw( $get( 'page' ) ),
-		'origine'   => $get( 'attr' ),
+		'pagina'    => esc_url_raw( str_replace( '+', '%20', $get( 'page' ) ) ),
+		'origine'   => '',
 		'landing'   => '',
 	);
+	$attr            = ip_lead_parse_attr( isset( $in['ip_attr'] ) ? (string) $in['ip_attr'] : '', wp_get_referer() );
+	$data['origine'] = $attr['origine'];
 	$landing_id = absint( $get( 'landing' ) );
 	if ( $landing_id && 'ip_landing' === get_post_type( $landing_id ) ) {
 		$data['landing'] = get_the_title( $landing_id );
@@ -328,7 +330,7 @@ function ip_handle_lead() {
 	if ( is_wp_error( $id ) ) {
 		$fail( 'Non siamo riusciti a registrare la richiesta. Chiamaci, ti rispondiamo subito.', 500 );
 	}
-	foreach ( $data as $k => $v ) {
+	foreach ( $data + $attr as $k => $v ) {
 		if ( '' !== $v ) {
 			update_post_meta( $id, '_lead_' . $k, $v );
 		}
@@ -344,7 +346,7 @@ function ip_handle_lead() {
 
 	$url = add_query_arg( array( 'grazie' => $type ), ip_thanks_url() );
 	if ( $ajax ) {
-		wp_send_json( array( 'ok' => true, 'redirect' => $url ) );
+		wp_send_json( array( 'ok' => true, 'redirect' => $url, 'id' => (int) $id ) );
 	}
 	wp_safe_redirect( $url );
 	exit;
@@ -402,39 +404,157 @@ function ip_store_uploads( $fail ) {
 }
 
 function ip_notify_lead( $id, $type, $data, $files ) {
-	$labels = array( 'info' => 'Richiesta informazioni', 'cfu' => 'Prevalutazione CFU', 'callback' => 'Richiesta di richiamata' );
-	$to     = array_filter( array_map( 'trim', explode( ',', (string) ip_opt( 'lead_to' ) ) ), 'is_email' );
-	if ( ! $to ) {
-		$to = array( get_option( 'admin_email' ) );
-	}
-	$lines = array();
-	foreach ( $data as $k => $v ) {
-		if ( '' !== $v ) {
-			$lines[] = str_pad( ( 'citta' === $k ? 'Città' : ucfirst( $k ) ) . ':', 12 ) . ' ' . $v;
-		}
-	}
-	$lines[] = '';
-	$lines[] = 'Apri nel pannello: ' . admin_url( 'post.php?action=edit&post=' . $id );
-
-	$headers = array( 'Content-Type: text/plain; charset=UTF-8' );
-	if ( is_email( $data['email'] ) ) {
-		$headers[] = 'Reply-To: ' . trim( $data['nome'] . ' ' . $data['cognome'] ) . ' <' . $data['email'] . '>';
-	}
-	$up     = wp_upload_dir();
-	$attach = array_map( function ( $f ) use ( $up ) {
-		return trailingslashit( $up['basedir'] ) . $f;
-	}, $files );
-
-	$subject = sprintf( '[%s] %s — %s', $labels[ $type ], trim( $data['nome'] . ' ' . $data['cognome'] ), $data['corso'] ? $data['corso'] : ( $data['interesse'] ? $data['interesse'] : $data['telefono'] ) );
-	wp_mail( $to, $subject, implode( "\n", $lines ), $headers, $attach );
+	ip_lead_emails( $id, $type, $data, $files );
 
 	$hook = ip_opt( 'webhook_url' );
 	if ( $hook ) {
+		$extra = array();
+		foreach ( ip_lead_attr_keys() as $k => $l ) {
+			$extra[ $k ] = (string) get_post_meta( $id, '_lead_' . $k, true );
+		}
 		wp_remote_post( $hook, array(
 			'timeout'  => 3,
 			'blocking' => false,
 			'headers'  => array( 'Content-Type' => 'application/json' ),
-			'body'     => wp_json_encode( array_merge( array( 'id' => $id, 'tipo' => $type, 'data' => current_time( 'c' ) ), $data ) ),
+			'body'     => wp_json_encode( array_merge( array( 'id' => $id, 'tipo' => $type, 'data' => current_time( 'c' ) ), $data, $extra ) ),
 		) );
 	}
+}
+
+/* ---------------------------------------------------------------------
+ * Provenienza: UTM, identificativi dei clic, referrer, canale
+ * ------------------------------------------------------------------- */
+
+function ip_lead_attr_keys() {
+	return array(
+		'canale'         => 'Canale',
+		'utm_source'     => 'Sorgente (utm_source)',
+		'utm_medium'     => 'Mezzo (utm_medium)',
+		'utm_campaign'   => 'Campagna (utm_campaign)',
+		'utm_term'       => 'Parola chiave (utm_term)',
+		'utm_content'    => 'Annuncio (utm_content)',
+		'click_id'       => 'ID clic',
+		'referrer'       => 'Sito di provenienza',
+		'ingresso'       => 'Pagina di ingresso',
+		'primo_contatto' => 'Primo contatto',
+	);
+}
+
+function ip_lead_short_url( $url ) {
+	$p = wp_parse_url( $url );
+	$q = isset( $p['query'] ) ? '?' . $p['query'] : '';
+	return ( isset( $p['path'] ) ? $p['path'] : '/' ) . ( strlen( $q ) > 60 ? substr( $q, 0, 57 ) . '…' : $q );
+}
+
+/**
+ * Legge il JSON inviato dal modulo ({ft: primo contatto, lt: ultimo contatto da fonte esterna}).
+ */
+function ip_lead_parse_attr( $raw, $fallback_ref = '' ) {
+	$out = array_fill_keys( array_keys( ip_lead_attr_keys() ), '' );
+	$j   = json_decode( wp_unslash( $raw ), true );
+	if ( ! is_array( $j ) ) {
+		$out['origine'] = sanitize_text_field( $raw ); // Formato precedente: testo libero.
+		$out['canale']  = 'Diretto';
+		return $out;
+	}
+	$clean = function ( $t ) {
+		$o = array();
+		foreach ( is_array( $t ) ? $t : array() as $k => $v ) {
+			if ( is_scalar( $v ) ) {
+				$o[ sanitize_key( $k ) ] = mb_substr( sanitize_text_field( (string) $v ), 0, 300 );
+			}
+		}
+		return $o;
+	};
+	$lt = $clean( isset( $j['lt'] ) ? $j['lt'] : array() );
+	$ft = $clean( isset( $j['ft'] ) ? $j['ft'] : array() );
+	foreach ( array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content' ) as $k ) {
+		$out[ $k ] = isset( $lt[ $k ] ) ? $lt[ $k ] : '';
+	}
+	foreach ( array( 'gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid' ) as $k ) {
+		if ( ! empty( $lt[ $k ] ) ) {
+			$out['click_id'] = $k . '=' . $lt[ $k ];
+			break;
+		}
+	}
+	$out['referrer'] = ! empty( $lt['ref'] ) ? esc_url_raw( str_replace( '+', '%20', $lt['ref'] ) ) : '';
+	$out['ingresso'] = ! empty( $lt['land'] ) ? esc_url_raw( str_replace( '+', '%20', $lt['land'] ) ) : '';
+	list( $out['canale'], $src, $med ) = ip_lead_channel( $lt );
+	if ( ! $out['utm_source'] && $src ) {
+		$out['utm_source'] = $src;
+		$out['utm_medium'] = $out['utm_medium'] ? $out['utm_medium'] : $med;
+	}
+	if ( $ft && ( ! empty( $ft['ts'] ) && ( empty( $lt['ts'] ) || $ft['ts'] !== $lt['ts'] ) ) ) {
+		list( $fc, $fs, $fm ) = ip_lead_channel( $ft );
+		$bits = array_filter( array(
+			$fc,
+			( ! empty( $ft['utm_source'] ) ? $ft['utm_source'] : $fs ) . ' / ' . ( ! empty( $ft['utm_medium'] ) ? $ft['utm_medium'] : $fm ),
+			! empty( $ft['utm_campaign'] ) ? $ft['utm_campaign'] : '',
+			! empty( $ft['ts'] ) ? wp_date( 'j/m/Y', (int) ( $ft['ts'] / 1000 ) ) : '',
+		) );
+		$out['primo_contatto'] = implode( ' · ', $bits );
+	}
+	$out['origine'] = implode( ' · ', array_filter( array(
+		$out['canale'],
+		$out['utm_source'] ? $out['utm_source'] . ' / ' . $out['utm_medium'] : '',
+		$out['utm_campaign'],
+	) ) );
+	return $out;
+}
+
+/**
+ * Canale, sorgente e mezzo di un contatto.
+ *
+ * @return array( canale, sorgente dedotta, mezzo dedotto )
+ */
+function ip_lead_channel( $t ) {
+	$src = strtolower( isset( $t['utm_source'] ) ? $t['utm_source'] : '' );
+	$med = strtolower( isset( $t['utm_medium'] ) ? $t['utm_medium'] : '' );
+	$paid = (bool) preg_match( '/cpc|ppc|paid|cpm|display|ads?$/', $med );
+	if ( ! empty( $t['gclid'] ) || ! empty( $t['gbraid'] ) || ! empty( $t['wbraid'] ) || ( 'google' === $src && $paid ) ) {
+		return array( 'Google Ads', 'google', 'cpc' );
+	}
+	if ( ! empty( $t['msclkid'] ) ) {
+		return array( 'Microsoft Ads', 'bing', 'cpc' );
+	}
+	$meta = (bool) preg_match( '/facebook|instagram|^fb$|^ig$|meta/', $src );
+	if ( $meta || ! empty( $t['fbclid'] ) ) {
+		return array( $paid ? 'Meta Ads' : 'Social', $src ? $src : 'facebook', $med ? $med : ( $paid ? 'paid' : 'social' ) );
+	}
+	if ( 'email' === $med || 'newsletter' === $med ) {
+		return array( 'Email', $src, $med );
+	}
+	if ( $src ) {
+		return array( $paid ? 'Altra pubblicità' : 'Campagna', $src, $med );
+	}
+	$ref = ! empty( $t['ref'] ) ? strtolower( (string) wp_parse_url( $t['ref'], PHP_URL_HOST ) ) : '';
+	if ( $ref ) {
+		$host = preg_replace( '/^(www|m|l|lm)\./', '', $ref );
+		if ( preg_match( '/(^|\.)(google|bing|yahoo|duckduckgo|ecosia|qwant|yandex)\./', $ref ) ) {
+			return array( 'Ricerca organica', preg_replace( '/\..*$/', '', $host ), 'organic' );
+		}
+		if ( preg_match( '/facebook|instagram|linkedin|tiktok|youtube|twitter|^t\.co$|x\.com|pinterest/', $host ) ) {
+			return array( 'Social', $host, 'social' );
+		}
+		return array( 'Sito esterno', $host, 'referral' );
+	}
+	return array( 'Diretto', '', '' );
+}
+
+/** Righe «Da dove arriva» per email e scheda. */
+function ip_lead_attr_rows( $id ) {
+	$rows = array();
+	foreach ( ip_lead_attr_keys() as $k => $l ) {
+		$v = (string) get_post_meta( $id, '_lead_' . $k, true );
+		if ( '' === $v ) {
+			continue;
+		}
+		if ( in_array( $k, array( 'referrer', 'ingresso' ), true ) ) {
+			$v = '<a href="' . esc_url( $v ) . '">' . esc_html( 'referrer' === $k ? $v : ip_lead_short_url( $v ) ) . '</a>';
+		} else {
+			$v = 'canale' === $k ? '<strong>' . esc_html( $v ) . '</strong>' : esc_html( $v );
+		}
+		$rows[ $l ] = $v;
+	}
+	return $rows;
 }

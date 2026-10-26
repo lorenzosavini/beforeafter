@@ -76,7 +76,8 @@ add_filter( 'manage_ip_lead_posts_columns', function () {
 		'ip_email'  => 'Email',
 		'ip_tipo'   => 'Tipo',
 		'ip_stato'  => 'Stato',
-		'ip_origin' => 'Origine',
+		'ip_page'   => 'Pagina di invio',
+		'ip_origin' => 'Provenienza',
 		'date'      => 'Ricevuta',
 	);
 } );
@@ -107,14 +108,28 @@ add_action( 'manage_ip_lead_posts_custom_column', function ( $col, $id ) {
 			$v = $m( 'stato' ) ? $m( 'stato' ) : 'nuovo';
 			printf( '<span class="ip-st ip-st-%s">%s</span>', esc_attr( $v ), esc_html( isset( $s[ $v ] ) ? $s[ $v ] : $v ) );
 			break;
-		case 'ip_origin':
+		case 'ip_page':
 			$p = $m( 'pagina' );
-			echo $p ? '<a href="' . esc_url( $p ) . '" target="_blank">' . esc_html( wp_parse_url( $p, PHP_URL_PATH ) ) . '</a>' : '';
+			echo $p ? '<a href="' . esc_url( $p ) . '" target="_blank">' . esc_html( ip_lead_short_url( $p ) ) . '</a>' : '—';
 			if ( $m( 'landing' ) ) {
 				echo '<br><small>Landing: ' . esc_html( $m( 'landing' ) ) . '</small>';
 			}
-			if ( $m( 'origine' ) ) {
-				echo '<br><small>' . esc_html( $m( 'origine' ) ) . '</small>';
+			break;
+		case 'ip_origin':
+			$c = $m( 'canale' );
+			if ( ! $c && ! $m( 'utm_source' ) ) {
+				echo $m( 'origine' ) ? '<small>' . esc_html( $m( 'origine' ) ) . '</small>' : '<span class="ip-ch">Diretto</span>';
+				break;
+			}
+			printf( '<span class="ip-ch ip-ch-%s">%s</span>', esc_attr( sanitize_title( $c ) ), esc_html( $c ? $c : 'Campagna' ) );
+			if ( $m( 'utm_source' ) ) {
+				echo '<br><small>' . esc_html( $m( 'utm_source' ) . ' / ' . $m( 'utm_medium' ) ) . '</small>';
+			}
+			if ( $m( 'utm_campaign' ) ) {
+				echo '<br><small>Campagna: ' . esc_html( $m( 'utm_campaign' ) ) . '</small>';
+			}
+			if ( $m( 'utm_term' ) ) {
+				echo '<br><small>Parola: ' . esc_html( $m( 'utm_term' ) ) . '</small>';
 			}
 			break;
 	}
@@ -124,7 +139,7 @@ add_action( 'admin_head-edit.php', function () {
 	if ( 'ip_lead' !== get_current_screen()->post_type ) {
 		return;
 	}
-	echo '<style>.ip-st{display:inline-block;padding:2px 8px;border-radius:2px;background:#f0f0f1;font-size:12px}.ip-st-nuovo{background:#fcf0e3;color:#8a3a00;font-weight:600}.ip-st-iscritto{background:#e6f4ea;color:#1e6b34}.ip-st-richiamare{background:#fff8c5}.column-ip_tipo{width:130px}.column-ip_stato{width:130px}</style>';
+	echo '<style>.ip-st{display:inline-block;padding:2px 8px;border-radius:2px;background:#f0f0f1;font-size:12px}.ip-st-nuovo{background:#fcf0e3;color:#8a3a00;font-weight:600}.ip-st-iscritto{background:#e6f4ea;color:#1e6b34}.ip-st-richiamare{background:#fff8c5}.column-ip_tipo{width:130px}.column-ip_stato{width:130px}.ip-ch{display:inline-block;padding:1px 7px;border-radius:2px;background:#eef2f0;font-size:12px;font-weight:600}.ip-ch-google-ads{background:#e8f0fe;color:#174ea6}.ip-ch-meta-ads,.ip-ch-social{background:#eef0fb;color:#3b4a9e}.ip-ch-ricerca-organica{background:#e6f4ea;color:#1e6b34}</style>';
 } );
 
 // Filtro per stato sopra l'elenco.
@@ -138,12 +153,30 @@ add_action( 'restrict_manage_posts', function ( $pt ) {
 		printf( '<option value="%s" %s>%s</option>', esc_attr( $k ), selected( $cur, $k, false ), esc_html( $l ) );
 	}
 	echo '</select>';
+	$ch = isset( $_GET['ip_canale'] ) ? sanitize_text_field( wp_unslash( $_GET['ip_canale'] ) ) : '';
+	echo '<select name="ip_canale"><option value="">Tutti i canali</option>';
+	foreach ( array( 'Google Ads', 'Meta Ads', 'Microsoft Ads', 'Altra pubblicità', 'Ricerca organica', 'Social', 'Email', 'Campagna', 'Sito esterno', 'Diretto' ) as $c ) {
+		printf( '<option value="%1$s" %2$s>%1$s</option>', esc_attr( $c ), selected( $ch, $c, false ) );
+	}
+	echo '</select>';
 	printf( '<a class="button" href="%s">Esporta CSV</a>', esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=ip_export_leads' ), 'ip_export' ) ) );
 } );
 add_action( 'pre_get_posts', function ( $q ) {
-	if ( is_admin() && $q->is_main_query() && 'ip_lead' === $q->get( 'post_type' ) && ! empty( $_GET['ip_stato'] ) ) {
-		$q->set( 'meta_key', '_lead_stato' );
-		$q->set( 'meta_value', sanitize_key( $_GET['ip_stato'] ) );
+	if ( ! is_admin() || ! $q->is_main_query() || 'ip_lead' !== $q->get( 'post_type' ) ) {
+		return;
+	}
+	$mq = array();
+	if ( ! empty( $_GET['ip_stato'] ) ) {
+		$mq[] = array( 'key' => '_lead_stato', 'value' => sanitize_key( $_GET['ip_stato'] ) );
+	}
+	if ( ! empty( $_GET['ip_canale'] ) ) {
+		$c    = sanitize_text_field( wp_unslash( $_GET['ip_canale'] ) );
+		$mq[] = 'Diretto' === $c
+			? array( 'relation' => 'OR', array( 'key' => '_lead_canale', 'value' => 'Diretto' ), array( 'key' => '_lead_canale', 'compare' => 'NOT EXISTS' ) )
+			: array( 'key' => '_lead_canale', 'value' => $c );
+	}
+	if ( $mq ) {
+		$q->set( 'meta_query', $mq );
 	}
 } );
 
@@ -155,7 +188,10 @@ add_action( 'add_meta_boxes_ip_lead', function () {
 } );
 
 function ip_lead_box( $post ) {
-	$keys = array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'citta', 'fascia', 'messaggio', 'marketing', 'consenso', 'landing', 'pagina', 'origine' );
+	$keys = array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'citta', 'fascia', 'messaggio', 'marketing', 'consenso', 'landing', 'pagina' );
+	if ( ! get_post_meta( $post->ID, '_lead_canale', true ) ) {
+		$keys[] = 'origine'; // Richieste precedenti alla 3.1.
+	}
 	echo '<table class="widefat striped"><tbody>';
 	foreach ( $keys as $k ) {
 		$v = (string) get_post_meta( $post->ID, '_lead_' . $k, true );
@@ -183,6 +219,19 @@ function ip_lead_box( $post ) {
 		echo '</td></tr>';
 	}
 	echo '</tbody></table>';
+	$attr = ip_lead_attr_rows( $post->ID );
+	if ( $attr ) {
+		echo '<h3 style="margin:18px 0 6px">Da dove arriva</h3><table class="widefat striped"><tbody>';
+		foreach ( $attr as $l => $v ) {
+			printf( '<tr><th style="width:160px">%s</th><td>%s</td></tr>', esc_html( $l ), $v ); // phpcs:ignore
+		}
+		echo '</tbody></table>';
+	}
+	$mail = (string) get_post_meta( $post->ID, '_lead_invio', true );
+	if ( $mail ) {
+		$bad = false !== strpos( $mail, 'NON inviata' );
+		printf( '<p style="margin-top:14px;color:%s"><span class="dashicons dashicons-email-alt"></span> %s</p>', $bad ? '#b32d2e' : '#3c434a', esc_html( $mail ) );
+	}
 }
 
 function ip_lead_state_box( $post ) {
@@ -246,7 +295,7 @@ add_action( 'admin_post_ip_export_leads', function () {
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_die( 'Non autorizzato.' );
 	}
-	$keys = array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'citta', 'fascia', 'messaggio', 'marketing', 'tipo', 'stato', 'note', 'landing', 'pagina', 'origine' );
+	$keys = array_merge( array( 'nome', 'cognome', 'telefono', 'email', 'interesse', 'corso', 'nascita', 'regione', 'citta', 'fascia', 'messaggio', 'marketing', 'tipo', 'stato', 'note', 'landing', 'pagina' ), array_keys( ip_lead_attr_keys() ), array( 'origine', 'invio' ) );
 	nocache_headers();
 	header( 'Content-Type: text/csv; charset=UTF-8' );
 	header( 'Content-Disposition: attachment; filename="richieste-' . gmdate( 'Y-m-d' ) . '.csv"' );

@@ -52,6 +52,14 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.1.0', '<' ) ) {
+		// Registro dei consensi cookie; testo del banner con le nuove categorie.
+		ip_consent_install();
+		$o = get_option( 'ip_settings', array() );
+		$o = is_array( $o ) ? $o : array();
+		unset( $o['consent_text'] );
+		update_option( 'ip_settings', $o );
+	}
 	if ( version_compare( $v, '3.0.1', '<' ) ) {
 		// Aggiornamenti dal sito ufficiale applicati in automatico (con le esclusioni).
 		$o = get_option( 'ip_settings', array() );

@@ -118,7 +118,6 @@ function ip_settings_fields() {
 			'fields' => array(
 				'price_from'   => array( 'Retta mensile a partire da (€)', 'text', '', 'Vuoto = calcolata in automatico dalle agevolazioni ufficiali (la rata mensile più bassa). Compila solo per forzare un valore.' ),
 				'retta_std'    => array( 'Retta standard corsi di laurea', 'text', '', 'Vuoto = presa in automatico dall’agevolazione «Retta standard». Nei testi puoi scrivere {retta_std}, {rata_min} e {retta_min}: diventano gli importi aggiornati.' ),
-				'lead_to'      => array( 'Email che ricevono le richieste', 'text', '', 'Più indirizzi separati da virgola. Vuoto = email dell’amministratore.' ),
 				'thanks_page'  => array( 'Pagina di ringraziamento', 'page', '' ),
 				'privacy_page' => array( 'Pagina informativa privacy', 'page', '', 'Creata dal tema con lo shortcode [ip_privacy]: il testo si aggiorna con i dati della società.' ),
 				'webhook_url'  => array( 'Webhook (CRM, Make, Zapier)', 'url', '', 'Ogni richiesta viene inviata qui in JSON. Facoltativo.' ),
@@ -182,6 +181,25 @@ function ip_settings_fields() {
 				'font_brand'        => array( 'Font Montserrat (come unimarconi.it)', 'checkbox', '1', 'Incluso nel tema, 38 KB. Disattivato = font di sistema, ancora più veloce.' ),
 			),
 		),
+		'email'       => array(
+			'title'  => 'Email e notifiche',
+			'fields' => array(
+				'mail_note'         => array( 'Come funziona', 'note', '', 'A ogni richiesta partono due email: la <strong>notifica</strong> a voi, con tutti i dati, la pagina e la provenienza (UTM), e la <strong>conferma</strong> alla persona che ha scritto. L’esito di ogni invio è salvato nella richiesta. Molti hosting non consegnano le email senza un server SMTP: compila la sezione SMTP qui sotto (i dati li trovi nel pannello della casella email) e usa «Invia un’email di prova».' ),
+				'lead_to'           => array( 'Email che ricevono le richieste', 'text', '', 'Più indirizzi separati da virgola. Vuoto = email dell’amministratore.' ),
+				'notify_admin'      => array( 'Notifica a ogni richiesta', 'checkbox', '1' ),
+				'mail_from'         => array( 'Mittente: indirizzo', 'text', '', 'Vuoto = email pubblica (Identità → Contatti). Deve essere una casella del vostro dominio, la stessa usata per l’SMTP, altrimenti le email finiscono in spam.' ),
+				'mail_from_name'    => array( 'Mittente: nome', 'text', '', 'Vuoto = nome del marchio.' ),
+				'autoreply_on'      => array( 'Conferma alla persona che scrive', 'checkbox', '1', 'Parte solo se ha lasciato l’email (il modulo di richiamata chiede solo il telefono).' ),
+				'autoreply_subject' => array( 'Conferma: oggetto', 'text', 'Abbiamo ricevuto la tua richiesta' ),
+				'autoreply_text'    => array( 'Conferma: testo', 'textarea', "Ciao {nome},\n\ngrazie per averci scritto. Un orientatore di {brand} ti ricontatterà entro un giorno lavorativo per parlarti di {corso}: percorso, costi e agevolazioni a cui hai diritto.\n\nSe preferisci, chiamaci al {telefono} o scrivici su WhatsApp.\n\nA presto,\nlo staff di {brand}", 'Segnaposto: {nome}, {corso}, {brand}, {telefono}, {orari}. In fondo vengono aggiunti da soli i contatti e il riepilogo della richiesta.' ),
+				'smtp_on'           => array( 'Invia tramite SMTP', 'checkbox', '', 'Consigliato: le email partono dalla vostra casella e arrivano in posta in arrivo.' ),
+				'smtp_host'         => array( 'Server SMTP', 'text', '', 'Es. smtps.aruba.it, smtp.gmail.com, smtp.office365.com' ),
+				'smtp_port'         => array( 'Porta', 'text', '587', '587 con TLS, 465 con SSL.' ),
+				'smtp_secure'       => array( 'Cifratura', 'select', 'tls', '', array( 'tls' => 'TLS (porta 587)', 'ssl' => 'SSL (porta 465)', '' => 'Nessuna' ) ),
+				'smtp_user'         => array( 'Utente SMTP', 'text', '', 'Di solito l’indirizzo email completo.' ),
+				'smtp_pass'         => array( 'Password SMTP', 'password', '', 'Lasciala vuota per non cambiarla. In alternativa scrivi in wp-config.php: <code>define( \'IP_SMTP_PASS\', \'...\' );</code>' ),
+			),
+		),
 		'tracking'    => array(
 			'title'  => 'Privacy, cookie e tracciamento',
 			'fields' => array(
@@ -193,9 +211,18 @@ function ip_settings_fields() {
 				'dpo'                => array( 'Responsabile della protezione dei dati (DPO)', 'text', '', 'Solo se nominato: nome e contatto. Vuoto = non mostrato.' ),
 				'privacy_extra'      => array( 'Informativa privacy: testo aggiuntivo', 'textarea', '', 'Facoltativo, compare prima del paragrafo «Modifiche».' ),
 				'cookie_extra'       => array( 'Cookie policy: altri strumenti', 'textarea', '', 'Facoltativo: altri servizi attivi nel contenitore GTM (es. Meta Pixel, _fbp, 90 giorni).' ),
-				'gtm_id'         => array( 'Google Tag Manager ID', 'text', '', 'Es. GTM-XXXXXXX. Caricato con Consent Mode v2 (consensi negati di default).' ),
-				'consent_banner' => array( 'Banner cookie integrato', 'checkbox', '1', 'Banner leggero (accetta / rifiuta) quando GTM è attivo. Disattivalo se usi un servizio esterno.' ),
-				'consent_text'   => array( 'Testo banner cookie', 'textarea', 'Usiamo cookie tecnici e, solo con il tuo consenso, cookie di statistica e marketing per misurare le visite e migliorare le campagne.' ),
+				'tag_note'       => array( 'Tag di Google', 'note', '', 'Tutti i tag partono con la <strong>modalità di consenso v2</strong>: finché il visitatore non accetta, Google riceve solo segnali anonimi senza cookie. Puoi usare GTM, oppure GA4 e Google Ads diretti, oppure entrambi: <strong>non configurare lo stesso tag in due posti</strong> (es. GA4 qui e anche dentro GTM), altrimenti le visite si contano due volte. Gli eventi per GTM sono sempre nel dataLayer: <code>generate_lead</code>, <code>contact_click</code>, <code>exit_intent_shown</code>, <code>ip_consent_update</code>.' ),
+				'gtm_id'         => array( 'Google Tag Manager ID', 'text', '', 'Es. GTM-XXXXXXX.' ),
+				'ga4_id'         => array( 'Google Analytics 4: ID di misurazione', 'text', '', 'Es. G-XXXXXXXXXX. Invia in automatico le pagine viste e l’evento <code>generate_lead</code> a ogni richiesta.' ),
+				'ads_id'         => array( 'Google Ads: ID conversione', 'text', '', 'Es. AW-123456789 (Google Ads → Obiettivi → Conversioni → Tag).' ),
+				'ads_lead_label' => array( 'Google Ads: etichetta conversione «Richiesta»', 'text', '', 'La parte dopo la barra: AW-123456789/<strong>AbC-D_efG</strong>. Scatta a ogni modulo inviato, con l’ID della richiesta per evitare doppioni.' ),
+				'ads_call_label' => array( 'Google Ads: etichetta conversione «Clic su telefono/WhatsApp»', 'text', '', 'Facoltativa.' ),
+				'ads_enhanced'   => array( 'Conversioni avanzate', 'checkbox', '', 'Invia a Google email e telefono di chi compila (Google li cifra prima di riceverli) per attribuire meglio le conversioni. Solo con consenso marketing. Attivala anche in Google Ads e citala nell’informativa privacy.' ),
+				'ads_value'      => array( 'Valore di una richiesta (€)', 'text', '', 'Facoltativo: valore medio da assegnare alla conversione, es. 30.' ),
+				'consent_banner' => array( 'Banner cookie integrato', 'checkbox', '1', 'Compare quando c’è almeno un tag. Disattivalo solo se usi un servizio esterno (Iubenda, Cookiebot…).' ),
+				'consent_text'   => array( 'Testo banner cookie', 'textarea', 'Usiamo cookie tecnici, necessari al sito, e, solo con il tuo consenso, cookie di statistica e di marketing per misurare le visite e migliorare le nostre campagne. Puoi accettarli tutti, rifiutarli o scegliere.' ),
+				'consent_months' => array( 'Validità della scelta (mesi)', 'text', '6', 'Dopo questo periodo il banner viene riproposto. Il Garante indica di non riproporlo prima di 6 mesi. Il banner ricompare anche quando cambi la data di aggiornamento della cookie policy.' ),
+				'consent_log'    => array( 'Registro dei consensi', 'checkbox', '1', 'Salva ogni scelta (data, scelte, versione della policy, codice anonimo) per dimostrare il consenso. Consultabile e esportabile in <a href="admin.php?page=ip-consents">Infopoint → Registro consensi</a>.' ),
 				'cookie_page'    => array( 'Pagina cookie policy', 'page', '', 'Creata dal tema con lo shortcode [ip_cookie].' ),
 				'head_code'      => array( 'Codice in &lt;head&gt;', 'code', '', 'Es. script di verifica o di un servizio cookie esterno.' ),
 				'footer_code'    => array( 'Codice prima di &lt;/body&gt;', 'code', '' ),
@@ -361,7 +388,13 @@ function ip_sanitize_settings( $in ) {
 		return $out; // Salvataggi da altre fonti (es. importatore) passano da update_option diretto.
 	}
 	foreach ( $fields[ $tab ]['fields'] as $k => $f ) {
+		if ( 'note' === $f[1] ) {
+			continue;
+		}
 		$v = isset( $in[ $k ] ) ? wp_unslash( $in[ $k ] ) : '';
+		if ( 'password' === $f[1] && '' === $v ) {
+			continue; // Vuota = invariata.
+		}
 		$out[ $k ] = ip_sanitize_field( $f, $v );
 	}
 	return $out;
@@ -379,6 +412,8 @@ function ip_sanitize_field( $f, $v ) {
 			return (string) absint( $v );
 		case 'color':
 			return sanitize_hex_color( $v ) ? sanitize_hex_color( $v ) : $f[2];
+		case 'password':
+			return trim( (string) $v );
 		case 'code':
 			return current_user_can( 'unfiltered_html' ) ? (string) $v : wp_kses_post( $v );
 		case 'textarea':
@@ -437,6 +472,7 @@ function ip_settings_page() {
 			</table>
 			<?php submit_button(); ?>
 		</form>
+		<?php do_action( 'ip_settings_after', $tab ); ?>
 	</div>
 	<?php
 }
@@ -503,6 +539,9 @@ function ip_settings_field( $k, $f ) {
 			break;
 		case 'code':
 			printf( '<textarea id="%s" name="%s" rows="5" class="large-text code">%s</textarea>', esc_attr( $id ), esc_attr( $name ), esc_textarea( $val ) );
+			break;
+		case 'password':
+			printf( '<input type="password" id="%s" name="%s" value="" class="regular-text" autocomplete="new-password" placeholder="%s">', esc_attr( $id ), esc_attr( $name ), $val ? '•••••••• (salvata)' : '' );
 			break;
 		case 'repeater':
 			ip_repeater( $name, $f[4], is_array( $val ) ? $val : array() );

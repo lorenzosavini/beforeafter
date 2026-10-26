@@ -97,16 +97,26 @@
 		});
 	});
 
-	/* Provenienza del contatto (primo accesso): UTM, gclid, fbclid, referrer */
-	(function () {
+	/* Provenienza del contatto: primo accesso e ultimo accesso da una fonte esterna
+	   (UTM, gclid, referrer). Resta nel browser e parte solo con un modulo inviato. */
+	var attr = (function () {
 		var p = new URLSearchParams(location.search);
-		var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
-		var found = keys.filter(function (k) { return p.get(k); }).map(function (k) { return k + '=' + p.get(k); });
-		if (found.length) {
-			store.set('ip_attr', found.join(' · '));
-		} else if (!store.get('ip_attr') && d.referrer && d.referrer.indexOf(location.host) === -1) {
-			store.set('ip_attr', 'referrer=' + d.referrer.split('?')[0]);
+		var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid'];
+		var read = function (k) { try { return JSON.parse(store.get(k) || 'null'); } catch (e) { return null; } };
+		var now = Date.now(), t = {}, hit = false;
+		keys.forEach(function (k) { var v = p.get(k); if (v) { t[k] = v.slice(0, 200); hit = true; } });
+		var ref = d.referrer && d.referrer.indexOf(location.host) === -1 ? d.referrer.split('?')[0].slice(0, 200) : '';
+		var ft = read('ip_ft'), lt = read('ip_lt');
+		if (ft && now - ft.ts > 90 * 864e5) ft = null;
+		if (hit || ref || !lt) {
+			t.ref = ref;
+			t.land = location.href.split('#')[0].slice(0, 400);
+			t.ts = now;
+			// Una visita diretta non cancella una campagna recente.
+			if (hit || ref || !lt) { lt = t; store.set('ip_lt', JSON.stringify(t)); }
+			if (!ft) { ft = t; store.set('ip_ft', JSON.stringify(t)); }
 		}
+		return { ft: ft, lt: lt };
 	})();
 
 	/* Moduli: invio senza ricaricare la pagina, con ripiego sull'invio classico */
@@ -114,7 +124,7 @@
 		var msg = form.querySelector('.form-msg');
 		var btn = form.querySelector('button[type=submit]');
 		form.querySelector('[name=ip_page]').value = location.href.split('#')[0];
-		form.querySelector('[name=ip_attr]').value = store.get('ip_attr') || '';
+		form.querySelector('[name=ip_attr]').value = JSON.stringify(attr);
 
 		function show(text) {
 			msg.textContent = text;
@@ -140,12 +150,15 @@
 				.then(function (r) { return r.json(); })
 				.then(function (res) {
 					if (res.ok) {
-						dl.push({ event: 'generate_lead', lead_type: form.ip_type.value });
-						if (form.hasAttribute('data-inline')) {
-							thanks(form);
-						} else {
-							location.href = res.redirect;
-						}
+						var done = false;
+						var go = function () {
+							if (done) return;
+							done = true;
+							if (form.hasAttribute('data-inline')) thanks(form);
+							else location.href = res.redirect;
+						};
+						leadConversion(form, res.id, go);
+						setTimeout(go, 900);
 					} else {
 						show(res.message);
 						btn.disabled = false;
@@ -155,6 +168,42 @@
 				.catch(function () { form.submit(); });
 		});
 	});
+
+	/* Conversioni: dataLayer per GTM, GA4 e Google Ads diretti (rispettano il consenso) */
+	function phoneE164(v) {
+		var n = String(v || '').replace(/[^\d+]/g, '');
+		if (!n) return '';
+		if (n.indexOf('00') === 0) n = '+' + n.slice(2);
+		if (n.charAt(0) !== '+') n = '+39' + n;
+		return n;
+	}
+	function leadConversion(form, id, cb) {
+		var T = window.ipTrack || {}, C = window.ipConsent || {};
+		var type = form.ip_type.value;
+		var email = form.ip_email ? form.ip_email.value.trim().toLowerCase() : '';
+		var phone = form.ip_telefono ? phoneE164(form.ip_telefono.value) : '';
+		var ev = { event: 'generate_lead', lead_type: type, lead_id: String(id || ''), form_id: form.id || '', page_path: location.pathname };
+		if (T.value) { ev.value = T.value; ev.currency = 'EUR'; }
+		if (T.enh && C.m) {
+			ev.user_data = {};
+			if (email) ev.user_data.email = email;
+			if (phone) ev.user_data.phone_number = phone;
+		}
+		dl.push(ev);
+		if (typeof window.gtag !== 'function' || (!T.ga4 && !T.ads)) return;
+		if (T.ga4) {
+			gtag('event', 'generate_lead', { send_to: T.ga4, lead_type: type, value: T.value || undefined, currency: T.value ? 'EUR' : undefined });
+		}
+		if (T.ads && T.lead) {
+			if (T.enh && C.m && (email || phone)) {
+				var ud = {};
+				if (email) ud.email = email;
+				if (phone) ud.phone_number = phone;
+				gtag('set', 'user_data', ud);
+			}
+			gtag('event', 'conversion', { send_to: T.ads + '/' + T.lead, value: T.value || 1, currency: 'EUR', transaction_id: String(id || ''), event_callback: cb });
+		}
+	}
 
 	/* Ringraziamento sul posto (landing): chi ha scritto resta sulla pagina */
 	function thanks(form) {
@@ -275,7 +324,15 @@
 	/* Misurazione dei contatti diretti */
 	d.addEventListener('click', function (e) {
 		var a = e.target.closest('[data-track]');
-		if (a) dl.push({ event: 'contact_click', contact_method: a.getAttribute('data-track'), link_url: a.href });
+		if (a) {
+			var method = a.getAttribute('data-track');
+			dl.push({ event: 'contact_click', contact_method: method, link_url: a.href });
+			var T = window.ipTrack || {};
+			if (typeof window.gtag === 'function') {
+				if (T.ga4) gtag('event', 'contact_click', { send_to: T.ga4, contact_method: method });
+				if (T.ads && T.call) gtag('event', 'conversion', { send_to: T.ads + '/' + T.call });
+			}
+		}
 	});
 	if (/[?&]grazie=/.test(location.search)) {
 		dl.push({ event: 'lead_thank_you', lead_type: new URLSearchParams(location.search).get('grazie') });
@@ -430,26 +487,46 @@
 		});
 	}
 
-	/* Banner cookie */
+	/* Banner cookie: necessari sempre, statistiche e marketing solo se scelti */
 	var banner = d.querySelector('[data-consent]');
-	if (banner) {
-		d.addEventListener('click', function (e) {
-			if (!e.target.closest('[data-consent-open]')) return;
+	if (banner && window.ipConsent) {
+		var C = window.ipConsent;
+		var prefs = banner.querySelector('[data-consent-prefs]');
+		var boxA = banner.querySelector('[data-ck="a"]'), boxM = banner.querySelector('[data-ck="m"]');
+		var saveBtn = banner.querySelector('[data-consent-set="save"]'), customBtn = banner.querySelector('[data-consent-custom]');
+		var open = function (custom) {
 			d.querySelectorAll('dialog[open]').forEach(function (x) { x.close(); });
+			if (boxA) boxA.checked = !!C.a;
+			if (boxM) boxM.checked = !!C.m;
+			prefs.hidden = !custom; saveBtn.hidden = !custom; customBtn.hidden = !!custom;
 			banner.hidden = false;
-			var f = banner.querySelector('button');
-			if (f) f.focus();
+		};
+		var g = function (x) { return x ? 'granted' : 'denied'; };
+		var set = function (choice) {
+			var a = choice === 'accept' || (choice === 'save' && !!(boxA && boxA.checked));
+			var m = choice === 'accept' || (choice === 'save' && !!(boxM && boxM.checked));
+			var id = C.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+			store.set('ip_consent', JSON.stringify({ v: C.v, t: Date.now(), a: a ? 1 : 0, m: m ? 1 : 0, id: id }));
+			C.ok = true; C.a = a; C.m = m; C.id = id;
+			gtag('consent', 'update', { ad_storage: g(m), ad_user_data: g(m), ad_personalization: g(m), analytics_storage: g(a) });
+			dl.push({ event: 'ip_consent_update', consent_analytics: g(a), consent_marketing: g(m) });
+			banner.hidden = true;
+			if (window.ipConsentLog) {
+				var f = new FormData();
+				f.append('action', 'ip_consent'); f.append('choice', choice); f.append('a', a ? 1 : 0); f.append('m', m ? 1 : 0);
+				f.append('v', C.v); f.append('cid', id); f.append('url', location.href.split('#')[0]);
+				if (navigator.sendBeacon) navigator.sendBeacon(window.ipConsentLog, f);
+				else if (window.fetch) fetch(window.ipConsentLog, { method: 'POST', body: f, keepalive: true });
+			}
+		};
+		d.addEventListener('click', function (e) {
+			if (e.target.closest('[data-consent-open]')) { e.preventDefault(); open(true); }
 		});
-		if (!store.get('ip_consent')) banner.hidden = false;
+		customBtn.addEventListener('click', function () { open(true); });
 		banner.addEventListener('click', function (e) {
 			var b = e.target.closest('[data-consent-set]');
-			if (!b) return;
-			var v = b.getAttribute('data-consent-set');
-			store.set('ip_consent', v);
-			if (typeof window.gtag === 'function') {
-				window.gtag('consent', 'update', { ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v });
-			}
-			banner.hidden = true;
+			if (b) set(b.getAttribute('data-consent-set'));
 		});
+		if (!C.ok) open(false);
 	}
 })();
