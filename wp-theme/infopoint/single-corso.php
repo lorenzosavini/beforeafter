@@ -118,7 +118,7 @@ while ( have_posts() ) :
 					</div>
 				<?php endif; ?>
 
-				<?php $docs = ip_part_on( 'docs', $id ) ? ip_meta_rows( 'docs', $id ) : array(); ?>
+				<?php $docs = ip_part_on( 'docs', $id ) ? apply_filters( 'ip_course_docs', ip_meta_rows( 'docs', $id ), $id ) : array(); ?>
 				<?php if ( $docs ) : ?>
 					<h2>Documenti</h2>
 					<ul class="docs">

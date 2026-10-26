@@ -381,3 +381,6 @@ body.ipl-locked { overflow: hidden; }
 #ip-vis .ipv-box-h { margin: 14px 0 6px; font-weight: 700; }
 #ip-vis .ipv-box-r { display: block; margin: 0 0 5px; }
 #ip-vis em { color: var(--ipa-muted); font-size: 12px; }
+.ipv-big { padding: 4px 0; border-top: 0; }
+.ipv-big .ipv-t strong { font-size: 16px; }
+.ipv-smart.is-on { border-color: var(--ipa-brand); box-shadow: 0 0 0 2px rgba(34, 94, 72, .15); }

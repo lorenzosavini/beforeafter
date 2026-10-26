@@ -70,11 +70,10 @@ function ip_site_on( $key ) {
 
 /** Una parte della scheda corso è visibile? (regola generale + eccezione del corso) */
 function ip_part_on( $key, $post_id = null ) {
-	if ( in_array( $key, ip_vis()['parts'], true ) ) {
-		return false;
-	}
-	$own = get_post_meta( $post_id ? $post_id : get_the_ID(), '_ip_vis_parts', true );
-	return ! ( is_array( $own ) && in_array( $key, $own, true ) );
+	$post_id = $post_id ? $post_id : get_the_ID();
+	$own     = get_post_meta( $post_id, '_ip_vis_parts', true );
+	$on      = ! in_array( $key, ip_vis()['parts'], true ) && ! ( is_array( $own ) && in_array( $key, $own, true ) );
+	return (bool) apply_filters( 'ip_part_on', $on, $key, $post_id );
 }
 
 /** ID dei corsi nascosti, compresi quelli delle tipologie nascoste. */
@@ -299,8 +298,9 @@ function ip_vis_switch( $name, $value, $checked, $label, $desc = '', $meta = '' 
 
 function ip_vis_page() {
 	$v        = ip_vis();
-	$tab      = sanitize_key( $_GET['vis'] ?? 'corsi' );
+	$tab      = sanitize_key( $_GET['vis'] ?? 'smart' );
 	$tabs     = array(
+		'smart'    => array( 'Versione essenziale', 'editor-contract' ),
 		'corsi'    => array( 'Corsi e tipologie', 'welcome-learn-more' ),
 		'sezioni'  => array( 'Sezioni dei corsi', 'list-view' ),
 		'scheda'   => array( 'Scheda corso', 'id-alt' ),
@@ -309,8 +309,9 @@ function ip_vis_page() {
 		'home'     => array( 'Home page', 'admin-home' ),
 		'sito'     => array( 'Elementi del sito', 'admin-site-alt3' ),
 	);
-	$tab      = isset( $tabs[ $tab ] ) ? $tab : 'corsi';
+	$tab      = isset( $tabs[ $tab ] ) ? $tab : 'smart';
 	$hidden_n = array(
+		'smart'   => 0,
 		'corsi'   => count( $v['courses'] ) + count( $v['tipologie'] ),
 		'sezioni' => count( $v['sections'] ),
 		'scheda'  => count( $v['parts'] ),
@@ -340,6 +341,9 @@ function ip_vis_page() {
 					<?php wp_nonce_field( 'ip_vis_save' ); ?>
 					<?php
 					switch ( $tab ) {
+						case 'smart':
+							ip_vis_tab_smart();
+							break;
 						case 'corsi':
 							ip_vis_tab_corsi( $v );
 							break;
@@ -383,6 +387,45 @@ function ip_vis_tools( $placeholder ) {
 		<button type="button" class="button" data-ipv-all="0">Nascondi tutto</button>
 		<label class="ipv-only"><input type="checkbox" data-ipv-only> Solo i nascosti</label>
 	</div>
+	<?php
+}
+
+function ip_vis_tab_smart() {
+	$s = ip_smart();
+	?>
+	<section class="ipa-card ipv-smart<?php echo $s['on'] ? ' is-on' : ''; ?>">
+		<label class="ipv-row ipv-big">
+			<span class="ipv-t"><strong>Versione essenziale dei corsi</strong><small>Ogni corso e percorso mostra solo le sezioni scelte qui sotto, accorciate, sempre a tendina, con l’invito a chiedere il dettaglio completo. Il testo intero resta salvato e continua ad aggiornarsi dal sito ufficiale: spegnendo l’interruttore torna tutto com’era.</small></span>
+			<input type="checkbox" class="ipv-sw" name="smart_on" value="1" <?php checked( $s['on'] ); ?>>
+		</label>
+		<input type="hidden" name="smart_form" value="1">
+	</section>
+	<section class="ipa-card">
+		<h3>Sezioni da tenere</h3>
+		<p class="ipa-card-d">Il tema riconosce l’argomento dal titolo: «Destinatari», «A chi è rivolto», «Requisiti di ammissione» finiscono tutti in «A chi è rivolto e requisiti». Di ogni argomento resta solo la prima sezione.</p>
+		<div class="ipv-list">
+			<?php foreach ( ip_smart_groups() as $k => $g ) : ?>
+				<?php ip_vis_switch( 'smart_groups', $k, in_array( $k, (array) $s['groups'], true ), $g[0] ); ?>
+			<?php endforeach; ?>
+		</div>
+	</section>
+	<section class="ipa-card">
+		<h3>Quanto testo per sezione</h3>
+		<table class="form-table" role="presentation">
+			<tr><th><label for="ipv-paras">Paragrafi per sezione</label></th><td><input type="number" id="ipv-paras" name="smart_paras" min="1" max="6" value="<?php echo (int) $s['paras']; ?>" class="small-text"> <span class="description">Un elenco o una tabella contano come un paragrafo.</span></td></tr>
+			<tr><th><label for="ipv-items">Voci per elenco</label></th><td><input type="number" id="ipv-items" name="smart_items" min="2" max="20" value="<?php echo (int) $s['items']; ?>" class="small-text"> <span class="description">Anche le righe delle tabelle.</span></td></tr>
+			<tr><th><label for="ipv-docs">Documenti da mostrare</label></th><td><input type="number" id="ipv-docs" name="smart_docs" min="0" max="10" value="<?php echo (int) $s['docs']; ?>" class="small-text"> <span class="description">I primi della lista, di solito brochure e «il corso in breve». 0 = nessuno.</span></td></tr>
+		</table>
+	</section>
+	<section class="ipa-card">
+		<h3>Parti della scheda da togliere nella versione essenziale</h3>
+		<p class="ipa-card-d">Spento = tolto. Si aggiungono a quelle già nascoste nella scheda «Scheda corso».</p>
+		<div class="ipv-list">
+			<?php foreach ( ip_vis_parts() as $k => $p ) : ?>
+				<?php ip_vis_switch( 'smart_keep', $k, ! in_array( $k, (array) $s['parts'], true ), $p[0], $p[1] ); ?>
+			<?php endforeach; ?>
+		</div>
+	</section>
 	<?php
 }
 
@@ -551,6 +594,16 @@ add_action( 'admin_post_ip_vis_save', function () {
 	$on   = function ( $k ) use ( $in ) {
 		return array_map( 'strval', (array) ( $in[ $k ] ?? array() ) );
 	};
+	if ( isset( $in['smart_form'] ) ) {
+		$v['smart'] = array(
+			'on'     => empty( $in['smart_on'] ) ? '' : '1',
+			'groups' => array_values( array_intersect( $on( 'smart_groups' ), array_keys( ip_smart_groups() ) ) ),
+			'paras'  => max( 1, min( 6, (int) ( $in['smart_paras'] ?? 2 ) ) ),
+			'items'  => max( 2, min( 20, (int) ( $in['smart_items'] ?? 6 ) ) ),
+			'docs'   => max( 0, min( 10, (int) ( $in['smart_docs'] ?? 2 ) ) ),
+			'parts'  => array_values( array_diff( array_keys( ip_vis_parts() ), $on( 'smart_keep' ) ) ),
+		);
+	}
 	if ( isset( $in['all_tip'] ) ) {
 		$all            = wp_parse_id_list( $in['all_tip'] );
 		$v['tipologie'] = array_values( array_diff( $all, array_map( 'intval', $on( 'show_tip' ) ) ) );
@@ -611,6 +664,9 @@ function ip_vis_course_box( $post ) {
 	preg_match_all( '#<h2\b[^>]*>(.*?)</h2>#is', $post->post_content, $m );
 	?>
 	<p><label><input type="checkbox" name="ip_vis_hide" value="1" <?php checked( $hidden ); ?>> <strong>Nascondi questo corso dal sito</strong></label></p>
+	<?php if ( ip_smart()['on'] ) : ?>
+		<p><label><input type="checkbox" name="ip_full" value="1" <?php checked( (bool) get_post_meta( $post->ID, '_ip_full', true ) ); ?>> Mostra sempre la <strong>versione completa</strong> di questo corso</label></p>
+	<?php endif; ?>
 	<?php if ( $m[1] ) : ?>
 		<p class="ipv-box-h">Sezioni a tendina da mostrare</p>
 		<?php foreach ( array_unique( $m[1] ) as $h ) : ?>
@@ -641,6 +697,9 @@ add_action( 'save_post_corso', function ( $id ) {
 	$list = ! empty( $in['ip_vis_hide'] ) ? array_unique( array_merge( $list, array( $id ) ) ) : array_diff( $list, array( $id ) );
 	$v['courses'] = array_values( $list );
 	update_option( 'ip_visibility', $v, true );
+	if ( ip_smart()['on'] ) {
+		! empty( $in['ip_full'] ) ? update_post_meta( $id, '_ip_full', '1' ) : delete_post_meta( $id, '_ip_full' );
+	}
 	$all = array_map( 'strval', (array) ( $in['ip_vis_all_sec'] ?? array() ) );
 	update_post_meta( $id, '_ip_vis_sections', array_values( array_diff( $all, array_merge( (array) ( $in['ip_vis_show_sec'] ?? array() ), $v['sections'] ) ) ) );
 	update_post_meta( $id, '_ip_vis_parts', array_values( array_diff( array_keys( ip_vis_parts() ), (array) ( $in['ip_vis_show_part'] ?? array() ), $v['parts'] ) ) );
