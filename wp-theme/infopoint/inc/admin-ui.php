@@ -83,7 +83,7 @@ function ip_settings_layout() {
 			'sections' => array(
 				array( 'Tag di Google', '', array( 'tag_note', 'gtm_id', 'ga4_id' ) ),
 				array( 'Google Ads', 'Le conversioni scattano da sole a ogni richiesta e, se vuoi, a ogni clic su telefono o WhatsApp.', array( 'ads_id', 'ads_lead_label', 'ads_call_label', 'ads_value', 'ads_enhanced' ) ),
-				array( 'Banner dei cookie', '', array( 'consent_banner', 'consent_text', 'consent_months', 'consent_log', 'cookie_page' ) ),
+				array( 'Banner dei cookie', '', array( 'consent_banner', 'consent_always', 'consent_text', 'consent_months', 'consent_log', 'cookie_page' ) ),
 				array( 'Codice personalizzato', 'Solo per script che non passano da Tag Manager.', array( 'head_code', 'footer_code' ) ),
 			),
 			'if'   => array(
@@ -91,6 +91,7 @@ function ip_settings_layout() {
 				'ads_call_label' => 'ads_id',
 				'ads_value'      => 'ads_id',
 				'ads_enhanced'   => 'ads_id',
+				'consent_always' => 'consent_banner',
 				'consent_text'   => 'consent_banner',
 				'consent_months' => 'consent_banner',
 				'consent_log'    => 'consent_banner',

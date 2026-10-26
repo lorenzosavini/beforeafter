@@ -102,7 +102,14 @@
 	var attr = (function () {
 		var p = new URLSearchParams(location.search);
 		var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid'];
-		var read = function (k) { try { return JSON.parse(store.get(k) || 'null'); } catch (e) { return null; } };
+		// Senza consenso la provenienza resta solo per la visita (sessionStorage);
+		// con il consenso alle statistiche o al marketing viene ricordata per 90 giorni.
+		var C0 = window.ipConsent || {};
+		var keep = !!(C0.ok && (C0.a || C0.m));
+		var ses = { get: function (k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} } };
+		var read = function (k) { try { return JSON.parse((keep ? store.get(k) : null) || ses.get(k) || 'null'); } catch (e) { return null; } };
+		var save = function (k, v) { ses.set(k, v); if (keep) store.set(k, v); };
+		if (!keep) { try { localStorage.removeItem('ip_ft'); localStorage.removeItem('ip_lt'); } catch (e) {} }
 		var now = Date.now(), t = {}, hit = false;
 		keys.forEach(function (k) { var v = p.get(k); if (v) { t[k] = v.slice(0, 200); hit = true; } });
 		var ref = d.referrer && d.referrer.indexOf(location.host) === -1 ? d.referrer.split('?')[0].slice(0, 200) : '';
@@ -113,10 +120,15 @@
 			t.land = location.href.split('#')[0].slice(0, 400);
 			t.ts = now;
 			// Una visita diretta non cancella una campagna recente.
-			if (hit || ref || !lt) { lt = t; store.set('ip_lt', JSON.stringify(t)); }
-			if (!ft) { ft = t; store.set('ip_ft', JSON.stringify(t)); }
+			if (hit || ref || !lt) { lt = t; save('ip_lt', JSON.stringify(t)); }
+			if (!ft) { ft = t; save('ip_ft', JSON.stringify(t)); }
 		}
-		return { ft: ft, lt: lt };
+		return { ft: ft, lt: lt, persist: function (on) {
+			try {
+				if (on) { if (ft) localStorage.setItem('ip_ft', JSON.stringify(ft)); if (lt) localStorage.setItem('ip_lt', JSON.stringify(lt)); }
+				else { localStorage.removeItem('ip_ft'); localStorage.removeItem('ip_lt'); }
+			} catch (e) {}
+		} };
 	})();
 
 	/* Moduli: invio senza ricaricare la pagina, con ripiego sull'invio classico */
@@ -510,6 +522,7 @@
 			C.ok = true; C.a = a; C.m = m; C.id = id;
 			gtag('consent', 'update', { ad_storage: g(m), ad_user_data: g(m), ad_personalization: g(m), analytics_storage: g(a) });
 			dl.push({ event: 'ip_consent_update', consent_analytics: g(a), consent_marketing: g(m) });
+			attr.persist(a || m);
 			banner.hidden = true;
 			if (window.ipConsentLog) {
 				var f = new FormData();

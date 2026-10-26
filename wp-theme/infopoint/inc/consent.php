@@ -28,7 +28,7 @@ function ip_tracking_on() {
 }
 
 function ip_consent_on() {
-	return ip_tracking_on() && ip_opt( 'consent_banner' );
+	return ip_opt( 'consent_banner' ) && ( ip_tracking_on() || ip_opt( 'consent_always' ) );
 }
 
 /** Cambia quando cambia la cookie policy: il banner viene riproposto. */
@@ -45,7 +45,7 @@ add_action( 'wp_head', function () {
 	$gtm = ip_gtm_id();
 	$ga4 = ip_ga4_id();
 	$ads = ip_ads_id();
-	if ( $gtm || $ga4 || $ads ) {
+	if ( $gtm || $ga4 || $ads || ip_consent_on() ) {
 		$cfg = array(
 			'v'    => ip_consent_version(),
 			'days' => ip_consent_days(),
@@ -133,9 +133,7 @@ function ip_consent_banner() {
 		<p id="ck-d"><?php echo esc_html( ip_opt( 'consent_text' ) ); ?><?php if ( $cookie ) : ?> <a href="<?php echo esc_url( $cookie ); ?>">Cookie policy</a><?php endif; ?></p>
 		<div class="consent-prefs" data-consent-prefs hidden>
 			<label class="ck-row"><span><strong>Necessari</strong><small>Fanno funzionare il sito e ricordano le tue scelte. Sempre attivi.</small></span><input type="checkbox" checked disabled></label>
-			<?php if ( $ga ) : ?>
-				<label class="ck-row"><span><strong>Statistiche</strong><small>Google Analytics: contiamo le visite e le pagine più lette, in forma aggregata.</small></span><input type="checkbox" data-ck="a"></label>
-			<?php endif; ?>
+			<label class="ck-row"><span><strong>Statistiche</strong><small><?php echo $ga ? 'Google Analytics: contiamo le visite e le pagine più lette, in forma aggregata. ' : ''; ?>Ricordiamo per 90 giorni da dove sei arrivato (ad esempio una campagna), per capire quali funzionano.</small></span><input type="checkbox" data-ck="a"></label>
 			<?php if ( $ads ) : ?>
 				<label class="ck-row"><span><strong>Marketing</strong><small>Google Ads: sappiamo quali annunci portano richieste e possiamo mostrarti annunci pertinenti.</small></span><input type="checkbox" data-ck="m"></label>
 			<?php endif; ?>
