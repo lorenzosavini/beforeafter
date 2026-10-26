@@ -24,7 +24,18 @@ function ip_ads_id() {
 
 /** C'è almeno un tag che usa cookie: serve il banner. */
 function ip_tracking_on() {
-	return ip_gtm_id() || ip_ga4_id() || ip_ads_id();
+	return ip_gtm_id() || ip_ga4_id() || ip_ads_id() || ip_tracking_elsewhere();
+}
+
+/**
+ * Tag di Google inseriti fuori dai campi ID: codice incollato in «Codice in
+ * <head>» / «prima di </body>» o plugin (GTM4WP, Site Kit). Anche in questi casi
+ * servono banner e consenso predefinito, scritti prima di qualsiasi tag.
+ */
+function ip_tracking_elsewhere() {
+	$code = (string) ip_opt( 'head_code' ) . (string) ip_opt( 'footer_code' );
+	return (bool) preg_match( '#googletagmanager\.com|gtag\(|GTM-[A-Z0-9]{4,}|G-[A-Z0-9]{6,}|AW-\d{6,}#', $code )
+		|| defined( 'GTM4WP_VERSION' ) || defined( 'GOOGLESITEKIT_VERSION' );
 }
 
 function ip_consent_on() {
@@ -47,7 +58,7 @@ add_action( 'wp_head', function () {
 	// li carica e non invia eventi diretti, così nessuna misura viene contata due volte.
 	$ga4 = $gtm ? '' : ip_ga4_id();
 	$ads = $gtm ? '' : ip_ads_id();
-	if ( $gtm || $ga4 || $ads || ip_consent_on() ) {
+	if ( $gtm || $ga4 || $ads || ip_consent_on() || ip_tracking_elsewhere() ) {
 		$cfg = array(
 			'v'    => ip_consent_version(),
 			'days' => ip_consent_days(),
@@ -87,7 +98,7 @@ add_action( 'wp_head', function () {
 	if ( $code ) {
 		echo $code . "\n"; // phpcs:ignore — inserito dall'amministratore.
 	}
-}, 1 );
+}, -100 ); // Prima di tutto: il consenso predefinito deve precedere qualsiasi tag, anche dei plugin.
 
 add_action( 'wp_body_open', function () {
 	$gtm = ip_gtm_id();
