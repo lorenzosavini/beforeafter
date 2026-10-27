@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 3.8.2
+Version: 3.9.0
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -82,6 +82,26 @@ p { margin: 0 0 1em; }
 .btnrow { display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* Trasparenza ------------------------------------------------------ */
+/* Banner informativo in alto (Impostazioni → Moduli e testi) */
+.notice-bar { font-size: .86rem; line-height: 1.4; background: var(--brand-deep); color: #e3ece8; }
+.notice-in { position: relative; display: flex; align-items: center; justify-content: center; min-height: 38px; padding-top: 7px; padding-bottom: 7px; }
+.notice-bar p { margin: 0; text-align: center; padding: 0 28px; }
+.notice-bar strong { color: #fff; font-weight: 700; }
+.notice-link { margin-left: 4px; color: #fff; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.notice-link::after { content: " →"; }
+.notice-link:hover { text-decoration-thickness: 2px; }
+.notice-x { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 1.25rem; line-height: 1; cursor: pointer; opacity: .75; }
+.notice-x:hover, .notice-x:focus-visible { opacity: 1; background: rgba(255, 255, 255, .14); }
+.notice-accent { background: var(--accent); color: #fff; }
+.notice-soft { background: var(--brand-tint); color: var(--brand-deep); border-bottom: 1px solid var(--line); }
+.notice-soft strong, .notice-soft .notice-link { color: var(--brand-dark); }
+.notice-soft .notice-x:hover, .notice-soft .notice-x:focus-visible { background: rgba(0, 0, 0, .06); }
+.notice-alert { background: #fdf3c7; color: #4a3b00; border-bottom: 1px solid #ecd98a; }
+.notice-alert strong, .notice-alert .notice-link { color: #3a2e00; }
+.notice-alert .notice-x:hover, .notice-alert .notice-x:focus-visible { background: rgba(0, 0, 0, .06); }
+.notice-off .notice-bar { display: none; }
+@media (max-width: 600px) { .notice-bar { font-size: .8rem; } .notice-in { min-height: 34px; } }
+@media print { .notice-bar { display: none; } }
 .disclosure { background: var(--brand-tint); border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: .8rem; line-height: 1.45; }
 .disclosure p { margin: 0; padding: 7px 0; }
 @media (max-width: 600px) { .disclosure { font-size: .72rem; } .disclosure p { padding: 5px 0; } .hdr-phone { font-size: .95rem; } }

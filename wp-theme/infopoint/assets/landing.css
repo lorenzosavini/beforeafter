@@ -8,6 +8,23 @@
 .lp-link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
 /* Barra di trasparenza e testata ----------------------------------- */
+/* Banner informativo (lo stesso del sito) */
+.notice-bar { font-size: .84rem; line-height: 1.4; background: var(--deep, #0e261d); color: #e3ece8; }
+.notice-in { position: relative; display: flex; align-items: center; justify-content: center; min-height: 36px; padding-top: 7px; padding-bottom: 7px; }
+.notice-bar p { margin: 0; text-align: center; padding: 0 28px; }
+.notice-bar strong { color: #fff; font-weight: 700; }
+.notice-link { margin-left: 4px; color: #fff; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.notice-link::after { content: " →"; }
+.notice-x { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 1.25rem; line-height: 1; cursor: pointer; opacity: .75; }
+.notice-x:hover, .notice-x:focus-visible { opacity: 1; background: rgba(255, 255, 255, .14); }
+.notice-accent { background: var(--accent, #a0300e); color: #fff; }
+.notice-soft { background: #eef2f0; color: var(--deep, #0e261d); border-bottom: 1px solid var(--hair, #dfe3e1); }
+.notice-soft strong, .notice-soft .notice-link { color: var(--brand-dark, #174f3a); }
+.notice-alert { background: #fdf3c7; color: #4a3b00; border-bottom: 1px solid #ecd98a; }
+.notice-alert strong, .notice-alert .notice-link { color: #3a2e00; }
+.notice-soft .notice-x:hover, .notice-alert .notice-x:hover { background: rgba(0, 0, 0, .06); }
+.notice-off .notice-bar { display: none; }
+@media (max-width: 600px) { .notice-bar { font-size: .78rem; } }
 .lp-disc { background: #eef2f0; color: var(--ink-2); font-size: .78rem; line-height: 1.45; }
 .lp-disc p { margin: 0; padding: 8px 0; }
 .lp-disc .lp-link { font-weight: 600; color: var(--brand-dark); }

@@ -52,6 +52,14 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.9.0', '<' ) ) {
+		// La vecchia «barra in alto» diventa il banner informativo: si tiene il testo scritto.
+		$o = get_option( 'ip_settings' );
+		if ( is_array( $o ) && ! empty( $o['topbar_text'] ) && empty( $o['notice_text'] ) ) {
+			$o['notice_text'] = $o['topbar_text'];
+			update_option( 'ip_settings', $o );
+		}
+	}
 	if ( version_compare( $v, '3.7.0', '<' ) ) {
 		// Versione essenziale da infopoint: si mostra ciò che serve per contattarci,
 		// gli approfondimenti diventano inviti; brochure su richiesta.

@@ -98,7 +98,16 @@ function ip_settings_fields() {
 		'testi'       => array(
 			'title'  => 'Testi ricorrenti',
 			'fields' => array(
-				'topbar_text' => array( 'Testo barra in alto', 'text', 'Iscrizioni aperte tutto l’anno · Valutazione dei crediti gratuita' ),
+				'notice_on'        => array( 'Mostra il banner informativo', 'checkbox', '', 'La barra sottile in cima alle pagine, sopra la testata: per iscrizioni aperte, scadenze, open day, chiusure per ferie.' ),
+				'notice_text'      => array( 'Testo del banner', 'textarea', 'Iscrizioni aperte tutto l’anno · Valutazione dei crediti gratuita', 'Breve, una riga. Le parole tra *asterischi* vanno in grassetto.' ),
+				'notice_link_text' => array( 'Testo del link', 'text', '', 'Es. «Scopri di più», «Prenota un colloquio». Vuoto = nessun link.' ),
+				'notice_link'      => array( 'Destinazione del link', 'text', '#richiedi', 'Una pagina del sito (es. /convenzioni-e-agevolazioni/), un sito esterno, oppure <code>#richiedi</code> per portare al modulo di contatto.' ),
+				'notice_style'     => array( 'Colore', 'select', 'brand', '', array( 'brand' => 'Verde scuro (come la testata)', 'accent' => 'Arancio (promozione)', 'soft' => 'Chiaro (discreto)', 'alert' => 'Giallo (avviso importante)' ) ),
+				'notice_where'     => array( 'Dove mostrarlo', 'select', 'all', '', array( 'all' => 'In tutte le pagine', 'home' => 'Solo nella home' ) ),
+				'notice_landing'   => array( 'Anche nelle landing delle campagne', 'checkbox', '', 'Nelle landing il link funziona solo se porta al modulo (<code>#richiedi</code>): da una landing non si esce.' ),
+				'notice_from'      => array( 'Visibile dal', 'text', '', 'Facoltativo, formato AAAA-MM-GG (es. 2026-11-01). Vuoto = da subito.' ),
+				'notice_to'        => array( 'Visibile fino al', 'text', '', 'Facoltativo, formato AAAA-MM-GG, giorno compreso. Vuoto = finché non lo spegni.' ),
+				'notice_close'     => array( 'Il visitatore può chiuderlo', 'checkbox', '1', 'Con la ×: resta chiuso per quel visitatore finché non cambi il testo.' ),
 				'nav_cta'     => array( 'Pulsante in testata', 'text', 'Richiedi informazioni' ),
 				'steps'       => array( 'Passi «Come funziona»', 'repeater', array(
 					array( 'titolo' => 'Ci racconti cosa cerchi', 'testo' => 'Una telefonata o un messaggio: titolo di studio, lavoro, tempo a disposizione, obiettivi.' ),

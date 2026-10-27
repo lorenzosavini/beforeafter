@@ -716,3 +716,48 @@ function ip_exit_banner( $args = array() ) {
 	</dialog>
 	<?php
 }
+
+/**
+ * Banner informativo in cima alle pagine (Impostazioni → Moduli e testi).
+ *
+ * @param bool $landing Pagina di campagna: il link vale solo se porta al modulo.
+ * @return string HTML, vuoto se spento, fuori dalle date o non previsto qui.
+ */
+function ip_notice_bar( $landing = false ) {
+	$text = trim( (string) ip_opt( 'notice_text' ) );
+	if ( ! ip_opt( 'notice_on' ) || '' === $text ) {
+		return '';
+	}
+	if ( $landing && ! ip_opt( 'notice_landing' ) ) {
+		return '';
+	}
+	if ( ! $landing && 'home' === ip_opt( 'notice_where' ) && ! is_front_page() ) {
+		return '';
+	}
+	$today = current_time( 'Y-m-d' );
+	$from  = trim( (string) ip_opt( 'notice_from' ) );
+	$to    = trim( (string) ip_opt( 'notice_to' ) );
+	if ( ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $from ) && $today < $from ) || ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $to ) && $today > $to ) ) {
+		return '';
+	}
+	$style = in_array( ip_opt( 'notice_style' ), array( 'brand', 'accent', 'soft', 'alert' ), true ) ? ip_opt( 'notice_style' ) : 'brand';
+	$label = trim( (string) ip_opt( 'notice_link_text' ) );
+	$href  = trim( (string) ip_opt( 'notice_link' ) );
+	$link  = '';
+	if ( $label && $href && ( ! $landing || 0 === strpos( $href, '#' ) ) ) {
+		if ( 0 === strpos( $href, '#' ) ) {
+			$link = '<a class="notice-link" href="' . esc_attr( $href ) . '"' . ( '#richiedi' === $href ? ' data-scroll-form' : '' ) . ' data-notice-link>' . esc_html( $label ) . '</a>';
+		} else {
+			$url  = 0 === strpos( $href, '/' ) ? home_url( $href ) : $href;
+			$ext  = wp_parse_url( $url, PHP_URL_HOST ) && wp_parse_url( $url, PHP_URL_HOST ) !== wp_parse_url( home_url(), PHP_URL_HOST );
+			$link = '<a class="notice-link" href="' . esc_url( $url ) . '"' . ( $ext ? ' target="_blank" rel="noopener"' : '' ) . ' data-notice-link>' . esc_html( $label ) . '</a>';
+		}
+	}
+	$html = preg_replace( '/\*([^*]+)\*/', '<strong>$1</strong>', esc_html( $text ) );
+	$id   = substr( md5( $text . '|' . $href . '|' . $label ), 0, 10 );
+	$x    = ip_opt( 'notice_close' ) ? '<button type="button" class="notice-x" data-notice-close aria-label="Chiudi l’avviso">×</button>' : '';
+	// Chi l'ha già chiuso non lo vede nemmeno per un istante.
+	$pre  = $x ? '<script>try{if(localStorage.getItem("ip_notice")==="' . $id . '")document.documentElement.classList.add("notice-off")}catch(e){}</script>' : '';
+	$wrap = is_singular( 'ip_landing' ) ? 'lp-w' : 'wrap'; // Le landing hanno un loro contenitore.
+	return $pre . '<div class="notice-bar notice-' . esc_attr( $style ) . '" data-notice="' . esc_attr( $id ) . '" role="region" aria-label="Avviso"><div class="' . $wrap . ' notice-in"><p>' . $html . ( $link ? ' ' . $link : '' ) . '</p>' . $x . '</div></div>';
+}

@@ -54,6 +54,7 @@ $head = function ( $title, $sub = '' ) {
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+<?php echo ip_notice_bar( true ); // phpcs:ignore ?>
 
 <?php if ( ip_opt( 'disclosure_bar' ) && ip_text( 'disclosure' ) ) : ?>
 <div class="lp-disc" role="note">

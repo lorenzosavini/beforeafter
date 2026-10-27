@@ -143,6 +143,16 @@
 		['dragleave', 'drop'].forEach(function (t) { box.addEventListener(t, function () { box.classList.remove('is-over'); }); });
 	});
 
+	/* Banner informativo: chiuso con la ×, resta chiuso finché non cambia il testo */
+	d.addEventListener('click', function (e) {
+		var x = e.target.closest('[data-notice-close]');
+		if (!x) return;
+		var bar = x.closest('.notice-bar');
+		store.set('ip_notice', bar.getAttribute('data-notice'));
+		d.documentElement.classList.add('notice-off');
+		dl.push({ event: 'notice_close', notice_text: bar.querySelector('p').textContent.trim().slice(0, 100) });
+	});
+
 	/* Misurazione per Tag Manager (poi GA4 e Google Ads): ogni interazione utile
 	   diventa un evento nel dataLayer. Nessun dato personale: dei campi si misura
 	   solo quali vengono compilati, mai cosa c'è scritto. */
@@ -152,6 +162,7 @@
 		dl.push(o);
 	}
 	function where(el) {
+		if (el.closest('.notice-bar')) return 'banner_informativo';
 		if (el.closest('dialog')) return 'popup_uscita';
 		if (el.closest('.hdr')) return 'testata';
 		if (el.closest('.mbar')) return 'barra_mobile';
@@ -281,6 +292,10 @@
 		if (!a) return;
 		var text = (a.textContent || a.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 100);
 		var href = a.getAttribute('href') || '';
+		if (a.hasAttribute('data-notice-link')) {
+			var bar = a.closest('.notice-bar');
+			track('notice_click', { notice_text: bar ? bar.querySelector('p').textContent.replace(text, '').trim().slice(0, 100) : '', link_text: text, link_url: href });
+		}
 		if (a.hasAttribute('data-scroll-form')) {
 			var type = a.closest('.smart-box') ? 'approfondimento' : (a.closest('.smart-docs') ? 'brochure' : (a.closest('.smart-more') ? 'dettaglio_sezione' : (a.closest('.mbar') ? 'barra_mobile' : 'invito_modulo')));
 			track('cta_click', { cta_text: text, cta_type: type, cta_location: where(a), cta_topic: (a.getAttribute('data-msg') || '').replace(/^Vorrei (ricevere |informazioni su: )?/, '').slice(0, 120) });

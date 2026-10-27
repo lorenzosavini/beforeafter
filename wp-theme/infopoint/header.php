@@ -14,6 +14,7 @@ $wa      = ip_wa_href();
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="skip" href="#main">Vai al contenuto</a>
+<?php echo ip_notice_bar( $landing ); // phpcs:ignore ?>
 
 <?php if ( ip_opt( 'disclosure_bar' ) && ip_text( 'disclosure' ) ) : ?>
 <div class="disclosure" role="note">

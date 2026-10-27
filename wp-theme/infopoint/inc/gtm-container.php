@@ -21,8 +21,8 @@ function ip_gtm_event_groups() {
 			array( 'contact_method', 'link_location', 'link_text', 'link_url' ),
 		),
 		'Interazioni' => array(
-			array( 'cta_click', 'file_download', 'menu_click', 'outbound_click', 'section_open', 'scroll_depth', 'engaged_time', 'search', 'course_filter', 'exit_intent_shown', 'exit_intent_close', 'lead_thank_you', 'page_not_found' ),
-			array( 'cta_text', 'cta_type', 'cta_location', 'cta_topic', 'file_name', 'file_extension', 'link_text', 'link_url', 'link_domain', 'link_location', 'menu_item', 'section_name', 'section_type', 'percent_scrolled', 'engaged_seconds', 'search_term', 'search_type', 'search_results', 'filter_type', 'filter_value', 'exit_trigger', 'exit_converted', 'lead_type' ),
+			array( 'cta_click', 'file_download', 'menu_click', 'outbound_click', 'section_open', 'scroll_depth', 'engaged_time', 'search', 'course_filter', 'exit_intent_shown', 'exit_intent_close', 'notice_click', 'notice_close', 'lead_thank_you', 'page_not_found' ),
+			array( 'cta_text', 'cta_type', 'cta_location', 'cta_topic', 'file_name', 'file_extension', 'link_text', 'link_url', 'link_domain', 'link_location', 'menu_item', 'section_name', 'section_type', 'percent_scrolled', 'engaged_seconds', 'search_term', 'search_type', 'search_results', 'filter_type', 'filter_value', 'exit_trigger', 'exit_converted', 'notice_text', 'lead_type' ),
 		),
 	);
 }
