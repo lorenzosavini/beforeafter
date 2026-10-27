@@ -151,6 +151,12 @@ function ip_upgrade() {
 		}
 	}
 	if ( IP_VERSION !== $v ) {
+		// CSS incorporato rifatto da capo con la nuova versione (sito e landing).
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_ip\_css\_%' OR option_name LIKE '\_transient\_timeout\_ip\_css\_%' OR option_name LIKE '\_transient\_ip\_lpcss\_%' OR option_name LIKE '\_transient\_timeout\_ip\_lpcss\_%'" ); // phpcs:ignore
+		if ( function_exists( 'wp_cache_supports' ) && wp_cache_supports( 'flush_group' ) ) {
+			wp_cache_flush_group( 'transient' );
+		}
 		update_option( 'ip_version', IP_VERSION );
 		flush_rewrite_rules(); // Nuovi indirizzi, es. /lp/ delle landing.
 	}

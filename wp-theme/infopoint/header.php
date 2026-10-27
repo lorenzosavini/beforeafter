@@ -16,11 +16,7 @@ $wa      = ip_wa_href();
 <a class="skip" href="#main">Vai al contenuto</a>
 <?php echo ip_notice_bar( $landing ); // phpcs:ignore ?>
 
-<?php if ( ip_opt( 'disclosure_bar' ) && ip_text( 'disclosure' ) ) : ?>
-<div class="disclosure" role="note">
-	<div class="wrap"><p><?php echo esc_html( ip_text( 'disclosure' ) ); ?><?php if ( ip_page_url( 'chi-siamo' ) ) : ?> <a href="<?php echo esc_url( ip_page_url( 'chi-siamo' ) ); ?>">Chi siamo</a><?php endif; ?></p></div>
-</div>
-<?php endif; ?>
+<?php echo ip_disclosure_bar(); // phpcs:ignore ?>
 
 
 <header class="hdr">

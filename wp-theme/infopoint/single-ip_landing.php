@@ -56,11 +56,7 @@ $head = function ( $title, $sub = '' ) {
 <?php wp_body_open(); ?>
 <?php echo ip_notice_bar( true ); // phpcs:ignore ?>
 
-<?php if ( ip_opt( 'disclosure_bar' ) && ip_text( 'disclosure' ) ) : ?>
-<div class="lp-disc" role="note">
-	<div class="lp-w"><p><?php echo esc_html( ip_text( 'disclosure' ) ); ?> <button type="button" class="lp-link" data-lp-open="lp-chi">Chi siamo</button></p></div>
-</div>
-<?php endif; ?>
+<?php echo ip_disclosure_bar( true ); // phpcs:ignore ?>
 
 <header class="lp-top">
 	<div class="lp-w lp-top-in">

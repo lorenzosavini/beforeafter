@@ -718,6 +718,31 @@ function ip_exit_banner( $args = array() ) {
 }
 
 /**
+ * Stile del banner informativo: viaggia con il banner stesso, così è sempre
+ * centrato e formattato anche se una cache serve un foglio di stile vecchio.
+ */
+function ip_notice_css() {
+	return '.notice-bar{font-size:.86rem;line-height:1.4;background:var(--brand-deep,#0e261d);color:#e3ece8;text-align:center}'
+		. '.notice-bar .notice-in{position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;max-width:var(--wrap,1240px);min-height:38px;margin:0 auto;padding:7px 48px}'
+		. '.notice-bar p{flex:0 1 auto;margin:0;padding:0;max-width:none;text-align:center}'
+		. '.notice-bar strong{color:inherit;font-weight:700}'
+		. '.notice-bar .notice-link{margin-left:6px;color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}'
+		. '.notice-bar .notice-link::after{content:" \2192"}'
+		. '.notice-bar .notice-x{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:inherit;font:inherit;font-size:1.3rem;line-height:1;cursor:pointer;opacity:.75}'
+		. '.notice-bar .notice-x:hover,.notice-bar .notice-x:focus-visible{opacity:1;background:rgba(127,127,127,.18)}'
+		. '.notice-brand strong,.notice-brand .notice-link{color:#fff}'
+		. '.notice-accent{background:var(--accent,#a0300e);color:#fff}'
+		. '.notice-soft{background:var(--brand-tint,#e9f0ed);color:var(--brand-deep,#0e261d);border-bottom:1px solid var(--line,#dcdfe2)}'
+		. '.notice-soft strong,.notice-soft .notice-link{color:var(--brand-dark,#174f3a)}'
+		. '.notice-alert{background:#fdf3c7;color:#4a3b00;border-bottom:1px solid #ecd98a}'
+		. '.notice-alert strong,.notice-alert .notice-link{color:#3a2e00}'
+		. '.notice-bar .notice-m{display:none}'
+		. '.notice-off .notice-bar,.notice-only-m{display:none}'
+		. '@media (max-width:700px){.notice-bar{font-size:.8rem}.notice-bar .notice-in{min-height:34px;padding:6px 40px 6px 14px}.notice-bar .notice-d{display:none}.notice-bar .notice-m{display:inline}.notice-only-m{display:block}.notice-only-d{display:none}}'
+		. '@media print{.notice-bar{display:none}}';
+}
+
+/**
  * Banner informativo in cima alle pagine (Impostazioni → Moduli e testi).
  *
  * @param bool $landing Pagina di campagna: il link vale solo se porta al modulo.
@@ -740,24 +765,72 @@ function ip_notice_bar( $landing = false ) {
 	if ( ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $from ) && $today < $from ) || ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $to ) && $today > $to ) ) {
 		return '';
 	}
-	$style = in_array( ip_opt( 'notice_style' ), array( 'brand', 'accent', 'soft', 'alert' ), true ) ? ip_opt( 'notice_style' ) : 'brand';
-	$label = trim( (string) ip_opt( 'notice_link_text' ) );
-	$href  = trim( (string) ip_opt( 'notice_link' ) );
-	$link  = '';
+	$style  = in_array( ip_opt( 'notice_style' ), array( 'brand', 'accent', 'soft', 'alert' ), true ) ? ip_opt( 'notice_style' ) : 'brand';
+	$dev    = in_array( ip_opt( 'notice_devices' ), array( 'desktop', 'mobile' ), true ) ? ip_opt( 'notice_devices' ) : 'all';
+	$text_m = trim( (string) ip_opt( 'notice_text_mobile' ) );
+	$label  = trim( (string) ip_opt( 'notice_link_text' ) );
+	$label_m = trim( (string) ip_opt( 'notice_link_text_mobile' ) );
+	$href   = trim( (string) ip_opt( 'notice_link' ) );
+	$bold   = function ( $t ) {
+		return preg_replace( '/\*([^*]+)\*/', '<strong>$1</strong>', esc_html( $t ) );
+	};
+	// Testo da computer e da telefono: se quello corto manca, vale l'altro.
+	$body = $text_m && $text_m !== $text
+		? '<span class="notice-d">' . $bold( $text ) . '</span><span class="notice-m">' . $bold( $text_m ) . '</span>'
+		: $bold( $text );
+	$link = '';
 	if ( $label && $href && ( ! $landing || 0 === strpos( $href, '#' ) ) ) {
+		$words = $label_m && $label_m !== $label ? '<span class="notice-d">' . esc_html( $label ) . '</span><span class="notice-m">' . esc_html( $label_m ) . '</span>' : esc_html( $label );
 		if ( 0 === strpos( $href, '#' ) ) {
-			$link = '<a class="notice-link" href="' . esc_attr( $href ) . '"' . ( '#richiedi' === $href ? ' data-scroll-form' : '' ) . ' data-notice-link>' . esc_html( $label ) . '</a>';
+			$link = '<a class="notice-link" href="' . esc_attr( $href ) . '"' . ( '#richiedi' === $href ? ' data-scroll-form' : '' ) . ' data-notice-link>' . $words . '</a>';
 		} else {
 			$url  = 0 === strpos( $href, '/' ) ? home_url( $href ) : $href;
 			$ext  = wp_parse_url( $url, PHP_URL_HOST ) && wp_parse_url( $url, PHP_URL_HOST ) !== wp_parse_url( home_url(), PHP_URL_HOST );
-			$link = '<a class="notice-link" href="' . esc_url( $url ) . '"' . ( $ext ? ' target="_blank" rel="noopener"' : '' ) . ' data-notice-link>' . esc_html( $label ) . '</a>';
+			$link = '<a class="notice-link" href="' . esc_url( $url ) . '"' . ( $ext ? ' target="_blank" rel="noopener"' : '' ) . ' data-notice-link>' . $words . '</a>';
 		}
 	}
-	$html = preg_replace( '/\*([^*]+)\*/', '<strong>$1</strong>', esc_html( $text ) );
-	$id   = substr( md5( $text . '|' . $href . '|' . $label ), 0, 10 );
-	$x    = ip_opt( 'notice_close' ) ? '<button type="button" class="notice-x" data-notice-close aria-label="Chiudi l’avviso">×</button>' : '';
+	$id  = substr( md5( $text . '|' . $text_m . '|' . $href . '|' . $label ), 0, 10 );
+	$x   = ip_opt( 'notice_close' ) ? '<button type="button" class="notice-x" data-notice-close aria-label="Chiudi l’avviso">×</button>' : '';
 	// Chi l'ha già chiuso non lo vede nemmeno per un istante.
-	$pre  = $x ? '<script>try{if(localStorage.getItem("ip_notice")==="' . $id . '")document.documentElement.classList.add("notice-off")}catch(e){}</script>' : '';
-	$wrap = is_singular( 'ip_landing' ) ? 'lp-w' : 'wrap'; // Le landing hanno un loro contenitore.
-	return $pre . '<div class="notice-bar notice-' . esc_attr( $style ) . '" data-notice="' . esc_attr( $id ) . '" role="region" aria-label="Avviso"><div class="' . $wrap . ' notice-in"><p>' . $html . ( $link ? ' ' . $link : '' ) . '</p>' . $x . '</div></div>';
+	$pre = '<style id="ip-notice-css">' . ip_notice_css() . '</style>';
+	if ( $x ) {
+		$pre .= '<script>try{if(localStorage.getItem("ip_notice")==="' . $id . '")document.documentElement.classList.add("notice-off")}catch(e){}</script>';
+	}
+	$cls = 'notice-bar notice-' . $style . ( 'all' !== $dev ? ' notice-only-' . ( 'mobile' === $dev ? 'm' : 'd' ) : '' );
+	return $pre . '<div class="' . esc_attr( $cls ) . '" data-notice="' . esc_attr( $id ) . '" role="region" aria-label="Avviso"><div class="notice-in"><p>' . $body . ( $link ? ' ' . $link : '' ) . '</p>' . $x . '</div></div>';
+}
+
+/**
+ * Avviso di trasparenza in cima alle pagine («… è un centro di orientamento
+ * accreditato…»): centrato, con testo corto da telefono e link «Chi siamo»
+ * facoltativo. Lo stile viaggia con l'avviso, come per il banner informativo.
+ *
+ * @param bool $landing Landing: il link apre la finestra «Chi siamo» della pagina.
+ */
+function ip_disclosure_bar( $landing = false ) {
+	$text = ip_opt( 'disclosure_bar' ) ? trim( ip_text( 'disclosure' ) ) : '';
+	if ( '' === $text ) {
+		return '';
+	}
+	$text_m = trim( ip_text( 'disclosure_mobile' ) );
+	$body   = $text_m && $text_m !== $text
+		? '<span class="disc-d">' . esc_html( $text ) . '</span><span class="disc-m">' . esc_html( $text_m ) . '</span>'
+		: esc_html( $text );
+	$label = trim( (string) ip_opt( 'disclosure_link_text' ) );
+	$label = '' !== $label ? $label : 'Chi siamo';
+	$link  = '';
+	if ( ip_opt( 'disclosure_link' ) ) {
+		if ( $landing ) {
+			$link = ' <button type="button" class="lp-link" data-lp-open="lp-chi">' . esc_html( $label ) . '</button>';
+		} elseif ( ip_page_url( 'chi-siamo' ) ) {
+			$link = ' <a href="' . esc_url( ip_page_url( 'chi-siamo' ) ) . '">' . esc_html( $label ) . '</a>';
+		}
+	}
+	$css = '.disclosure,.lp-disc{text-align:center}'
+		. '.disclosure p,.lp-disc p{max-width:none;margin:0 auto;text-align:center}'
+		. '.disclosure .disc-m,.lp-disc .disc-m{display:none}'
+		. '@media (max-width:700px){.disclosure .disc-d,.lp-disc .disc-d{display:none}.disclosure .disc-m,.lp-disc .disc-m{display:inline}}';
+	$cls  = $landing ? 'lp-disc' : 'disclosure';
+	$wrap = $landing ? 'lp-w' : 'wrap';
+	return '<style id="ip-disc-css">' . $css . '</style><div class="' . $cls . '" role="note"><div class="' . $wrap . '"><p>' . $body . $link . '</p></div></div>';
 }
