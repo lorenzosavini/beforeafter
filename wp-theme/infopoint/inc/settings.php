@@ -589,7 +589,11 @@ function ip_htaccess_note() {
 		'scrittura' => '<br><strong>Stato:</strong> il file .htaccess non è scrivibile: chiedi all’hosting di attivare la cache del browser per CSS, JS, font e immagini.',
 	);
 	$state = (string) get_option( 'ip_htaccess_state' );
-	if ( 'ok' === $state && ! ip_opt( 'browser_cache' ) ) {
+	// Qui non si può usare ip_opt(): questa nota fa parte della definizione delle
+	// impostazioni, e ip_opt() la rileggerebbe all'infinito. Si legge l'opzione grezza.
+	$saved = get_option( 'ip_settings', array() );
+	$on    = ! is_array( $saved ) || ! array_key_exists( 'browser_cache', $saved ) || ! empty( $saved['browser_cache'] );
+	if ( 'ok' === $state && ! $on ) {
 		return '';
 	}
 	return isset( $notes[ $state ] ) ? $notes[ $state ] : '';
