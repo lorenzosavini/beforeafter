@@ -91,7 +91,9 @@ add_action( 'wp_enqueue_scripts', function () {
 	if ( ! ip_opt( 'inline_css' ) ) {
 		wp_enqueue_style( 'infopoint', IP_URI . '/style.css', array(), IP_VERSION );
 	}
-	wp_enqueue_script( 'infopoint', IP_URI . '/assets/app.js', array(), IP_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+	// Versione compatta (tools/build.sh); il sorgente leggibile con SCRIPT_DEBUG.
+	$js = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || ! is_readable( IP_DIR . '/assets/app.min.js' ) ? 'app.js' : 'app.min.js';
+	wp_enqueue_script( 'infopoint', IP_URI . '/assets/' . $js, array(), IP_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
 }, 100 );
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
@@ -99,9 +101,56 @@ remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 remove_action( 'wp_body_open', 'wp_global_styles_render_svg_filters' );
 add_filter( 'should_load_separate_core_block_assets', '__return_true' );
 
-// CSS incorporato: una richiesta in meno, nessun blocco del rendering.
+/**
+ * Tipo di pagina per il CSS critico (assets/critical/<tipo>.css, generato da
+ * tools/critical-css.js), '' = pagina non coperta: CSS completo incorporato.
+ * Con ?ip_full_css il CSS completo è sempre incorporato (serve allo strumento).
+ */
+function ip_critical_type() {
+	if ( isset( $_GET['ip_full_css'] ) || ! ip_opt( 'inline_css' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		return '';
+	}
+	if ( is_singular( 'ip_landing' ) ) {
+		$t = 'landing';
+	} elseif ( is_front_page() ) {
+		$t = 'home';
+	} elseif ( is_singular( 'corso' ) ) {
+		$t = 'corso';
+	} elseif ( is_page() && ! is_page_template( 'page-templates/landing.php' ) || is_404() ) {
+		$t = 'pagina';
+	} elseif ( is_post_type_archive( 'corso' ) || is_tax() || is_search() || is_home() || is_category() || is_tag() ) {
+		$t = 'elenco';
+	} else {
+		return '';
+	}
+	return is_readable( IP_DIR . '/assets/critical/' . $t . '.css' ) ? $t : '';
+}
+
+/** Foglio di stile completo caricato senza bloccare la prima visualizzazione. */
+function ip_async_css( $url, $id ) {
+	printf(
+		'<link rel="preload" id="%1$s" href="%2$s" as="style" fetchpriority="low" onload="this.onload=null;this.rel=\'stylesheet\'"><noscript><link rel="stylesheet" href="%2$s"></noscript>' . "\n",
+		esc_attr( $id ),
+		esc_url( $url )
+	);
+}
+
+// CSS: nella pagina solo quello che serve all'apertura (CSS critico del tipo di
+// pagina), il foglio completo arriva subito dopo e resta in cache per le altre
+// pagine. Va prima dei colori scelti nel pannello (ip-vars), che così vincono.
 add_action( 'wp_head', function () {
 	if ( ! ip_opt( 'inline_css' ) ) {
+		return;
+	}
+	$type = ip_critical_type();
+	if ( $type ) {
+		$crit = get_transient( 'ip_crit_' . $type . '_' . IP_VERSION );
+		if ( false === $crit || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+			$crit = trim( preg_replace( '#/\*.*?\*/#s', '', (string) file_get_contents( IP_DIR . '/assets/critical/' . $type . '.css' ) ) );
+			set_transient( 'ip_crit_' . $type . '_' . IP_VERSION, $crit, WEEK_IN_SECONDS );
+		}
+		echo '<style id="ip-css-crit">' . str_replace( 'url("assets/', 'url("' . IP_URI . '/assets/', $crit ) . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput
+		ip_async_css( IP_URI . '/style.css?ver=' . IP_VERSION, 'ip-css-full' );
 		return;
 	}
 	$css = get_transient( 'ip_css_' . IP_VERSION );
@@ -223,3 +272,49 @@ add_action( 'template_redirect', function () {
 		exit;
 	}
 } );
+
+/* ---------------------------------------------------------------------
+ * Velocità di caricamento
+ * ------------------------------------------------------------------- */
+
+// Le immagini fuori vista cedono la banda a quella principale (anche nel testo).
+add_filter( 'wp_get_attachment_image_attributes', function ( $attr ) {
+	if ( isset( $attr['loading'] ) && 'lazy' === $attr['loading'] && empty( $attr['fetchpriority'] ) ) {
+		$attr['fetchpriority'] = 'low';
+	}
+	return $attr;
+} );
+add_filter( 'wp_content_img_tag', function ( $img ) {
+	return false !== strpos( $img, 'loading="lazy"' ) && false === strpos( $img, 'fetchpriority' ) ? str_replace( '<img ', '<img fetchpriority="low" ', $img ) : $img;
+} );
+
+// Pagina successiva caricata in anticipo quando il visitatore si ferma su un link:
+// il clic apre la pagina quasi all'istante (solo pagine del sito, mai i moduli).
+add_filter( 'wp_speculation_rules_configuration', function ( $config ) {
+	return is_array( $config ) ? array( 'mode' => 'prefetch', 'eagerness' => 'moderate' ) : $config;
+} );
+
+/*
+ * Immagini fuori vista caricate solo quando si avvicinano allo schermo (600 px):
+ * il browser altrimenti scarica in anticipo le immagini «lazy» entro ~2.500 px e
+ * su rete lenta ruba banda a quella principale. Spazio riservato (larghezza e
+ * altezza restano), copia in <noscript> per chi non ha JavaScript.
+ */
+add_filter( 'wp_get_attachment_image', function ( $html, $id, $size, $icon, $attr ) {
+	if ( is_admin() || wp_doing_ajax() || is_feed() || empty( $attr['loading'] ) || 'lazy' !== $attr['loading'] || false !== strpos( $html, 'data-src=' ) ) {
+		return $html;
+	}
+	$lazy = str_replace(
+		array( ' src="', ' srcset="', ' sizes="', ' loading="lazy"' ),
+		array( ' src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="', ' data-srcset="', ' data-sizes="', '' ),
+		$html
+	);
+	$lazy = preg_match( '/ class="/', $lazy ) ? preg_replace( '/ class="/', ' class="lz ', $lazy, 1 ) : str_replace( '<img ', '<img class="lz" ', $lazy );
+	return $lazy . '<noscript>' . $html . '</noscript>';
+}, 10, 5 );
+
+add_action( 'wp_footer', function () {
+	?>
+<script>(function(d,w){var a=[].slice.call(d.querySelectorAll('img.lz'));if(!a.length)return;function s(i){if(i.dataset.sizes)i.sizes=i.dataset.sizes;if(i.dataset.srcset)i.srcset=i.dataset.srcset;i.src=i.dataset.src;i.classList.remove('lz')}if(!('IntersectionObserver'in w)){a.forEach(s);return}var o=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){o.unobserve(x.target);s(x.target)}})},{rootMargin:'600px 0px'});a.forEach(function(i){o.observe(i)});w.addEventListener('beforeprint',function(){a.forEach(function(i){if(i.classList.contains('lz'))s(i)})})})(document,window)</script>
+	<?php
+}, 1 );

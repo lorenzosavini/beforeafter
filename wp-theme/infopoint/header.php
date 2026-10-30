@@ -8,7 +8,7 @@ $wa      = ip_wa_href();
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="<?php echo esc_attr( ip_opt( 'color_brand' ) ? ip_opt( 'color_brand' ) : '#225e48' ); ?>">
-<?php if ( ip_opt( 'font_brand' ) ) : ?><link rel="preload" href="<?php echo esc_url( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>" as="font" type="font/woff2" crossorigin><?php endif; ?>
+<?php if ( ip_opt( 'font_brand' ) ) : ?><script>(function(d){var c=navigator.connection||{};if(c.saveData||/2g|3g/.test(c.effectiveType||''))return;d.documentElement.classList.add('wf');var l=d.createElement('link');l.rel='preload';l.as='font';l.type='font/woff2';l.crossOrigin='anonymous';l.href='<?php echo esc_js( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>';d.head.appendChild(l)})(document)</script><?php endif; ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>

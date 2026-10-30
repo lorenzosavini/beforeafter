@@ -87,7 +87,7 @@ while ( have_posts() ) :
 				<?php endif; ?>
 				</div>
 				<?php if ( $photo ) : ?>
-					<figure class="phead-img"><?php the_post_thumbnail( 'medium_large', array( 'loading' => 'eager', 'fetchpriority' => 'high', 'alt' => '' ) ); ?></figure>
+					<figure class="phead-img"><?php the_post_thumbnail( 'medium_large', array( 'loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async', 'alt' => '', 'sizes' => '(max-width: 700px) 92vw, 480px' ) ); ?></figure>
 				<?php endif; ?>
 			</div>
 		</header>

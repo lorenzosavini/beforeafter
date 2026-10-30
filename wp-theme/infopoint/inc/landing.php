@@ -685,6 +685,12 @@ add_action( 'wp_head', function () {
 		printf( '<link rel="stylesheet" href="%s">', esc_url( IP_URI . '/assets/landing.css?ver=' . IP_VERSION ) );
 		return;
 	}
+	// Con il CSS critico (che contiene già quello della landing per l'apertura)
+	// il foglio completo della landing arriva subito dopo, senza bloccare.
+	if ( 'landing' === ip_critical_type() ) {
+		ip_async_css( IP_URI . '/assets/landing.css?ver=' . IP_VERSION, 'ip-lp-css-full' );
+		return;
+	}
 	$css = get_transient( 'ip_lpcss_' . IP_VERSION );
 	if ( false === $css || ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
 		$css = (string) file_get_contents( IP_DIR . '/assets/landing.css' );
@@ -807,3 +813,21 @@ function ip_lp_team() {
 		'people' => ip_rows( 'lp_team' ),
 	);
 }
+
+// Mappa delle sedi servita a parte (vedi single-ip_landing.php): leggera da
+// tenere in cache, il numero nell'indirizzo cambia quando cambiano le sedi.
+add_action( 'parse_request', function () {
+	if ( ! isset( $_GET['ip_lp_map'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		return;
+	}
+	$m = ip_lp_map_data();
+	if ( empty( $m['count'] ) || empty( $m['map']['regions'] ) ) {
+		status_header( 404 );
+		exit;
+	}
+	header( 'Content-Type: text/html; charset=utf-8' );
+	header( 'Cache-Control: public, max-age=604800' );
+	header( 'X-Robots-Tag: noindex' );
+	echo ip_lp_map_svg( $m ); // phpcs:ignore
+	exit;
+}, 0 );

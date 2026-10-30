@@ -4,9 +4,10 @@ Tema classico, senza page builder e senza plugin obbligatori. Sostituisce
 Elementor, Contact Form 7/Flamingo, ACF, Yoast (per l'essenziale) e il banner
 cookie esterno.
 
-**Peso:** home completa ≈ 15 KB compressi (HTML + CSS incorporato), un solo
-file JS da ~6 KB, font Montserrat incluso nel tema (38 KB, disattivabile),
-zero jQuery, zero CSS dei blocchi core, zero richieste a server esterni.
+**Peso e velocità:** ogni pagina porta con sé solo il CSS che serve alla parte
+visibile all'apertura (CSS critico per tipo di pagina, 6–8 KB compressi); il
+foglio completo arriva subito dopo e resta in cache. Un solo script compatto
+(~9 KB compressi), zero jQuery, zero CSS dei blocchi core. Vedi «Velocità».
 
 **Palette ufficiale UniMarconi** (presa dal CSS di unimarconi.it): verde
 `#225e48` (hover `#174f3a`), rosso mattone `#a0300e` (hover `#ca451d`),
@@ -216,6 +217,36 @@ così nessuna pagina resta senza conversione.
 - **Predefinito** — testo editoriale + modulo finale.
 - **Pagina con modulo laterale** — modulo fisso a destra (es. percorsi abilitanti).
 - **Landing per campagne** — senza menu, modulo sopra la piega: per Google/Meta Ads.
+
+## Velocità
+
+Pensato per le campagne: la pagina deve aprirsi anche su rete 2G.
+
+- **CSS critico per tipo di pagina** (home, corso, pagina, elenco, landing) in
+  `assets/critical/`: nella pagina solo le regole per ciò che si vede
+  all'apertura, il foglio completo caricato subito dopo senza bloccare. Le
+  pagine non coperte incorporano il CSS completo come prima.
+- **Font**: Montserrat solo con connessione veloce; su 2G/3G o con «risparmio
+  dati» si usa Arial con le misure di Montserrat, così il testo non si sposta.
+- **Immagini**: quella principale con priorità alta e nella misura giusta per
+  il telefono; tutte le altre a priorità bassa e caricate solo quando servono.
+- **Testata visibile da subito**: le animazioni d'ingresso non nascondono più
+  titolo, testo e modulo.
+- **Tag Manager dopo la pagina** (Impostazioni → Tracciamento, attivo di
+  base): parte a caricamento finito o al primo gesto, gli eventi restano in coda.
+- **Mappa delle sedi delle landing** caricata a parte quando ci si avvicina.
+- **Navigazione anticipata**: passando sopra un link del sito la pagina viene
+  preparata in anticipo e si apre quasi all'istante.
+
+**Dopo una modifica a JS o CSS** rigenera i file ottimizzati con
+`tools/build.sh` (minifica `assets/app.js` in `assets/app.min.js` e ricalcola il
+CSS critico aprendo le pagine di un sito di prova: `?ip_full_css` mostra una
+pagina con il CSS completo incorporato, serve allo strumento).
+
+**Sul server**: la cosa che conta di più è una **cache di pagina** (LiteSpeed
+Cache su hosting LiteSpeed, altrimenti WP Super Cache o la cache del vostro
+hosting/Cloudflare) e la compressione gzip/brotli attiva. Il tema è compatibile:
+nessun contenuto personale nelle pagine, il token dei moduli non scade.
 
 ## Note
 

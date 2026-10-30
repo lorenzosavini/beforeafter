@@ -84,7 +84,11 @@ add_action( 'wp_head', function () {
 		ip_dl_print();
 		if ( $gtm ) {
 			?>
+<?php if ( ip_opt( 'gtm_delay' ) ) : // Dopo la pagina (o al primo gesto): testi e immagini hanno tutta la banda. Gli eventi restano in coda nel dataLayer. ?>
+<script>(function(w,d,i){var done=0,ev=['scroll','pointerdown','keydown','touchstart'];function go(){if(done)return;done=1;ev.forEach(function(e){w.removeEventListener(e,go,{passive:true})});w.dataLayer.push({'gtm.start':new Date().getTime(),event:'gtm.js'});var j=d.createElement('script');j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i;d.head.appendChild(j)}ev.forEach(function(e){w.addEventListener(e,go,{passive:true})});if(d.readyState==='complete')setTimeout(go,0);else w.addEventListener('load',function(){setTimeout(go,0)})})(window,document,'<?php echo esc_js( $gtm ); ?>');</script>
+<?php else : ?>
 <script>(function(w,d,s,l,i){w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i;f.parentNode.insertBefore(j,f)})(window,document,'script','dataLayer','<?php echo esc_js( $gtm ); ?>');</script>
+<?php endif; ?>
 			<?php
 		}
 		if ( $ga4 || $ads ) {
@@ -165,7 +169,7 @@ function ip_consent_banner() {
 			<button type="button" data-consent-set="accept">Accetta tutti</button>
 		</div>
 	</div>
-	<script>window.ipConsentLog=<?php echo ip_opt( 'consent_log' ) ? wp_json_encode( admin_url( 'admin-ajax.php' ) ) : 'null'; ?>;</script>
+	<script>window.ipConsentLog=<?php echo ip_opt( 'consent_log' ) ? wp_json_encode( admin_url( 'admin-ajax.php' ) ) : 'null'; ?>;<?php // Banner visibile appena letto, senza aspettare app.js; un tocco anticipato viene applicato appena app.js è pronto. ?>(function(d){var b=d.querySelector('[data-consent]'),C=window.ipConsent;if(!b||!C||C.ok)return;b.hidden=false;window.ipConsentEarly=[];b.addEventListener('click',function(e){var x=e.target.closest('[data-consent-set],[data-consent-custom]');if(x&&!window.ipConsentReady)window.ipConsentEarly.push(x.getAttribute('data-consent-set')||'custom')})})(document);</script>
 	<?php
 }
 

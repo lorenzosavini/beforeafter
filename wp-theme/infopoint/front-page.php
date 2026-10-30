@@ -16,7 +16,7 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 <?php $hero_img = ip_hero_image_id(); ?>
 <section class="hero hero-photo">
 	<?php if ( $hero_img ) : ?>
-		<?php echo wp_get_attachment_image( $hero_img, 'full', false, array( 'class' => 'hero-bg', 'alt' => '', 'loading' => 'eager', 'fetchpriority' => 'high', 'sizes' => '100vw' ) ); ?>
+		<?php echo wp_get_attachment_image( $hero_img, 'full', false, array( 'class' => 'hero-bg', 'alt' => '', 'loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async', 'sizes' => '(max-width: 700px) 70vw, 100vw' ) ); // Da telefono è sotto una velatura: basta una versione più leggera. ?>
 	<?php endif; ?>
 	<div class="wrap hero-in">
 		<div class="hero-text">

@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 3.9.1
+Version: 3.10.0
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -37,9 +37,13 @@ Text Domain: infopoint
 	--r: 10px;
 	--r-btn: 20px;
 	--wrap: 1180px;
-	--font: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+	--font: "Montserrat Fallback", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 	--mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
+/* Montserrat solo con connessioni veloci (classe .wf messa in testa alla pagina);
+   altrimenti Arial con le stesse misure di Montserrat: il testo non si sposta. */
+@font-face { font-family: "Montserrat Fallback"; src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Helvetica"); size-adjust: 112.5%; ascent-override: 86%; descent-override: 22.3%; line-gap-override: 0%; }
+html.wf { --font: "Montserrat", "Montserrat Fallback", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
 @font-face { font-family: "Montserrat"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("assets/fonts/montserrat-latin-var.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212; }
 
 /* Base -------------------------------------------------------------- */
@@ -844,16 +848,18 @@ summary.has-i::after { top: 50% !important; transform: translateY(-50%); }
 
 /* Animazioni leggere ----------------------------------------------------- */
 @keyframes ip-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/* Testata: visibile dal primo istante (conta per la velocità percepita), solo un leggero assestamento. */
+@keyframes ip-rise { from { transform: translateY(10px); } to { transform: none; } }
 @keyframes ip-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ip-zoom { from { transform: scale(1.06); } to { transform: scale(1); } }
 .rv { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1); }
 .rv.in { opacity: 1; transform: none; }
-.hero-text > *, .lp-hero-t > *, .phead-band .wrap > *, .phead-course .phead-main > * { animation: ip-up .7s cubic-bezier(.2, .7, .2, 1) both; }
+.hero-text > *, .lp-hero-t > *, .phead-band .wrap > *, .phead-course .phead-main > * { animation: ip-rise .6s cubic-bezier(.2, .7, .2, 1) both; }
 .hero-text > :nth-child(2), .lp-hero-t > :nth-child(2), .phead-band .wrap > :nth-child(2), .phead-course .phead-main > :nth-child(2) { animation-delay: .06s; }
 .hero-text > :nth-child(3), .lp-hero-t > :nth-child(3), .phead-band .wrap > :nth-child(3), .phead-course .phead-main > :nth-child(3) { animation-delay: .12s; }
 .hero-text > :nth-child(4), .lp-hero-t > :nth-child(4), .phead-band .wrap > :nth-child(4), .phead-course .phead-main > :nth-child(4) { animation-delay: .18s; }
 .hero-text > :nth-child(n+5), .lp-hero-t > :nth-child(n+5), .phead-band .wrap > :nth-child(n+5), .phead-course .phead-main > :nth-child(n+5) { animation-delay: .24s; }
-.hero-form, .lp-hero-f, .phead-img { animation: ip-up .8s .15s cubic-bezier(.2, .7, .2, 1) both; }
+.hero-form, .lp-hero-f, .phead-img { animation: ip-rise .7s .1s cubic-bezier(.2, .7, .2, 1) both; }
 .hero-photo .hero-bg, .lp-hero-img img { animation: ip-zoom 1.6s cubic-bezier(.2, .7, .2, 1) both; }
 .btn, .agev-cta, .lp-btn, .chip { transition: background-color .15s, border-color .15s, color .15s, transform .15s, box-shadow .15s; }
 .btn:hover, .agev-cta:hover, .lp-btn:hover { transform: translateY(-1px); }

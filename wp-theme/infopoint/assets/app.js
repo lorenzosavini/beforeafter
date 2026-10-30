@@ -578,7 +578,15 @@
 		if (tabs.length) sel(0);
 	});
 
-	/* Landing: mappa delle sedi, una regione alla volta */
+	/* Landing: mappa delle sedi, una regione alla volta. Arriva a parte, quando
+	   il visitatore ci si avvicina (la pagina si apre prima anche su rete lenta). */
+	d.querySelectorAll('[data-map-src]').forEach(function (map) {
+		var load = function () { fetch(map.getAttribute('data-map-src')).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) { if (t) { map.innerHTML = t; map.style.aspectRatio = ''; } }).catch(function () {}); };
+		if (!window.fetch) return;
+		if (!('IntersectionObserver' in window)) { load(); return; }
+		var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); load(); } }, { rootMargin: '800px 0px' });
+		io.observe(map);
+	});
 	d.querySelectorAll('[data-lp-map]').forEach(function (map) {
 		var list = map.parentNode.querySelector('.lp-regs');
 		function mark(reg) {
@@ -845,6 +853,9 @@
 			var b = e.target.closest('[data-consent-set]');
 			if (b) set(b.getAttribute('data-consent-set'));
 		});
-		if (!C.ok) open(false);
+		// Scelte fatte sul banner prima che questo script arrivasse (rete lenta).
+		window.ipConsentReady = true;
+		(window.ipConsentEarly || []).forEach(function (c) { if (c === 'custom') open(true); else set(c); });
+		if (!C.ok && banner.hidden) open(false);
 	}
 })();

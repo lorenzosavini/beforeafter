@@ -48,8 +48,7 @@ $head = function ( $title, $sub = '' ) {
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0e261d">
-<?php if ( ip_opt( 'font_brand' ) ) : ?><link rel="preload" href="<?php echo esc_url( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>" as="font" type="font/woff2" crossorigin><?php endif; ?>
-<link rel="preload" href="<?php echo esc_url( IP_URI . '/assets/fonts/sourceserif4-latin-var.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+<?php if ( ip_opt( 'font_brand' ) ) : ?><script>(function(d){var c=navigator.connection||{};if(c.saveData||/2g|3g/.test(c.effectiveType||''))return;d.documentElement.classList.add('wf');var l=d.createElement('link');l.rel='preload';l.as='font';l.type='font/woff2';l.crossOrigin='anonymous';l.href='<?php echo esc_js( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>';d.head.appendChild(l)})(document)</script><?php endif; ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -83,7 +82,7 @@ $head = function ( $title, $sub = '' ) {
 
 	<section class="lp-hero<?php echo $img ? ' has-img' : ''; ?>">
 		<?php if ( $img ) : ?>
-			<div class="lp-hero-img"><?php echo wp_get_attachment_image( $img, 'full', false, array( 'alt' => '', 'loading' => 'eager', 'fetchpriority' => 'high', 'sizes' => '(max-width: 900px) 100vw, 45vw' ) ); ?></div>
+			<div class="lp-hero-img"><?php echo wp_get_attachment_image( $img, 'full', false, array( 'alt' => '', 'loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'async', 'sizes' => '(max-width: 700px) 35vw, (max-width: 900px) 100vw, 45vw' ) ); // Da telefono resta sotto una velatura al 93%: basta la versione piccola. ?></div>
 		<?php endif; ?>
 		<div class="lp-w lp-hero-in">
 			<div class="lp-hero-t">
@@ -298,7 +297,8 @@ $head = function ( $title, $sub = '' ) {
 	<?php if ( $m['count'] && ! empty( $m['map']['regions'] ) ) : ?>
 		<section class="lp-sec lp-sedi">
 			<div class="lp-w lp-map-grid">
-				<div class="lp-map" data-lp-map><?php echo ip_lp_map_svg( $m ); // phpcs:ignore ?></div>
+				<?php // La mappa (≈ 30 KB) arriva a parte, quando ci si avvicina: la pagina si apre prima. ?>
+				<div class="lp-map" data-lp-map data-map-src="<?php echo esc_url( add_query_arg( 'ip_lp_map', substr( md5( ip_lp_map_svg( $m ) ), 0, 10 ), home_url( '/' ) ) ); ?>" style="aspect-ratio: <?php echo esc_attr( $m['map']['w'] . ' / ' . $m['map']['h'] ); ?>"></div>
 				<div class="lp-map-t">
 					<?php $head( 'Gli esami li sostieni in presenza, in ' . $m['count'] . ' sedi', count( $m['regions'] ) . ' regioni: scegli la più comoda quando prenoti l’appello. Elenco ufficiale dell’Ateneo, aggiornato automaticamente.' ); ?>
 					<div class="lp-regs">
