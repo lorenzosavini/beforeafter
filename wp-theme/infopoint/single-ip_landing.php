@@ -48,7 +48,7 @@ $head = function ( $title, $sub = '' ) {
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0e261d">
-<?php if ( ip_opt( 'font_brand' ) ) : ?><script>(function(d){var c=navigator.connection||{};if(c.saveData||/2g|3g/.test(c.effectiveType||''))return;d.documentElement.classList.add('wf');var l=d.createElement('link');l.rel='preload';l.as='font';l.type='font/woff2';l.crossOrigin='anonymous';l.href='<?php echo esc_js( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>';d.head.appendChild(l)})(document)</script><?php endif; ?>
+<?php if ( ip_opt( 'font_brand' ) ) : // Montserrat solo con connessione veloce, senza precaricarlo: la banda va prima all'immagine principale. ?><script>(function(d){var c=navigator.connection||{};if(c.saveData||/2g|3g/.test(c.effectiveType||''))return;d.documentElement.classList.add('wf')})(document)</script><?php endif; ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -61,7 +61,7 @@ $head = function ( $title, $sub = '' ) {
 	<div class="lp-w lp-top-in">
 		<span class="lp-brand">
 			<?php if ( has_custom_logo() ) : ?>
-				<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'lp-logo', 'alt' => esc_attr( ip_opt( 'brand' ) ), 'loading' => 'eager' ) ); ?>
+				<?php echo ip_logo_image( 'lp-logo', 'eager', '(max-width: 900px) 170px, 250px' ); // phpcs:ignore ?>
 			<?php else : ?>
 				<span class="lp-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></span>
 				<span class="lp-brand-t"><strong><?php echo esc_html( ip_opt( 'brand' ) ); ?></strong><small><?php echo esc_html( ip_role_label() ); ?></small></span>

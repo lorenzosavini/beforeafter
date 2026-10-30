@@ -37,6 +37,7 @@ add_action( 'after_setup_theme', function () {
 	) );
 
 	add_image_size( 'ip-card', 640, 360, true );
+	add_image_size( 'ip-logo', 520, 9999, false ); // Logo: basta anche per gli schermi ad alta densità.
 } );
 
 add_action( 'init', function () {
@@ -150,7 +151,7 @@ add_action( 'wp_head', function () {
 			set_transient( 'ip_crit_' . $type . '_' . IP_VERSION, $crit, WEEK_IN_SECONDS );
 		}
 		echo '<style id="ip-css-crit">' . str_replace( 'url("assets/', 'url("' . IP_URI . '/assets/', $crit ) . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput
-		ip_async_css( IP_URI . '/style.css?ver=' . IP_VERSION, 'ip-css-full' );
+		ip_async_css( IP_URI . ( is_readable( IP_DIR . '/assets/style.min.css' ) ? '/assets/style.min.css' : '/style.css' ) . '?ver=' . IP_VERSION, 'ip-css-full' );
 		return;
 	}
 	$css = get_transient( 'ip_css_' . IP_VERSION );
@@ -318,3 +319,105 @@ add_action( 'wp_footer', function () {
 <script>(function(d,w){var a=[].slice.call(d.querySelectorAll('img.lz'));if(!a.length)return;function s(i){if(i.dataset.sizes)i.sizes=i.dataset.sizes;if(i.dataset.srcset)i.srcset=i.dataset.srcset;i.src=i.dataset.src;i.classList.remove('lz')}if(!('IntersectionObserver'in w)){a.forEach(s);return}var o=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){o.unobserve(x.target);s(x.target)}})},{rootMargin:'600px 0px'});a.forEach(function(i){o.observe(i)});w.addEventListener('beforeprint',function(){a.forEach(function(i){if(i.classList.contains('lz'))s(i)})})})(document,window)</script>
 	<?php
 }, 1 );
+
+/**
+ * Logo del sito nella misura giusta: il file caricato può essere enorme
+ * (es. 2560 px) ma si vede al massimo a 260 px. La versione da 520 px viene
+ * ricavata una sola volta dal logo caricato, se manca.
+ *
+ * @param string $class   Classe dell'immagine.
+ * @param string $loading eager|lazy.
+ * @param string $sizes   Larghezze mostrate.
+ */
+function ip_logo_image( $class, $loading = 'eager', $sizes = '(max-width: 600px) 200px, 260px' ) {
+	$id = (int) get_theme_mod( 'custom_logo' );
+	if ( ! $id ) {
+		return '';
+	}
+	$meta = wp_get_attachment_metadata( $id );
+	if ( is_array( $meta ) && empty( $meta['sizes']['ip-logo'] ) && ! empty( $meta['width'] ) && $meta['width'] > 520 && ! get_transient( 'ip_logo_try_' . $id ) ) {
+		set_transient( 'ip_logo_try_' . $id, 1, DAY_IN_SECONDS ); // Un tentativo al giorno al massimo.
+		$file = get_attached_file( $id );
+		if ( $file && file_exists( $file ) ) {
+			$size = image_make_intermediate_size( $file, 520, 9999, false );
+			if ( $size ) {
+				$meta['sizes']['ip-logo'] = $size;
+				wp_update_attachment_metadata( $id, $meta );
+			}
+		}
+	}
+	$size = is_array( $meta ) && ! empty( $meta['sizes']['ip-logo'] ) ? 'ip-logo' : 'medium_large';
+	return wp_get_attachment_image( $id, $size, false, array(
+		'class'    => $class,
+		'alt'      => esc_attr( ip_opt( 'brand' ) ),
+		'loading'  => $loading,
+		'decoding' => 'async',
+		'sizes'    => $sizes,
+		// Priorità normale: quella alta spetta all'immagine principale (WordPress
+		// altrimenti la dà da sola alla prima immagine della pagina, cioè al logo).
+		'fetchpriority' => 'auto',
+	) );
+}
+
+/* ---------------------------------------------------------------------
+ * Cache del browser e compressione (.htaccess, server Apache/LiteSpeed)
+ * ------------------------------------------------------------------- */
+
+function ip_htaccess_rules() {
+	return array(
+		'# Scritto dal tema Infopoint (Impostazioni → Prestazioni): si toglie spegnendo l\'opzione.',
+		'<IfModule mod_expires.c>',
+		'ExpiresActive On',
+		'ExpiresByType text/css "access plus 1 year"',
+		'ExpiresByType application/javascript "access plus 1 year"',
+		'ExpiresByType text/javascript "access plus 1 year"',
+		'ExpiresByType font/woff2 "access plus 1 year"',
+		'ExpiresByType image/webp "access plus 6 months"',
+		'ExpiresByType image/avif "access plus 6 months"',
+		'ExpiresByType image/jpeg "access plus 6 months"',
+		'ExpiresByType image/png "access plus 6 months"',
+		'ExpiresByType image/gif "access plus 6 months"',
+		'ExpiresByType image/svg+xml "access plus 6 months"',
+		'ExpiresByType image/x-icon "access plus 6 months"',
+		'</IfModule>',
+		'<IfModule mod_headers.c>',
+		'<FilesMatch "\.(css|js|woff2)$">',
+		'Header set Cache-Control "public, max-age=31536000, immutable"',
+		'</FilesMatch>',
+		'<FilesMatch "\.(webp|avif|jpe?g|png|gif|svg|ico)$">',
+		'Header set Cache-Control "public, max-age=15552000"',
+		'</FilesMatch>',
+		'</IfModule>',
+		'<IfModule mod_deflate.c>',
+		'AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/javascript text/javascript application/json application/xml image/svg+xml',
+		'</IfModule>',
+	);
+}
+
+/** Scrive o toglie le regole; restituisce lo stato per il pannello. */
+function ip_htaccess_sync() {
+	$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? strtolower( (string) $_SERVER['SERVER_SOFTWARE'] ) : '';
+	if ( false === strpos( $server, 'apache' ) && false === strpos( $server, 'litespeed' ) ) {
+		return 'server';
+	}
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/misc.php';
+	$file = get_home_path() . '.htaccess';
+	if ( ( file_exists( $file ) && ! wp_is_writable( $file ) ) || ( ! file_exists( $file ) && ! wp_is_writable( dirname( $file ) ) ) ) {
+		return 'scrittura';
+	}
+	$ok = insert_with_markers( $file, 'Infopoint velocità', ip_opt( 'browser_cache' ) ? ip_htaccess_rules() : array() );
+	return $ok ? 'ok' : 'scrittura';
+}
+
+// Dopo ogni salvataggio delle impostazioni e a ogni aggiornamento del tema.
+add_action( 'update_option_ip_settings', function () {
+	ip_opt( 'ip_flush' );
+	update_option( 'ip_htaccess_state', ip_htaccess_sync(), false );
+}, 20 );
+add_action( 'admin_init', function () {
+	if ( get_option( 'ip_htaccess_ver' ) !== IP_VERSION && current_user_can( 'manage_options' ) ) {
+		update_option( 'ip_htaccess_ver', IP_VERSION, false );
+		update_option( 'ip_htaccess_state', ip_htaccess_sync(), false );
+	}
+} );

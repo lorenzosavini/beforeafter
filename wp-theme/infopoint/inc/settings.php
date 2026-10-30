@@ -250,6 +250,7 @@ function ip_settings_fields() {
 			'title'  => 'Prestazioni',
 			'fields' => array(
 				'inline_css'       => array( 'CSS incorporato nella pagina', 'checkbox', '1', 'Elimina una richiesta di rete: il CSS del tema pesa pochi KB.' ),
+				'browser_cache'    => array( 'Cache del browser e compressione', 'checkbox', '1', 'Scrive nel file .htaccess del sito (server Apache o LiteSpeed) le regole per far conservare al browser font, CSS e script per un anno e le immagini per sei mesi, e per comprimere i testi: le pagine successive si aprono senza riscaricarli. Spento = regole tolte.' . ( is_admin() ? ip_htaccess_note() : '' ) ),
 				'disable_comments' => array( 'Disattiva commenti', 'checkbox', '1' ),
 				'disable_seo'      => array( 'Disattiva SEO integrato', 'checkbox', '', 'Si disattiva da solo se è attivo Yoast, Rank Math o SEOPress.' ),
 			),
@@ -579,3 +580,17 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 		wp_enqueue_media();
 	}
 } );
+
+/** Stato delle regole di cache nel file .htaccess, per il pannello. */
+function ip_htaccess_note() {
+	$notes = array(
+		'ok'        => '<br><strong>Stato:</strong> regole attive nel file .htaccess.',
+		'server'    => '<br><strong>Stato:</strong> il server non è Apache/LiteSpeed: imposta la cache del browser dal pannello dell’hosting (o chiedi all’assistenza).',
+		'scrittura' => '<br><strong>Stato:</strong> il file .htaccess non è scrivibile: chiedi all’hosting di attivare la cache del browser per CSS, JS, font e immagini.',
+	);
+	$state = (string) get_option( 'ip_htaccess_state' );
+	if ( 'ok' === $state && ! ip_opt( 'browser_cache' ) ) {
+		return '';
+	}
+	return isset( $notes[ $state ] ) ? $notes[ $state ] : '';
+}

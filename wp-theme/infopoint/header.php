@@ -8,7 +8,7 @@ $wa      = ip_wa_href();
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="<?php echo esc_attr( ip_opt( 'color_brand' ) ? ip_opt( 'color_brand' ) : '#225e48' ); ?>">
-<?php if ( ip_opt( 'font_brand' ) ) : ?><script>(function(d){var c=navigator.connection||{};if(c.saveData||/2g|3g/.test(c.effectiveType||''))return;d.documentElement.classList.add('wf');var l=d.createElement('link');l.rel='preload';l.as='font';l.type='font/woff2';l.crossOrigin='anonymous';l.href='<?php echo esc_js( IP_URI . '/assets/fonts/montserrat-latin-var.woff2' ); ?>';d.head.appendChild(l)})(document)</script><?php endif; ?>
+<?php if ( ip_opt( 'font_brand' ) ) : // Montserrat solo con connessione veloce, senza precaricarlo: la banda va prima all'immagine principale. ?><script>(function(d){var c=navigator.connection||{};if(c.saveData||/2g|3g/.test(c.effectiveType||''))return;d.documentElement.classList.add('wf')})(document)</script><?php endif; ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -24,7 +24,7 @@ $wa      = ip_wa_href();
 		<?php // Nelle landing il logo non porta fuori dalla pagina. ?>
 		<<?php echo $landing ? 'span' : 'a'; ?> class="brand"<?php echo $landing ? '' : ' href="' . esc_url( home_url( '/' ) ) . '" rel="home"'; ?>>
 			<?php if ( has_custom_logo() ) : ?>
-				<?php echo wp_get_attachment_image( get_theme_mod( 'custom_logo' ), 'full', false, array( 'class' => 'brand-logo', 'alt' => esc_attr( ip_opt( 'brand' ) ), 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?>
+				<?php echo ip_logo_image( 'brand-logo', 'eager' ); // phpcs:ignore ?>
 			<?php else : ?>
 				<span class="brand-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></span>
 				<span class="brand-text">

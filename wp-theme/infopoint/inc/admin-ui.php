@@ -152,7 +152,7 @@ function ip_settings_layout() {
 			'icon'  => 'admin-tools',
 			'desc'  => 'Velocità e funzioni di WordPress da spegnere.',
 			'sections' => array(
-				array( 'Prestazioni', '', array( 'inline_css', 'disable_comments', 'disable_seo' ) ),
+				array( 'Prestazioni', '', array( 'inline_css', 'browser_cache', 'disable_comments', 'disable_seo' ) ),
 			),
 		),
 	);

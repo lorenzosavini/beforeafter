@@ -635,13 +635,21 @@
 			});
 		} else if (exitDlg.hasAttribute('data-mobile') || d.body.classList.contains('lp')) {
 			if (!test) setTimeout(function () { armed = true; }, 20000);
-			var lastY = window.scrollY, upY = lastY, upT = Date.now(), maxDepth = 0;
+			var lastY = window.scrollY, upY = lastY, upT = Date.now(), maxDepth = 0, busy = false, pageH = 0;
+			// Altezza della pagina letta di rado (non a ogni scorrimento: evita ricalcoli del layout).
+			var measure = function () { pageH = d.documentElement.scrollHeight - window.innerHeight; };
+			window.addEventListener('load', measure); window.addEventListener('resize', measure); setTimeout(measure, 3000);
 			window.addEventListener('scroll', function () {
-				var y = window.scrollY, t = Date.now(), h = d.documentElement.scrollHeight - window.innerHeight;
-				if (h > 0) maxDepth = Math.max(maxDepth, y / h);
-				if (y >= lastY || t - upT > 700) { upY = y; upT = t; }
-				if (y < lastY && maxDepth > 0.4 && upY - y > 350 && t - upT < 700) showExit('scroll_up');
-				lastY = y;
+				if (busy) return;
+				busy = true;
+				requestAnimationFrame(function () {
+					busy = false;
+					var y = window.scrollY, t = Date.now();
+					if (pageH > 0) maxDepth = Math.max(maxDepth, y / pageH);
+					if (y >= lastY || t - upT > 700) { upY = y; upT = t; }
+					if (y < lastY && maxDepth > 0.4 && upY - y > 350 && t - upT < 700) showExit('scroll_up');
+					lastY = y;
+				});
 			}, { passive: true });
 		}
 	}
@@ -780,9 +788,10 @@
 				reveal.unobserve(en.target);
 			});
 		}, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-		items.forEach(function (el) {
-			var r = el.getBoundingClientRect();
-			if (r.top < window.innerHeight && r.bottom > 0) return; /* già in vista: nessuna animazione */
+		// Prima tutte le misure, poi tutte le modifiche: un solo calcolo del layout.
+		var vh = window.innerHeight;
+		var off = items.filter(function (el) { var r = el.getBoundingClientRect(); return !(r.top < vh && r.bottom > 0); }); /* già in vista: nessuna animazione */
+		off.forEach(function (el) {
 			var sib = el.parentNode ? Array.prototype.indexOf.call(el.parentNode.children, el) : 0;
 			el.style.transitionDelay = Math.min(sib % 4, 3) * 70 + 'ms';
 			el.classList.add('rv');

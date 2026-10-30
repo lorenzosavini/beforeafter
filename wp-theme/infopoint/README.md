@@ -226,8 +226,15 @@ Pensato per le campagne: la pagina deve aprirsi anche su rete 2G.
   `assets/critical/`: nella pagina solo le regole per ciò che si vede
   all'apertura, il foglio completo caricato subito dopo senza bloccare. Le
   pagine non coperte incorporano il CSS completo come prima.
-- **Font**: Montserrat solo con connessione veloce; su 2G/3G o con «risparmio
-  dati» si usa Arial con le misure di Montserrat, così il testo non si sposta.
+- **Font**: Montserrat solo con connessione veloce e senza precaricamento (la
+  banda va prima all'immagine principale); su 2G/3G o con «risparmio dati» si usa
+  Arial con le misure di Montserrat, così il testo non si sposta.
+- **Logo**: anche se il file caricato è enorme, il sito usa una versione da 520 px
+  ricavata in automatico, a priorità normale.
+- **Cache del browser e compressione** (Impostazioni → Prestazioni, attiva di
+  base): regole nel file `.htaccess` (Apache/LiteSpeed) per conservare font, CSS e
+  script un anno e le immagini sei mesi; lo stato è indicato sotto l'opzione.
+- **Foglio di stile completo** servito in versione compatta (`assets/*.min.css`).
 - **Immagini**: quella principale con priorità alta e nella misura giusta per
   il telefono; tutte le altre a priorità bassa e caricate solo quando servono.
 - **Testata visibile da subito**: le animazioni d'ingresso non nascondono più
@@ -239,7 +246,8 @@ Pensato per le campagne: la pagina deve aprirsi anche su rete 2G.
   preparata in anticipo e si apre quasi all'istante.
 
 **Dopo una modifica a JS o CSS** rigenera i file ottimizzati con
-`tools/build.sh` (minifica `assets/app.js` in `assets/app.min.js` e ricalcola il
+`tools/build.sh` (minifica `assets/app.js` in `assets/app.min.js`, crea le versioni
+compatte dei fogli di stile e ricalcola il
 CSS critico aprendo le pagine di un sito di prova: `?ip_full_css` mostra una
 pagina con il CSS completo incorporato, serve allo strumento).
 

@@ -688,7 +688,7 @@ add_action( 'wp_head', function () {
 	// Con il CSS critico (che contiene già quello della landing per l'apertura)
 	// il foglio completo della landing arriva subito dopo, senza bloccare.
 	if ( 'landing' === ip_critical_type() ) {
-		ip_async_css( IP_URI . '/assets/landing.css?ver=' . IP_VERSION, 'ip-lp-css-full' );
+		ip_async_css( IP_URI . ( is_readable( IP_DIR . '/assets/landing.min.css' ) ? '/assets/landing.min.css' : '/assets/landing.css' ) . '?ver=' . IP_VERSION, 'ip-lp-css-full' );
 		return;
 	}
 	$css = get_transient( 'ip_lpcss_' . IP_VERSION );

@@ -49,7 +49,11 @@ function collect(sheetId) {
 		out.push(cur);
 		return out.map(s => s.trim()).filter(Boolean);
 	};
+	// Testata e logo si tengono sempre: il sito può avere il logo o il marchio
+	// testuale, e il sito di prova da cui si calcola può non avere lo stesso.
+	const always = /\.(brand|brand-logo|brand-mark|brand-text|lp-brand|lp-brand-t|lp-logo|lp-mark|hdr|hdr-in|lp-top|lp-top-in)\b/;
 	const used = sel => split(sel).some(part => {
+		if (always.test(part)) return true;
 		const base = part.replace(dyn, '').trim() || '*';
 		if (/^(html|body|:root|\*)/.test(base)) return true;
 		let els;
