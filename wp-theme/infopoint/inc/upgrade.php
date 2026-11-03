@@ -60,6 +60,32 @@ function ip_upgrade() {
 			update_option( 'ip_settings', $o );
 		}
 	}
+	if ( version_compare( $v, '3.10.7', '<' ) ) {
+		// Banner in alto: dagli stili già pronti ai colori scelti (stesso aspetto di prima).
+		$o = get_option( 'ip_settings' );
+		if ( is_array( $o ) && ! isset( $o['notice_fg'] ) ) {
+			$map = array(
+				'brand'  => array( '#0e261d', '#ffffff' ),
+				'accent' => array( '#a0300e', '#ffffff' ),
+				'soft'   => array( '#e9f0ed', '#0e261d' ),
+				'alert'  => array( '#fdf3c7', '#4a3b00' ),
+			);
+			$st = isset( $o['notice_style'] ) ? $o['notice_style'] : 'brand';
+			if ( isset( $map[ $st ] ) ) {
+				list( $o['notice_bg'], $o['notice_fg'] ) = $map[ $st ];
+			} else {
+				$bg = sanitize_hex_color( isset( $o['notice_bg'] ) ? $o['notice_bg'] : '' ) ? $o['notice_bg'] : '#0e261d';
+				$h  = ltrim( $bg, '#' );
+				if ( 3 === strlen( $h ) ) {
+					$h = $h[0] . $h[0] . $h[1] . $h[1] . $h[2] . $h[2];
+				}
+				$o['notice_bg'] = $bg;
+				$o['notice_fg'] = ( 0.299 * hexdec( substr( $h, 0, 2 ) ) + 0.587 * hexdec( substr( $h, 2, 2 ) ) + 0.114 * hexdec( substr( $h, 4, 2 ) ) ) > 160 ? '#1b2420' : '#ffffff';
+			}
+			unset( $o['notice_style'] );
+			update_option( 'ip_settings', $o );
+		}
+	}
 	if ( version_compare( $v, '3.9.0', '<' ) ) {
 		// La vecchia «barra in alto» diventa il banner informativo: si tiene il testo scritto.
 		$o = get_option( 'ip_settings' );

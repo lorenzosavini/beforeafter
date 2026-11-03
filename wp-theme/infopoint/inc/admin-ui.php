@@ -48,7 +48,7 @@ function ip_settings_layout() {
 			'icon'  => 'feedback',
 			'desc'  => 'Testi dei moduli, consensi, banner d’uscita e frasi che si ripetono nelle pagine.',
 			'sections' => array(
-				array( 'Banner informativo in alto', 'La barra sottile sopra la testata, da accendere quando serve: iscrizioni aperte, scadenze, open day, chiusure.', array( 'notice_on', 'notice_text', 'notice_text_mobile', 'notice_link_text', 'notice_link_text_mobile', 'notice_link', 'notice_devices', 'notice_style', 'notice_where', 'notice_landing', 'notice_from', 'notice_to', 'notice_close' ) ),
+				array( 'Banner informativo in alto', 'La barra sottile sopra la testata, da accendere quando serve: iscrizioni aperte, scadenze, open day, chiusure.', array( 'notice_on', 'notice_text', 'notice_text_mobile', 'notice_link_text', 'notice_link_text_mobile', 'notice_link', 'notice_devices', 'notice_bg', 'notice_fg', 'notice_where', 'notice_landing', 'notice_from', 'notice_to', 'notice_close' ) ),
 				array( 'Modulo di richiesta', '', array( 'form_title', 'form_text', 'form_button', 'thanks_page' ) ),
 				array( 'Consensi', 'Le parole «informativa privacy» diventano il link alla pagina scelta.', array( 'privacy_text', 'privacy_page', 'mkt_text' ) ),
 				array( 'Banner d’uscita', 'Compare a chi sta per lasciare il sito. Per provarlo aggiungi <code>?prova-banner</code> all’indirizzo di una pagina.', array( 'exit_on', 'exit_mobile', 'exit_title', 'exit_text', 'exit_points' ) ),
@@ -63,7 +63,8 @@ function ip_settings_layout() {
 				'notice_devices'   => 'notice_on',
 				'notice_link_text' => 'notice_on',
 				'notice_link'      => 'notice_on',
-				'notice_style'     => 'notice_on',
+				'notice_bg'        => 'notice_on',
+				'notice_fg'        => 'notice_on',
 				'notice_where'     => 'notice_on',
 				'notice_landing'   => 'notice_on',
 				'notice_from'      => 'notice_on',

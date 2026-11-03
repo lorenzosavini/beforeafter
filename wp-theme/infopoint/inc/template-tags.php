@@ -730,12 +730,6 @@ function ip_notice_css() {
 		. '.notice-bar .notice-link::after{content:" \2192"}'
 		. '.notice-bar .notice-x{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:inherit;font:inherit;font-size:1.3rem;line-height:1;cursor:pointer;opacity:.75}'
 		. '.notice-bar .notice-x:hover,.notice-bar .notice-x:focus-visible{opacity:1;background:rgba(127,127,127,.18)}'
-		. '.notice-brand strong,.notice-brand .notice-link{color:#fff}'
-		. '.notice-accent{background:var(--accent,#a0300e);color:#fff}'
-		. '.notice-soft{background:var(--brand-tint,#e9f0ed);color:var(--brand-deep,#0e261d);border-bottom:1px solid var(--line,#dcdfe2)}'
-		. '.notice-soft strong,.notice-soft .notice-link{color:var(--brand-dark,#174f3a)}'
-		. '.notice-alert{background:#fdf3c7;color:#4a3b00;border-bottom:1px solid #ecd98a}'
-		. '.notice-alert strong,.notice-alert .notice-link{color:#3a2e00}'
 		. '.notice-bar .notice-m{display:none}'
 		. '.notice-off .notice-bar,.notice-only-m{display:none}'
 		. '@media (max-width:700px){.notice-bar{font-size:.8rem}.notice-bar .notice-in{min-height:34px;padding:6px 40px 6px 14px}.notice-bar .notice-d{display:none}.notice-bar .notice-m{display:inline}.notice-only-m{display:block}.notice-only-d{display:none}}'
@@ -765,7 +759,10 @@ function ip_notice_bar( $landing = false ) {
 	if ( ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $from ) && $today < $from ) || ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $to ) && $today > $to ) ) {
 		return '';
 	}
-	$style  = in_array( ip_opt( 'notice_style' ), array( 'brand', 'accent', 'soft', 'alert' ), true ) ? ip_opt( 'notice_style' ) : 'brand';
+	// Colori scelti nel pannello (sfondo e testo); grassetto, link e × seguono il testo.
+	$bg     = sanitize_hex_color( ip_opt( 'notice_bg' ) ) ? sanitize_hex_color( ip_opt( 'notice_bg' ) ) : '#0e261d';
+	$fg     = sanitize_hex_color( ip_opt( 'notice_fg' ) ) ? sanitize_hex_color( ip_opt( 'notice_fg' ) ) : '#ffffff';
+	$inline = ' style="background:' . esc_attr( $bg ) . ';color:' . esc_attr( $fg ) . '"';
 	$dev    = in_array( ip_opt( 'notice_devices' ), array( 'desktop', 'mobile' ), true ) ? ip_opt( 'notice_devices' ) : 'all';
 	$text_m = trim( (string) ip_opt( 'notice_text_mobile' ) );
 	$label  = trim( (string) ip_opt( 'notice_link_text' ) );
@@ -796,8 +793,8 @@ function ip_notice_bar( $landing = false ) {
 	if ( $x ) {
 		$pre .= '<script>try{if(localStorage.getItem("ip_notice")==="' . $id . '")document.documentElement.classList.add("notice-off")}catch(e){}</script>';
 	}
-	$cls = 'notice-bar notice-' . $style . ( 'all' !== $dev ? ' notice-only-' . ( 'mobile' === $dev ? 'm' : 'd' ) : '' );
-	return $pre . '<div class="' . esc_attr( $cls ) . '" data-notice="' . esc_attr( $id ) . '" role="region" aria-label="Avviso"><div class="notice-in"><p>' . $body . ( $link ? ' ' . $link : '' ) . '</p>' . $x . '</div></div>';
+	$cls = 'notice-bar' . ( 'all' !== $dev ? ' notice-only-' . ( 'mobile' === $dev ? 'm' : 'd' ) : '' );
+	return $pre . '<div class="' . esc_attr( $cls ) . '"' . $inline . ' data-notice="' . esc_attr( $id ) . '" role="region" aria-label="Avviso"><div class="notice-in"><p>' . $body . ( $link ? ' ' . $link : '' ) . '</p>' . $x . '</div></div>';
 }
 
 /**
