@@ -22,7 +22,7 @@ function ip_settings_layout() {
 			'icon'  => 'building',
 			'desc'  => 'Nome, telefoni, sede, orari e dati legali: compaiono in tutto il sito, nei moduli e nelle email.',
 			'sections' => array(
-				array( 'Nome e presentazione', 'Come vi chiamate e come vi presentate.', array( 'brand', 'city', 'disclaimer' ) ),
+				array( 'Nome e presentazione', 'Come vi chiamate e come vi presentate.', array( 'brand', 'city', 'disclaimer', 'logo_tag_on', 'logo_tag', 'logo_tag_mobile' ) ),
 				array( 'Telefoni e WhatsApp', 'Diventano i pulsanti «Chiama» e «WhatsApp» del sito.', array( 'phone1', 'phone1_label', 'phone2', 'phone2_label', 'whatsapp', 'wa_text' ) ),
 				array( 'Email, sede e orari', '', array( 'email', 'address', 'address_exam', 'hours', 'maps_url' ) ),
 				array( 'Social', 'Vuoto = icona nascosta.', array( 'facebook', 'instagram', 'linkedin', 'youtube', 'tiktok' ) ),

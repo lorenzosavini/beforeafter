@@ -834,3 +834,19 @@ function ip_disclosure_bar( $landing = false ) {
 	$wrap = $landing ? 'lp-w' : 'wrap';
 	return '<style id="ip-disc-css">' . $css . '</style><div class="' . $cls . '" role="note"><div class="' . $wrap . '"><p>' . $body . $link . '</p></div></div>';
 }
+
+/** Testo accanto al logo («Centro di orientamento accreditato…»), '' se spento o senza logo. */
+function ip_logo_tag( $class = 'brand-tag' ) {
+	if ( ! has_custom_logo() || ! ip_opt( 'logo_tag_on' ) ) {
+		return '';
+	}
+	$lines = array_slice( array_values( array_filter( array_map( 'trim', explode( "\n", (string) ip_opt( 'logo_tag' ) ) ) ) ), 0, 3 );
+	if ( ! $lines ) {
+		return '';
+	}
+	$out = '';
+	foreach ( $lines as $i => $l ) {
+		$out .= ( count( $lines ) > 1 && count( $lines ) - 1 === $i ) ? '<strong>' . esc_html( $l ) . '</strong>' : '<span>' . esc_html( $l ) . '</span>';
+	}
+	return '<span class="' . esc_attr( $class . ( ip_opt( 'logo_tag_mobile' ) ? ' tag-m' : '' ) ) . '">' . $out . '</span>';
+}

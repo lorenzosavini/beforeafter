@@ -14,6 +14,9 @@ function ip_settings_fields() {
 			'title'  => 'Identità',
 			'fields' => array(
 				'brand'        => array( 'Nome del vostro marchio', 'text', '', 'Il nome del polo, con la sua presenza territoriale come da contratto (es. «Infopoint Lanciano»). La società che lo gestisce va in «Trasparenza» e non sostituisce questo nome. Non usare «UniMarconi» o «Università Marconi»: Google lo considera uso del marchio altrui. Se vuoto viene usato il titolo del sito.' ),
+				'logo_tag_on'     => array( 'Testo accanto al logo', 'checkbox', '1', 'Quando c’è il logo: il testo qui sotto compare alla sua destra, separato da una linea sottile.' ),
+				'logo_tag'        => array( 'Testo accanto al logo: righe', 'textarea', "Centro di orientamento accreditato\nUniversità degli Studi Guglielmo Marconi", 'Una riga per riga mostrata (al massimo tre); l’ultima va in grassetto.' ),
+				'logo_tag_mobile' => array( 'Testo accanto al logo anche da telefono', 'checkbox', '', 'Da telefono lo spazio è poco: spento, accanto al logo resta solo il pulsante del menu.' ),
 				'city'         => array( 'Città', 'text', '', 'Usata nei testi (es. «… a Lanciano»).' ),
 				'disclaimer'   => array( 'Nota a piè di pagina', 'textarea', '{brand} è un {ruolo}, gestito da {azienda}. Marchi e denominazioni dell’Università appartengono ai rispettivi titolari.', 'Segnaposto: {brand}, {azienda}, {ruolo}.' ),
 			),

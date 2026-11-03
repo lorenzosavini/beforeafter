@@ -62,6 +62,7 @@ $head = function ( $title, $sub = '' ) {
 		<span class="lp-brand">
 			<?php if ( has_custom_logo() ) : ?>
 				<?php echo ip_logo_image( 'lp-logo', 'eager', '(max-width: 900px) 170px, 250px' ); // phpcs:ignore ?>
+				<?php echo ip_logo_tag( 'lp-brand-tag' ); // phpcs:ignore ?>
 			<?php else : ?>
 				<span class="lp-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></span>
 				<span class="lp-brand-t"><strong><?php echo esc_html( ip_opt( 'brand' ) ); ?></strong><small><?php echo esc_html( ip_role_label() ); ?></small></span>

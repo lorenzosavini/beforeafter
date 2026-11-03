@@ -25,6 +25,7 @@ $wa      = ip_wa_href();
 		<<?php echo $landing ? 'span' : 'a'; ?> class="brand"<?php echo $landing ? '' : ' href="' . esc_url( home_url( '/' ) ) . '" rel="home"'; ?>>
 			<?php if ( has_custom_logo() ) : ?>
 				<?php echo ip_logo_image( 'brand-logo', 'eager' ); // phpcs:ignore ?>
+				<?php echo ip_logo_tag(); // phpcs:ignore ?>
 			<?php else : ?>
 				<span class="brand-mark" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( ip_opt( 'brand' ), 0, 1 ) ) ); ?></span>
 				<span class="brand-text">
