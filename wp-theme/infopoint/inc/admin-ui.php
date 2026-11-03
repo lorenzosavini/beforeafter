@@ -26,7 +26,7 @@ function ip_settings_layout() {
 				array( 'Telefoni e WhatsApp', 'Diventano i pulsanti «Chiama» e «WhatsApp» del sito.', array( 'phone1', 'phone1_label', 'phone2', 'phone2_label', 'whatsapp', 'wa_text' ) ),
 				array( 'Email, sede e orari', '', array( 'email', 'address', 'address_exam', 'hours', 'maps_url' ) ),
 				array( 'Social', 'Vuoto = icona nascosta.', array( 'facebook', 'instagram', 'linkedin', 'youtube', 'tiktok' ) ),
-				array( 'Dati legali e trasparenza', 'Richiesti da Google Ads e dalla legge: ragione sociale, P.IVA, PEC, rapporto con l’Ateneo.', array( 'company_name', 'vat', 'legal_address', 'rea', 'pec', 'capital', 'partner_role', 'partner_since', 'partner_letter', 'partner_proof', 'disclosure_bar', 'disclosure', 'disclosure_mobile', 'disclosure_link', 'disclosure_link_text', 'form_notice' ) ),
+				array( 'Dati legali e trasparenza', 'Richiesti da Google Ads e dalla legge: ragione sociale, P.IVA, PEC, rapporto con l’Ateneo.', array( 'company_name', 'vat', 'legal_address', 'rea', 'pec', 'capital', 'partner_role', 'partner_since', 'partner_letter', 'partner_proof', 'disclosure_bar', 'disclosure', 'disclosure_mobile', 'disclosure_link', 'disclosure_link_text', 'disclosure_bg', 'disclosure_fg', 'disclosure_link_color', 'form_notice' ) ),
 			),
 		),
 		'home'     => array(

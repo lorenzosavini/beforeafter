@@ -827,6 +827,19 @@ function ip_disclosure_bar( $landing = false ) {
 		. '.disclosure p,.lp-disc p{max-width:none;margin:0 auto;text-align:center}'
 		. '.disclosure .disc-m,.lp-disc .disc-m{display:none}'
 		. '@media (max-width:700px){.disclosure .disc-d,.lp-disc .disc-d{display:none}.disclosure .disc-m,.lp-disc .disc-m{display:inline}}';
+	// Colori scelti nel pannello: si applicano solo se diversi da quelli di partenza.
+	$bg = sanitize_hex_color( ip_opt( 'disclosure_bg' ) );
+	$fg = sanitize_hex_color( ip_opt( 'disclosure_fg' ) );
+	$lc = sanitize_hex_color( ip_opt( 'disclosure_link_color' ) );
+	if ( $bg && '#e9f0ed' !== strtolower( $bg ) ) {
+		$css .= '.disclosure,.lp-disc{background:' . $bg . ';border-bottom-color:rgba(127,127,127,.25)}';
+	}
+	if ( $fg && '#3e454c' !== strtolower( $fg ) ) {
+		$css .= '.disclosure,.lp-disc{color:' . $fg . '}';
+	}
+	if ( $lc && '#174f3a' !== strtolower( $lc ) ) {
+		$css .= '.disclosure a,.lp-disc .lp-link{color:' . $lc . '}';
+	}
 	$cls  = $landing ? 'lp-disc' : 'disclosure';
 	$wrap = $landing ? 'lp-w' : 'wrap';
 	return '<style id="ip-disc-css">' . $css . '</style><div class="' . $cls . '" role="note"><div class="' . $wrap . '"><p>' . $body . $link . '</p></div></div>';
