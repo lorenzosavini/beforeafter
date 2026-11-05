@@ -20,14 +20,28 @@ File: `campagna-search-infopoint-lanciano.csv` (UTF-8, una campagna, tre gruppi 
 - Offerta: **Massimizza conversioni**. Budget **20 €/giorno** (segnaposto: mettilo tu). Rete: solo Ricerca Google, lingua italiano.
 - Suffisso URL finale con UTM, così le richieste arrivano nel pannello con campagna, gruppo e parola chiave.
 
+## Asset (file separati, da importare dopo la campagna)
+Stessa procedura: **Account → Importa → Da file…**, un file alla volta. Tutti gli asset sono collegati alla campagna.
+
+| File | Contenuto |
+|---|---|
+| `asset-sitelink.csv` | 12 sitelink: Corsi di laurea online · Master I e II livello · Corsi per insegnanti · Percorsi abilitanti · Riconoscimento CFU · Costi e agevolazioni · Come iscriversi · Corsi singoli · Doppia iscrizione · Formazione e dottorati · Chi siamo · Contatti e orari |
+| `asset-callout.csv` | 8 callout: Orientamento ai corsi · Assistenza all'iscrizione · Valutazione dei crediti · Consulenza senza impegno · Sede a Lanciano · Lun–ven 10–13 e 15–18 · Contatto anche WhatsApp · Gestito da ZDM S.r.l. |
+| `asset-snippet.csv` | 2 snippet strutturati: *Corsi di laurea* (Lauree triennali, Lauree magistrali, Master I e II livello, Percorsi abilitanti, Corsi singoli, Corsi di formazione) e *Catalogo dei servizi* (Orientamento, Informazioni sui corsi, Assistenza iscrizione, Valutazione crediti) |
+| `asset-call.csv` | Chiamata: 0872 676609 (Italia) |
+
+Tutti i link sono stati verificati (pagine attive). Testi sobri, nessun prezzo: la pagina Costi e agevolazioni è solo linkata.
+Se l'Editor non riconosce l'intestazione di uno snippet (`Degree programs`, `Service catalog`), sceglila dall'elenco: «Corsi di laurea» e «Catalogo dei servizi».
+
 ## Da impostare a mano nell'Editor
 - **Località** (Campagna → Località): raggio intorno a Lanciano (es. 40 km) oppure provincia di Chieti; *Opzioni località* → «Presenza: persone che si trovano o si trovano regolarmente nelle località scelte».
+- **Orari della chiamata**: nell'asset chiamata imposta la pianificazione lun–ven 10–13 e 15–18, così il pulsante compare solo quando rispondete.
 - **Obiettivi**: conversioni principali = Richiesta dal modulo + Chiamate dagli annunci (≥ 60 s).
-- **Asset** (consigliati):
-  - *Chiamata*: 0872 676609.
-  - *Sitelink*: «Tutti i corsi» → /corsi/ · «Costi e agevolazioni» → /convenzioni-e-agevolazioni/ · «Riconoscimento CFU» → /riconoscimento-cfu/ · «Chi siamo» → /chi-siamo/ · «Contatti» → /contatti/
-  - *Callout*: «Orientamento universitario» · «Assistenza all'iscrizione» · «Valutazione dei crediti» · «Consulenza senza impegno»
+- **Asset che non si importano da file** (da Google Ads, Asset):
   - *Nome e logo dell'attività*: lo stesso nome con cui vi presentate sul sito e nella verifica dell'inserzionista, con il vostro logo (non quello dell'Ateneo).
+  - *Località*: collega il Profilo dell'attività su Google della sede di Lanciano, se ce l'avete.
+  - *Immagini*: 2–4 foto vostre (sede, persone al lavoro), non foto o loghi dell'Università.
+- **Da non usare per ora**: asset prezzo, promozione e modulo per i lead (coerenza con la home senza prezzi e meno elementi da far revisionare).
 
 ## Note
 - Se un titolo con «Marconi» viene limitato per marchio, serve l'autorizzazione dell'Università (modulo di autorizzazione marchi di Google).
