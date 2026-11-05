@@ -73,9 +73,10 @@ add_action( 'wp_head', function () {
 			'value' => (float) str_replace( ',', '.', (string) ip_opt( 'ads_value' ) ),
 			'gtm'   => $gtm ? 1 : 0,
 		);
-		// Con Tag Manager le conversioni avanzate sono decise nel contenitore: i dati
-		// partono sempre (solo con il consenso marketing), il contenitore li usa o no.
-		if ( $gtm ) {
+		// Con Tag Manager (dal campo del tema o incollato a mano) le conversioni avanzate
+		// sono decise nel contenitore: i dati partono sempre, solo con il consenso
+		// marketing, e il contenitore li usa o no.
+		if ( $gtm || ip_tracking_elsewhere() ) {
 			$track['enh'] = 1;
 		}
 		?>

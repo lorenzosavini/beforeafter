@@ -123,7 +123,7 @@ add_shortcode( 'ip_privacy', function () {
 				<li>A fornitori che ci prestano servizi, nominati responsabili del trattamento (art. 28 GDPR): <?php echo esc_html( implode( '; ', $proc ) ); ?>.</li>
 			<?php endif; ?>
 			<?php if ( $gtm ) : ?>
-				<li>A Google Ireland Ltd, per i servizi di statistica e pubblicità, solo se acconsenti ai cookie.<?php if ( ip_ads_id() && ip_opt( 'ads_enhanced' ) ) : ?> Se hai accettato i cookie di marketing e invii un modulo, email e telefono vengono trasmessi a Google in forma cifrata (hash) solo per misurare l’efficacia degli annunci (conversioni avanzate); Google non li usa per altri scopi.<?php endif; ?></li>
+				<li>A Google Ireland Ltd, per i servizi di statistica e pubblicità, solo se acconsenti ai cookie.<?php if ( ( ip_ads_id() && ip_opt( 'ads_enhanced' ) ) || ip_gtm_id() || ip_tracking_elsewhere() ) : ?> Se hai accettato i cookie di marketing e invii un modulo, email e telefono vengono trasmessi a Google in forma cifrata (hash) solo per misurare l’efficacia degli annunci (conversioni avanzate); Google non li usa per altri scopi.<?php endif; ?></li>
 			<?php endif; ?>
 			<li>All’Università degli Studi Guglielmo Marconi, solo quando ci chiedi di avviare per tuo conto una pratica (ad esempio la prevalutazione dei CFU o l’iscrizione) e solo i dati necessari a quella pratica.</li>
 			<li>Ad autorità e soggetti pubblici, quando lo prevede la legge.</li>
