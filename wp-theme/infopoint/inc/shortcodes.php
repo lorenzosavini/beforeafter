@@ -383,6 +383,7 @@ function ip_agevolazioni_list( $limit = 6 ) {
 	$num  = function ( $v ) {
 		return (float) str_replace( ',', '.', str_replace( '.', '', (string) $v ) );
 	};
+	$hide = ip_home_no_prices();
 	$fees = ip_fees();
 	$std  = $num( $fees['std_retta'] );
 	$best = $num( $fees['min_rata'] );
@@ -406,7 +407,7 @@ function ip_agevolazioni_list( $limit = 6 ) {
 	}
 	?>
 	<div class="alist">
-		<?php if ( $std ) : ?>
+		<?php if ( $std && ! $hide ) : ?>
 			<p class="alist-std"><span>Retta standard</span> <strong><?php echo esc_html( ip_eur( $fees['std_retta'] ) ); ?> l’anno</strong><?php echo $fees['std_rata'] ? ' · ' . esc_html( ip_eur( $fees['std_rata'] ) ) . ' al mese' : ''; ?> <em>Con le agevolazioni paghi meno:</em></p>
 		<?php endif; ?>
 		<ul class="alist-rows">
@@ -418,13 +419,14 @@ function ip_agevolazioni_list( $limit = 6 ) {
 				$save  = $std && $num( $retta ) > 0 && $num( $retta ) < $std ? $std - $num( $retta ) : 0;
 				$is_b  = $best && $num( $rata ) === $best;
 				?>
-				<li class="alist-row<?php echo $is_b ? ' is-best' : ''; ?>">
+				<li class="alist-row<?php echo $is_b && ! $hide ? ' is-best' : ''; ?><?php echo $hide ? ' no-price' : ''; ?>">
 					<span class="alist-ico"><?php echo ip_icon( ip_agev_icon( $title ), 20 ); // phpcs:ignore ?></span>
 					<div class="alist-t">
-						<h3><?php echo esc_html( $title ); ?><?php if ( $is_b ) : ?> <span class="alist-flag">La più conveniente</span><?php endif; ?></h3>
+						<h3><?php echo esc_html( $title ); ?><?php if ( $is_b && ! $hide ) : ?> <span class="alist-flag">La più conveniente</span><?php endif; ?></h3>
 						<p><?php echo esc_html( ip_meta( 'dest', $p->ID ) ); ?></p>
 						<?php if ( ip_agev_deadline( $p->ID ) ) : ?><p class="alist-due"><?php echo ip_icon( 'calendar', 14 ); // phpcs:ignore ?> Richieste entro il <?php echo esc_html( ip_agev_deadline( $p->ID ) ); ?></p><?php endif; ?>
 					</div>
+					<?php if ( ! $hide ) : ?>
 					<div class="alist-p">
 						<?php if ( $rata ) : ?>
 							<strong>€ <?php echo esc_html( $rata ); ?><small>/mese</small></strong>
@@ -434,6 +436,7 @@ function ip_agevolazioni_list( $limit = 6 ) {
 						<?php endif; ?>
 						<?php if ( $save ) : ?><em>−€ <?php echo esc_html( number_format( $save, 0, ',', '.' ) ); ?> l’anno</em><?php endif; ?>
 					</div>
+					<?php endif; ?>
 					<a class="alist-cta" href="#richiedi" data-scroll-form data-interest="<?php echo esc_attr( $title ); ?>">Verifica <?php echo ip_icon( 'arrow', 16 ); // phpcs:ignore ?></a>
 				</li>
 			<?php endforeach; ?>

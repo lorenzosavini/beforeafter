@@ -53,7 +53,7 @@ function ip_settings_layout() {
 				array( 'Consensi', 'Le parole «informativa privacy» diventano il link alla pagina scelta.', array( 'privacy_text', 'privacy_page', 'mkt_text' ) ),
 				array( 'Banner d’uscita', 'Compare a chi sta per lasciare il sito. Per provarlo aggiungi <code>?prova-banner</code> all’indirizzo di una pagina.', array( 'exit_on', 'exit_mobile', 'exit_title', 'exit_text', 'exit_points' ) ),
 				array( 'Testi ricorrenti', 'Fascia di contatto, modulo in fondo alle pagine, passi «come funziona».', array( 'nav_cta', 'cta_title', 'cta_text', 'end_title', 'end_text', 'steps', 'course_empty' ) ),
-				array( 'Prezzi', 'Vuoti = calcolati in automatico dalle agevolazioni.', array( 'price_from', 'retta_std' ) ),
+				array( 'Prezzi', 'Vuoti = calcolati in automatico dalle agevolazioni.', array( 'home_prices', 'price_from', 'retta_std' ) ),
 				array( 'Collegamento al CRM', '', array( 'webhook_url' ) ),
 			),
 			'if'   => array(

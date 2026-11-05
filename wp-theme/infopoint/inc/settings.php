@@ -139,6 +139,7 @@ function ip_settings_fields() {
 			'title'  => 'Moduli e richieste',
 			'fields' => array(
 				'price_from'   => array( 'Retta mensile a partire da (€)', 'text', '', 'Vuoto = calcolata in automatico dalle agevolazioni ufficiali (la rata mensile più bassa). Compila solo per forzare un valore.' ),
+				'home_prices'  => array( 'Mostra le cifre delle rette in home', 'checkbox', '', 'Spento (consigliato per Google Ads) = in home nessun importo: niente «retta da… al mese», l’elenco agevolazioni senza cifre, tolte dalle domande frequenti le frasi con importi. Le cifre restano nella pagina Costi e agevolazioni e nelle schede dei corsi.' ),
 				'retta_std'    => array( 'Retta standard corsi di laurea', 'text', '', 'Vuoto = presa in automatico dall’agevolazione «Retta standard». Nei testi puoi scrivere {retta_std}, {rata_min} e {retta_min}: diventano gli importi aggiornati.' ),
 				'thanks_page'  => array( 'Pagina di ringraziamento', 'page', '' ),
 				'privacy_page' => array( 'Pagina informativa privacy', 'page', '', 'Creata dal tema con lo shortcode [ip_privacy]: il testo si aggiorna con i dati della società.' ),

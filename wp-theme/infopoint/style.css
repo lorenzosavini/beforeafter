@@ -2,7 +2,7 @@
 Theme Name: Infopoint
 Theme URI: https://github.com/lorenzosavini/beforeafter
 Description: Tema leggero per info point dell'Università Marconi con palette ufficiale, offerta formativa ufficiale (corsi, piani di studio, documenti, agevolazioni), moduli con archivio richieste, SEO e consenso cookie integrati. Nessun page builder, nessun plugin necessario.
-Version: 3.10.8
+Version: 3.10.9
 Requires at least: 6.4
 Requires PHP: 7.4
 Author: Lorenzo Savini
@@ -944,6 +944,7 @@ details[open] > :not(summary) { animation: ip-fade .35s ease both; }
 .alist-row { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto auto; align-items: center; gap: 18px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--white); transition: border-color .2s, box-shadow .2s, transform .2s; }
 .alist-row:hover { border-color: var(--brand-soft); box-shadow: 0 10px 26px rgba(14, 38, 29, .08); }
 .alist-row.is-best { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.alist-row.no-price { grid-template-columns: 46px minmax(0, 1fr) auto; }
 .alist-ico { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; background: var(--brand-deep); color: #fff; }
 .alist-t h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 3px; font-size: 1.02rem; line-height: 1.3; }
 .alist-t p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; margin: 0; font-size: .86rem; line-height: 1.45; color: var(--muted); }
@@ -959,6 +960,7 @@ details[open] > :not(summary) { animation: ip-fade .35s ease both; }
 @media (max-width: 760px) {
 	.alist-std em { margin-left: 0; flex-basis: 100%; }
 	.alist-row { grid-template-columns: 42px minmax(0, 1fr) auto; grid-template-areas: "i t t" "p p c"; gap: 12px 12px; padding: 14px; }
+	.alist-row.no-price { grid-template-areas: "i t t" "i t c"; }
 	.alist-ico { grid-area: i; width: 42px; height: 42px; }
 	.alist-t { grid-area: t; }
 	.alist-t p { -webkit-line-clamp: 2; }

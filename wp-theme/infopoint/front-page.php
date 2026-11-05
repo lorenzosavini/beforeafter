@@ -7,7 +7,8 @@
 defined( 'ABSPATH' ) || exit;
 get_header();
 
-$price   = ip_price_from();
+$noprice = ip_home_no_prices();
+$price   = $noprice ? '' : ip_price_from();
 $agev    = ip_page_url( 'convenzioni-e-agevolazioni' );
 $cfu     = ip_page_url( 'riconoscimento-cfu' );
 $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand' ) . ' · ' . ip_role_label();
@@ -25,11 +26,12 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 			<?php else : ?>
 				<p class="hero-kicker"><span class="hero-badge"><?php echo esc_html( ip_opt( 'brand' ) ); ?></span> <?php echo esc_html( ip_role_label() ); ?></p>
 			<?php endif; ?>
-			<h1><?php echo ip_hl( ip_opt( 'hero_title' ) ); // phpcs:ignore ?></h1>
-			<p class="hero-lead"><?php echo ip_hl( ip_opt( 'hero_text' ) ); // phpcs:ignore ?></p>
-			<?php if ( ip_rows( 'hero_ticks' ) ) : ?>
+			<h1><?php echo ip_hl( $noprice ? ip_strip_prices( ip_opt( 'hero_title' ) ) : ip_opt( 'hero_title' ) ); // phpcs:ignore ?></h1>
+			<p class="hero-lead"><?php echo ip_hl( $noprice ? ip_strip_prices( ip_opt( 'hero_text' ) ) : ip_opt( 'hero_text' ) ); // phpcs:ignore ?></p>
+			<?php $ticks = $noprice ? ip_rows_no_prices( ip_rows( 'hero_ticks' ), array( 'testo' ) ) : ip_rows( 'hero_ticks' ); ?>
+			<?php if ( $ticks ) : ?>
 				<ul class="hero-points">
-					<?php foreach ( ip_rows( 'hero_ticks' ) as $t ) : ?>
+					<?php foreach ( $ticks as $t ) : ?>
 						<li><?php echo esc_html( $t['testo'] ); ?></li>
 					<?php endforeach; ?>
 				</ul>
@@ -38,7 +40,9 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 				<?php echo ip_phone_link( 'phone1', 'btn btn-white' ); // phpcs:ignore ?>
 				<a class="btn btn-line-light" href="<?php echo esc_url( ip_courses_url() ); ?>">Tutti i corsi</a>
 			</div>
-			<?php if ( $price ) : ?>
+			<?php if ( $noprice && $agev ) : ?>
+				<p class="hero-price">Rette e agevolazioni sono quelle stabilite dall’Ateneo: ti aiutiamo a capire quali valgono per te · <a href="<?php echo esc_url( $agev ); ?>">costi e agevolazioni</a></p>
+			<?php elseif ( $price ) : ?>
 				<p class="hero-price">Retta da <strong><?php echo esc_html( $price ); ?> al mese</strong> con le agevolazioni dell’Ateneo<?php if ( $agev ) : ?> · <a href="<?php echo esc_url( $agev ); ?>">vedi tutte</a><?php endif; ?><?php echo ip_agev_deadline_text() ? '<br><small>' . esc_html( ip_agev_deadline_text() ) . '</small>' : ''; // phpcs:ignore ?></p>
 			<?php endif; ?>
 		</div>
@@ -48,10 +52,11 @@ $eyebrow = ip_opt( 'hero_eyebrow' ) ? ip_text( 'hero_eyebrow' ) : ip_opt( 'brand
 	</div>
 </section>
 
-<?php if ( ip_rows( 'facts' ) ) : ?>
+<?php $facts = $noprice ? ip_rows_no_prices( ip_rows( 'facts' ), array( 'titolo', 'testo' ) ) : ip_rows( 'facts' ); ?>
+<?php if ( $facts ) : ?>
 <section class="facts" aria-label="L’ateneo in breve">
 	<div class="wrap facts-in">
-		<?php foreach ( ip_rows( 'facts' ) as $f ) : ?>
+		<?php foreach ( $facts as $f ) : ?>
 			<p><strong><?php echo esc_html( $f['titolo'] ); ?></strong><span><?php echo esc_html( $f['testo'] ); ?></span></p>
 		<?php endforeach; ?>
 	</div>
@@ -145,7 +150,8 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 						<h2><?php echo esc_html( ip_opt( 't_agev' ) ); ?></h2>
 						<?php if ( $agev ) : ?><a class="more-link" href="<?php echo esc_url( $agev ); ?>">Tutte le agevolazioni</a><?php endif; ?>
 					</header>
-					<?php if ( ip_opt( 'agev_text' ) ) : ?><p class="sec-lead"><?php echo esc_html( ip_opt( 'agev_text' ) ); ?></p><?php endif; ?>
+					<?php $atext = $noprice ? ip_strip_prices( ip_fill( ip_opt( 'agev_text' ) ) ) : ip_opt( 'agev_text' ); ?>
+					<?php if ( $atext ) : ?><p class="sec-lead"><?php echo esc_html( $atext ); ?></p><?php endif; ?>
 					<?php ip_agevolazioni_list( max( 1, (int) ip_opt( 'agev_count' ) ) ); ?>
 				</div>
 			</section>
@@ -169,7 +175,7 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 				<div class="wrap promo">
 					<div class="promo-text">
 						<h2><?php echo esc_html( ip_opt( 'cfu_title' ) ); ?></h2>
-						<p><?php echo esc_html( ip_opt( 'cfu_text' ) ); ?></p>
+						<p><?php echo esc_html( $noprice ? ip_strip_prices( ip_opt( 'cfu_text' ) ) : ip_opt( 'cfu_text' ) ); ?></p>
 						<p><a class="btn btn-primary" href="<?php echo esc_url( $cfu ? $cfu : '#richiedi' ); ?>"><?php echo esc_html( ip_opt( 'cfu_button' ) ); ?></a></p>
 						<p class="muted">Risposta via email, nessun impegno.</p>
 					</div>
@@ -219,7 +225,7 @@ foreach ( (array) ip_opt( 'sections' ) as $section ) :
 			<section class="sec">
 				<div class="wrap narrow">
 					<header class="sec-head"><h2><?php echo esc_html( ip_opt( 't_faq' ) ); ?></h2></header>
-					<?php ip_faq_list( ip_rows( 'faq' ) ); ?>
+					<?php ip_faq_list( $noprice ? ip_rows_no_prices( ip_rows( 'faq' ), array( 'domanda', 'risposta' ) ) : ip_rows( 'faq' ) ); ?>
 				</div>
 			</section>
 			<?php
