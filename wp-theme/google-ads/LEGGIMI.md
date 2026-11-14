@@ -57,3 +57,6 @@ Dopo l'analisi dei termini di ricerca (AI Max spento a mano).
 - **Budget fisso 35 €/giorno per tutta la campagna** (i gruppi se lo dividono): attivi solo **Laurea triennale, Laurea magistrale, Abilitazione insegnamento, Master didattica I livello**. Gli altri 8 sono pronti **in pausa**: si accendono uno alla volta al posto di un gruppo che rende poco.
 - Pubblico stretto: parole chiave larghe (master online, magistrale online, dottorato online, microcredenziali…) solo a corrispondenza esatta; 36 esclusioni incrociate tra gruppi (es. il Master I livello esclude «secondo livello», «docenti»); 21 esclusioni di campagna per chi cerca solo informazioni (bando, decreto, dpcm, notizie, cos'è, gratuito, forum, esiti…).
 - In pausa per evitare doppioni: «laurea triennale online» (Generico), «laurea magistrale online» (Lavoratori), «unimarconi percorsi abilitanti» (Iscrizioni e contatti).
+
+## Riequilibrio per 35 €/giorno in tutto l'account: `riequilibrio-budget-35.csv`
+Tutti i gruppi stanno nella stessa campagna e si dividono lo stesso budget. Il file imposta il budget della campagna a 35 €/giorno, mette in pausa il gruppo «Lavoratori e crediti CFU» (rende poco e si sovrappone alle landing triennale e magistrale) e la parola chiave «iscrizione università marconi» (27,60 € spesi, 0 conversioni). Restano attivi: Generico, Brand, Iscrizioni e contatti + le 4 landing.
