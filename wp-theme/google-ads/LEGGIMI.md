@@ -51,3 +51,9 @@ Se l'Editor non riconosce l'intestazione di uno snippet (`Degree programs`, `Ser
 Dopo l'analisi dei termini di ricerca (AI Max spento a mano).
 - Nuovo gruppo **«Iscrizioni e contatti Marconi»**: chi cerca contatti, numero, iscrizione, immatricolazione, costi, corsi dell'Università Marconi (15 parole chiave × frase + esatta). Annuncio con la descrizione «Centro di orientamento accreditato Università G. Marconi, non la segreteria dell'Ateneo.» **fissata in posizione 1**: chi clicca sa prima chi siete (trasparenza richiesta da Google). Un'altra descrizione rimanda all'Ateneo chi è già iscritto.
 - 27 esclusioni per chi è **già studente** (esami, appelli, tirocini, ufficio lauree, ufficio tasse, seduta di laurea, area studenti, dipartimento, rinuncia, rimborso, «unimarconi risponde»…), altre università (unifortunato, unimercatorum, unidav) e corsi non disponibili online (fisioterapia, dietistica, farmacia, architettura, formazione primaria, «gratuiti»). **Non** sono esclusi contatti, numero, telefono, segreteria: possono essere futuri iscritti.
+
+## Gruppi per tipologia con landing: `landing-gruppi-per-tipologia.csv`
+12 gruppi «LP - …», uno per landing creata dal tema (/lp/…/), ognuno con parole chiave proprie (frase + esatta), un annuncio dedicato (titoli sul tipo di corso, descrizione di trasparenza, invito al contatto) e la sua landing come URL finale.
+- In pausa: «LP - Specializzazione sul sostegno» (la tipologia oggi non mostra corsi: attivalo solo se il corso è disponibile).
+- Messe in pausa per evitare doppioni: «laurea triennale online» nel gruppo Generico, «laurea magistrale online» in Lavoratori, «unimarconi percorsi abilitanti» in Iscrizioni e contatti (ora le servono i gruppi LP).
+- Gruppi a basso volume (corsi di formazione, microcredenziali, dottorato): attivi, ma con poche ricerche; si valutano dopo 2–3 settimane.
